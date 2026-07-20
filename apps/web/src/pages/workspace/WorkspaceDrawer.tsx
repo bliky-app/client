@@ -11,6 +11,7 @@ import {
   Settings,
   X,
   List,
+  LayoutDashboard,
   type LucideIcon,
 } from "lucide-react"
 import type { Workspace, WorkspaceSectionId, Permission } from "@/types/models"
@@ -25,7 +26,7 @@ interface SectionConfig {
 }
 
 const SECTIONS: SectionConfig[] = [
-  { id: "overview", label: "Обзор", icon: Home, permission: null },
+  { id: "overview", label: "Обзор", icon: LayoutDashboard, permission: null },
   { id: "schedule", label: "Расписание", icon: Calendar, permission: "view_global_schedule" },
   { id: "appointments", label: "Записи", icon: ClipboardList, permission: null },
   { id: "work_schedule", label: "График", icon: Clock, permission: null },
