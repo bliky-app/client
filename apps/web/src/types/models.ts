@@ -100,6 +100,7 @@ export interface AppointmentStage {
 export interface Appointment {
   id: string
   startDateTime: string // ISO 8601 (заменили date и startTime)
+  color?: string
   client: Client
   serviceName: string
   price: number

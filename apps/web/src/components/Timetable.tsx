@@ -338,14 +338,22 @@ export default function Timetable({
                         {colEvents.map(event => {
                           const top = t2px(formatTime(event.startDateTime, workspaceTimezone), gStart)
                           const height = event.stages.reduce((a, s) => a + s.durationMinutes, 0) * PPM
+                          const eventColor = event.color || (viewType === "personal" 
+                            ? event.workspace.color 
+                            : (event.staff?.color || event.staff?.user?.color))
+
                           return (
                             <div key={event.id} onClick={() => onEventClick?.(event)}
                               className="absolute left-1.5 right-1.5 flex rounded-xl shadow-sm transition-transform hover:scale-[1.01] cursor-pointer overflow-hidden bg-panel-surface border border-panel-border"
                               style={{ top, height }}>
                               <div className="w-1 shrink-0 flex flex-col h-full bg-panel-base/50">
                                 {event.stages.map(s => (
-                                  <div key={s.id} style={{ height: s.durationMinutes * PPM }}
-                                    className={`w-full box-border ${s.isActive ? "bg-panel-text" : "border-l-4 border-dashed border-panel-border bg-transparent"}`} />
+                                  <div key={s.id} 
+                                    style={{ 
+                                      height: s.durationMinutes * PPM,
+                                      ...(s.isActive ? { backgroundColor: eventColor } : { borderColor: eventColor })
+                                    }}
+                                    className={`w-full box-border ${s.isActive ? (eventColor ? "" : "bg-panel-text") : `border-l-4 border-dashed bg-transparent ${eventColor ? "" : "border-panel-border"}`}`} />
                                 ))}
                               </div>
                               <div className="flex flex-col flex-1 min-w-0 px-2 py-1.5 pointer-events-none relative">
