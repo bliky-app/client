@@ -236,9 +236,9 @@ export default function Timetable({
                     <th className="w-24 px-4 py-3 text-left text-xs font-semibold text-panel-text-muted border-b border-panel-border-subtle bg-panel-surface">Дата</th>
                     {uniqueStaff.map(s => (
                       <th key={s.id} className="px-2 py-2 border-b border-panel-border-subtle text-center min-w-16 bg-panel-surface">
-                        <div className="flex flex-col items-center gap-1">
-                          <Avatar type="user" name={s.shortName || s.user?.shortName || "?"} avatarUrl={s.user?.avatarUrl} color={s.color || s.user?.color} className="w-7 h-7 rounded-full text-[10px]" />
-                          <span className={`text-[10px] truncate max-w-16 ${currentUserId && s.user?.id === currentUserId ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-semibold" : "text-panel-text-muted font-medium"}`}>
+                        <div className="flex flex-row items-center justify-center gap-1.5">
+                          <Avatar type="user" name={s.shortName || s.user?.shortName || "?"} avatarUrl={s.user?.avatarUrl} color={s.color || s.user?.color} className="w-6 h-6 rounded-full text-[9px] shrink-0" />
+                          <span className={`text-[10px] truncate max-w-20 ${currentUserId && s.user?.id === currentUserId ? "bg-panel-text text-panel-base px-1.5 py-0.5 rounded-full font-semibold" : "text-panel-text-muted font-medium"}`}>
                             {s.shortName || s.user?.shortName}
                           </span>
                         </div>
@@ -340,7 +340,7 @@ export default function Timetable({
                   return (
                     <div key={col.id} className="flex-1 border-r border-panel-border-subtle relative min-w-50">
                       <div
-                        className={`${headerHeightClass} border-b border-panel-border-subtle sticky top-0 z-10 flex flex-col items-center justify-center cursor-pointer hover:bg-panel-surface-hover transition-colors bg-panel-surface`}
+                        className={`${headerHeightClass} border-b border-panel-border-subtle sticky top-0 z-10 flex flex-row items-center justify-center gap-2.5 cursor-pointer hover:bg-panel-surface-hover transition-colors bg-panel-surface px-2`}
                         onClick={() => { 
                           if (!col.dateString) return; 
                           const [y,m,d] = col.dateString.split("-").map(Number); 
@@ -348,16 +348,18 @@ export default function Timetable({
                         }}
                       >
                         {viewType === "team" && col.staff && (
-                          <Avatar type="user" name={col.staff.shortName || col.staff.user?.shortName || "?"} avatarUrl={col.staff.user?.avatarUrl} color={col.staff.color || col.staff.user?.color} className="w-8 h-8 rounded-full text-[10px] mb-1 shrink-0" />
+                          <Avatar type="user" name={col.staff.shortName || col.staff.user?.shortName || "?"} avatarUrl={col.staff.user?.avatarUrl} color={col.staff.color || col.staff.user?.color} className="w-9 h-9 rounded-full text-xs shrink-0" />
                         )}
-                        <span className={`text-sm truncate max-w-[120px] ${col.isToday && viewType !== "team" ? "font-bold text-panel-text" : (viewType === "team" && currentUserId && col.staff?.user?.id === currentUserId) ? "bg-panel-text text-panel-base px-2.5 py-0.5 rounded-full font-semibold" : "font-semibold text-panel-text-muted"}`}>
-                          {col.label}
-                        </span>
-                        {col.subLabel && (
-                          <span className={`mt-1 ${(col.isToday && viewType !== "team") ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-medium text-xs" : "text-[9px] uppercase tracking-wider font-semibold text-panel-text-subtle/70"}`}>
-                            {col.subLabel}
+                        <div className="flex flex-col items-start justify-center min-w-0">
+                          <span className={`text-sm truncate max-w-full ${col.isToday && viewType !== "team" ? "font-bold text-panel-text" : (viewType === "team" && currentUserId && col.staff?.user?.id === currentUserId) ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-semibold" : "font-semibold text-panel-text-muted"}`}>
+                            {col.label}
                           </span>
-                        )}
+                          {col.subLabel && (
+                            <span className={`truncate max-w-full ${(col.isToday && viewType !== "team") ? "mt-0.5 bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-medium text-xs" : "text-[11px] font-medium text-panel-text-subtle"}`}>
+                              {col.subLabel}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       <div className="relative" style={{ height: gH }}>
