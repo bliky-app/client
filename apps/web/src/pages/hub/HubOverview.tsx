@@ -1,4 +1,4 @@
-import HubHeader from "./HubHeader"
+
 import type { HubOverviewData } from "@/types/models"
 import { usePermissions } from "@/lib/permissions"
 import { formatCurrency, pluralize, formatTime, getGreeting } from "@/lib/formatters"
@@ -192,19 +192,15 @@ export default function HubOverview({ data }: HubOverviewProps) {
   }
 
   return (
-    <div className="bg-hub-base text-hub-text px-6 py-8 flex flex-col gap-10">
-      <HubHeader user={user} date={clientDate} />
-
-      <div className="flex flex-col gap-3">
-        <h1 className="text-2xl text-white font-medium tracking-tight flex items-center gap-2.5">
-          <span className="text-white">—</span> {greeting}
-        </h1>
-        <div className="text-xl font-medium leading-relaxed">
-          {renderMasterBlock()}
-          {renderAdminBlock()}
-          {renderOwnerBlock()}
-          {renderFallbackBlock()}
-        </div>
+    <div className="flex flex-col gap-3">
+      <h1 className="text-2xl text-white font-medium tracking-tight flex items-center gap-2.5">
+        <span className="text-white">—</span> {greeting}
+      </h1>
+      <div className="text-xl font-medium leading-relaxed">
+        {renderMasterBlock()}
+        {renderAdminBlock()}
+        {renderOwnerBlock()}
+        {renderFallbackBlock()}
       </div>
     </div>
   )

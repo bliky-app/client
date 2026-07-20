@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import { Check, Home, Plus } from "lucide-react"
+import { createPortal } from "react-dom"
 import Avatar from "@/components/Avatar"
 import { usePermissions } from "@/lib/permissions"
 
@@ -9,14 +10,18 @@ interface WorkspaceDropdownProps {
   activeWorkspaceId?: string
   className?: string
   onSelect?: () => void
+  // When provided, dropdown is positioned via fixed coords (portal mode).
+  // Pass the DOMRect of the trigger button, captured synchronously on click.
+  triggerRect?: DOMRect
 }
 
-export default function WorkspaceDropdown({ 
-  isOpen, 
-  onClose, 
-  activeWorkspaceId, 
-  className = "", 
-  onSelect 
+export default function WorkspaceDropdown({
+  isOpen,
+  onClose,
+  activeWorkspaceId,
+  className = "",
+  onSelect,
+  triggerRect,
 }: WorkspaceDropdownProps) {
   const navigate = useNavigate()
   const location = useLocation()
@@ -25,14 +30,19 @@ export default function WorkspaceDropdown({
 
   if (!isOpen) return null
 
-  return (
+  const content = (
     <>
-      <div 
-        className="fixed inset-0 z-40" 
-        onClick={onClose}
-      />
-      <div className={`absolute bg-hub-surface border border-hub-border rounded-2xl shadow-xl z-50 py-2 flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${className}`}>
-        
+      {/* Backdrop */}
+      <div className="fixed inset-0 z-[200]" onClick={onClose} />
+
+      {/* Dropdown */}
+      <div
+        className={`z-[201] bg-hub-surface border border-hub-border rounded-2xl shadow-xl py-2 flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${triggerRect ? "fixed w-64" : `absolute ${className}`}`}
+        style={triggerRect ? {
+          top: triggerRect.bottom + 8,
+          left: Math.min(triggerRect.left, window.innerWidth - 272),
+        } : undefined}
+      >
         <button
           onClick={() => {
             onClose()
@@ -91,7 +101,6 @@ export default function WorkspaceDropdown({
           onClick={() => {
             onClose()
             if (onSelect) onSelect()
-            // TODO: navigate to create workspace page or open modal
           }}
           className="flex items-center px-4 py-3 hover:bg-hub-surface-hover transition-colors text-left gap-3 w-full group"
         >
@@ -105,4 +114,11 @@ export default function WorkspaceDropdown({
       </div>
     </>
   )
+
+  // If we have triggerRect, render in a portal to escape any stacking context
+  if (triggerRect) {
+    return createPortal(content, document.body)
+  }
+
+  return <>{content}</>
 }

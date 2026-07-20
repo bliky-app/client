@@ -2,41 +2,49 @@ import { useState } from "react"
 import { Bell, Settings, ChevronDown, Calendar as CalendarIcon } from "lucide-react"
 import Avatar from "@/components/Avatar"
 import WorkspaceDropdown from "@/components/WorkspaceDropdown"
-
 import type { User } from "@/types/models"
+import { MONTHS } from "@/lib/formatters"
 
 interface HubHeaderProps {
   user: User
   date: Date
 }
 
-import { MONTHS } from "@/lib/formatters"
-
 export default function HubHeader({ user, date }: HubHeaderProps) {
   const [showDropdown, setShowDropdown] = useState(false)
+  // Capture the button's rect synchronously on click — no useEffect, no jump
+  const [triggerRect, setTriggerRect] = useState<DOMRect | undefined>()
 
   const dayOfMonth = date.getDate()
   const monthName = MONTHS[date.getMonth()]
   const year = date.getFullYear()
 
+  const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!showDropdown) {
+      // Capture position right now, before anything renders
+      setTriggerRect(e.currentTarget.getBoundingClientRect())
+    }
+    setShowDropdown(prev => !prev)
+  }
+
   return (
-    <div className="flex justify-between items-center w-full relative z-30">
+    <div className="flex justify-between items-center w-full">
       <div className="relative">
-        <button 
-          onClick={() => setShowDropdown(!showDropdown)}
+        <button
+          onClick={handleToggle}
           className="flex items-center gap-3 text-left group"
         >
-            <Avatar
-              type="user"
-              name={user.shortName}
-              avatarUrl={user.avatarUrl}
-              className="h-11 w-11 rounded-full border border-hub-border text-lg group-hover:border-hub-border-light transition-colors"
-            />
-            <div className="flex flex-col min-w-0 pr-2">
-              <div className="flex items-center gap-1.5">
-                <span className="text-hub-text font-semibold text-lg leading-tight truncate group-hover:text-hub-text-muted transition-colors">
-                  {user.shortName}
-                </span>
+          <Avatar
+            type="user"
+            name={user.shortName}
+            avatarUrl={user.avatarUrl}
+            className="h-11 w-11 rounded-full border border-hub-border text-lg group-hover:border-hub-border-light transition-colors"
+          />
+          <div className="flex flex-col min-w-0 pr-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-hub-text font-semibold text-lg leading-tight truncate group-hover:text-hub-text-muted transition-colors">
+                {user.shortName}
+              </span>
               <ChevronDown className={`w-4 h-4 text-hub-text-subtle transition-transform ${showDropdown ? "rotate-180" : ""}`} />
             </div>
             <span className="text-hub-text-subtle text-xs leading-tight mt-0.5 flex items-center gap-1 truncate">
@@ -46,10 +54,10 @@ export default function HubHeader({ user, date }: HubHeaderProps) {
           </div>
         </button>
 
-        <WorkspaceDropdown 
-          isOpen={showDropdown} 
+        <WorkspaceDropdown
+          isOpen={showDropdown}
           onClose={() => setShowDropdown(false)}
-          className="top-14 left-0 w-64"
+          triggerRect={triggerRect}
         />
       </div>
 
