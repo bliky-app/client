@@ -130,11 +130,11 @@ export default function Timetable({
       const d = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + i, 12, 0, 0)
       return {
         date: d,
-        str: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
-        label: `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`, // DD.MM
+        str: getTzDateString(d, timezone),
+        label: new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit", timeZone: timezone }).format(d),
       }
     })
-  }, [currentDate])
+  }, [currentDate, timezone])
 
   const VIEW_LABELS: Record<TimetableViewMode, string> = { "1day": "1 день", "3days": "3 дня", week: "Неделя", month: "Месяц" }
   const allowedModes = viewType === "personal" ? ["3days", "week", "month"] : ["1day", "month"]
@@ -235,7 +235,11 @@ export default function Timetable({
                   {teamMonthDates.map(({ date, str, label }) => (
                     <tr key={str} className="border-b border-panel-border-subtle/50 hover:bg-panel-base/50 transition-colors cursor-pointer"
                       onClick={() => { onDateSelect?.(date); onViewModeChange?.("1day") }}>
-                      <td className="px-4 py-2 text-xs font-medium text-panel-text-muted whitespace-nowrap">{label}</td>
+                      <td className="px-4 py-2 text-xs font-medium text-panel-text-muted whitespace-nowrap">
+                        <span className={`inline-flex items-center justify-center ${str === todayStr ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-semibold" : ""}`}>
+                          {label}
+                        </span>
+                      </td>
                       {uniqueStaff.map(s => {
                         const count = byDateStaff[`${str}_${s.id}`] || 0
                         return (
