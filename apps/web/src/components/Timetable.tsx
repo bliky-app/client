@@ -160,7 +160,7 @@ export default function Timetable({
     <div className="flex flex-col bg-panel-surface overflow-hidden flex-1 w-full shrink-0 min-h-0">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-panel-border-subtle bg-panel-surface z-20 flex-wrap">
-        <h2 className="text-base font-semibold text-panel-text whitespace-nowrap">{headerTitle}</h2>
+        <h2 className="text-base font-semibold text-panel-text whitespace-nowrap pl-2">{headerTitle}</h2>
 
         <div className="flex items-center gap-2">
           {/* View mode */}
