@@ -51,12 +51,12 @@
     --color-brand: var(--brand);
     
     /* Dark Theme (Hub, Modals, Overlays) - Always dark */
-    --color-hub-base: #000000;
-    --color-hub-surface: #09090b; /* zinc-950 */
-    --color-hub-surface-hover: #18181b; /* zinc-900 */
-    --color-hub-border: #18181b; /* zinc-900 */
-    --color-hub-border-light: #27272a; /* zinc-800 */
-    --color-hub-border-subtle: #09090b; /* zinc-950 */
+    --color-hub-base: #09090b; /* zinc-950 */
+    --color-hub-surface: #18181b; /* zinc-900 */
+    --color-hub-surface-hover: #27272a; /* zinc-800 */
+    --color-hub-border: #27272a; /* zinc-800 */
+    --color-hub-border-light: #3f3f46; /* zinc-700 */
+    --color-hub-border-subtle: #18181b; /* zinc-900 */
     --color-hub-text: #ffffff; /* white */
     --color-hub-text-muted: #a1a1aa; /* zinc-400 */
     --color-hub-text-subtle: #71717a; /* zinc-500 */
@@ -134,21 +134,21 @@
 }
 
 .dark {
-    /* Clearly separate from the black Hub */
-    --theme-panel-base: #18181b; /* zinc-900 */
-    --theme-panel-surface: #27272a; /* zinc-800 */
-    --theme-panel-surface-hover: #3f3f46; /* zinc-700 */
-    --theme-panel-border: #3f3f46; /* zinc-700 */
-    --theme-panel-border-subtle: #27272a; /* zinc-800 */
+    /* Premium dark theme without full OLED */
+    --theme-panel-base: #111113; /* Very dark gray, slightly lighter than hub */
+    --theme-panel-surface: #18181b; /* zinc-900 */
+    --theme-panel-surface-hover: #27272a; /* zinc-800 */
+    --theme-panel-border: #27272a; /* zinc-800 */
+    --theme-panel-border-subtle: #18181b; /* zinc-900 */
     --theme-panel-text: #ffffff; /* white */
     --theme-panel-text-muted: #a1a1aa; /* zinc-400 */
-    --theme-panel-text-subtle: #a1a1aa; /* zinc-400 */
-    --theme-panel-text-muted-dark: #d4d4d8; /* zinc-300 */
+    --theme-panel-text-subtle: #71717a; /* zinc-500 */
+    --theme-panel-text-muted-dark: #a1a1aa; /* zinc-400 */
 
-    --theme-timetable-today: #27272a; /* zinc-800 */
-    --theme-timetable-busy: #3f3f46; /* zinc-700 */
-    --theme-timetable-divider: #3f3f46; /* zinc-700 */
-    --theme-timetable-slot: #18181b; /* zinc-900 */
+    --theme-timetable-today: #18181b; /* zinc-900 */
+    --theme-timetable-busy: #27272a; /* zinc-800 */
+    --theme-timetable-divider: #27272a; /* zinc-800 */
+    --theme-timetable-slot: #111113; /* matches panel-base */
 
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
