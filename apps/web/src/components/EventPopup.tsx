@@ -36,11 +36,21 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
       >
         <div className="p-6 flex flex-col gap-6">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3">
-              {event.color && <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: event.color }} />}
-              <h2 className="text-xl font-bold text-panel-text leading-tight">
-                {event.serviceName}
-              </h2>
+            <div className="flex items-start gap-3">
+              {event.color && <div className="w-3 h-3 rounded-full shrink-0 mt-1.5" style={{ backgroundColor: event.color }} />}
+              <div className="flex flex-col items-start gap-1.5">
+                <h2 className="text-xl font-bold text-panel-text leading-tight">
+                  {event.serviceName}
+                </h2>
+                <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                  event.isConfirmed 
+                    ? "bg-emerald-50 text-emerald-600 border border-emerald-200/60" 
+                    : "bg-amber-50 text-amber-600 border border-amber-200/60"
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${event.isConfirmed ? "bg-emerald-500" : "bg-amber-500"}`} />
+                  {event.isConfirmed ? "Подтверждена" : "Не подтверждена"}
+                </div>
+              </div>
             </div>
             <button
               onClick={onClose}
