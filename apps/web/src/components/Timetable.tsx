@@ -168,10 +168,10 @@ export default function Timetable({
 
         <div className="flex items-center gap-2">
           {/* View mode */}
-          <div className="flex items-center bg-panel-base rounded-xl border border-panel-border-subtle p-0.5 shrink-0">
+          <div className="flex items-center bg-panel-base rounded-xl border border-panel-border-subtle p-1 shrink-0">
             {(allowedModes as TimetableViewMode[]).map(m => (
               <button key={m} onClick={() => { onViewModeChange?.(m); setShowCal(false) }}
-                className={`text-xs px-2.5 py-1.5 rounded-[10px] font-medium transition-colors ${viewMode === m ? "bg-panel-surface text-panel-text shadow-sm" : "text-panel-text-muted hover:text-panel-text"}`}>
+                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${viewMode === m ? "bg-panel-surface text-panel-text shadow-sm border border-panel-border-subtle" : "text-panel-text-muted hover:text-panel-text"}`}>
                 {VIEW_LABELS[m]}
               </button>
             ))}
