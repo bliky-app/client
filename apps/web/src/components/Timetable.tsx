@@ -215,13 +215,13 @@ export default function Timetable({
                 return (
                   <button key={ds}
                     onClick={() => { onDateSelect?.(day); setShowCal(false) }}
-                    className={`relative aspect-square flex flex-col items-center justify-center rounded-xl transition-colors ${heatBg(count)} ${ds === curStr ? "ring-2 ring-panel-text ring-inset" : ""} hover:bg-panel-surface text-sm`}>
-                    <span className={`z-10 flex items-center justify-center ${ds === todayStr ? "bg-panel-text text-panel-base rounded-full w-6 h-6 font-bold" : "text-panel-text"}`}>
+                    className={`aspect-square flex flex-col items-center justify-between py-1 rounded-xl transition-colors ${heatBg(count)} ${ds === curStr ? "ring-2 ring-panel-text ring-inset" : ""} hover:bg-panel-surface`}>
+                    <span className={`flex items-center justify-center text-sm ${ds === todayStr ? "bg-panel-text text-panel-base rounded-full w-6 h-6 font-bold" : "text-panel-text"}`}>
                       {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}
                     </span>
-                    {count > 0 && (
-                      <span className="absolute bottom-0.5 text-[9px] font-medium text-panel-text/90">{count}</span>
-                    )}
+                    <div className="h-3 flex items-end justify-center">
+                      {count > 0 && <span className="text-[9px] font-medium text-panel-text/90 leading-none">{count}</span>}
+                    </div>
                   </button>
                 )
               })}
@@ -297,13 +297,13 @@ export default function Timetable({
                           return (
                             <button key={ds}
                               onClick={() => { onDateSelect?.(day); onViewModeChange?.("week") }}
-                              className={`relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all hover:opacity-80 ${heatBg(count)}`}>
-                              <span className={`text-sm font-semibold z-10 flex items-center justify-center ${isToday ? "bg-panel-text text-panel-base rounded-full w-7 h-7" : count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
+                              className={`aspect-square rounded-xl flex flex-col items-center justify-between py-1.5 transition-all hover:opacity-80 ${heatBg(count)}`}>
+                              <span className={`text-sm font-semibold flex items-center justify-center ${isToday ? "bg-panel-text text-panel-base rounded-full w-7 h-7" : count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
                                 {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}
                               </span>
-                              {count > 0 && (
-                                <span className="absolute bottom-0.5 text-[9px] font-medium text-panel-text/90">{count}</span>
-                              )}
+                              <div className="h-4 flex items-end justify-center">
+                                {count > 0 && <span className="text-[10px] font-medium text-panel-text/90 leading-none">{count}</span>}
+                              </div>
                             </button>
                           )
                         })}

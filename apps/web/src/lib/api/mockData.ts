@@ -323,20 +323,9 @@ const expectedKirillRevenue = todayKirillRevenue
 const todayWorkspaceRevenue = todayWorkspaceApts.reduce((sum, a) => sum + a.price, 0)
 const unconfirmed = todayWorkspaceApts.filter(a => !a.isConfirmed).length
 
-// Dynamically calculate completed appointments based on current time
-let completeCount = 0
-let todayRevenueCount = 0
-
-for (const a of todayKirillApts) {
-  const endD = new Date(a.startDateTime)
-  const totalDuration = a.stages.reduce((acc, stg) => acc + stg.durationMinutes, 0)
-  endD.setMinutes(endD.getMinutes() + totalDuration)
-  
-  if (endD <= today) {
-    completeCount++
-    todayRevenueCount += a.price
-  }
-}
+// Mocking some completed state (e.g. 1 appointment is completed if Kirill has any)
+const completeCount = todayKirillApts.length > 0 ? 1 : 0
+const todayRevenueCount = todayKirillApts.length > 0 ? todayKirillApts[0].price : 0
 
 // Find Kirill's last appointment end time
 let lastEndTime: string | null = null
