@@ -256,10 +256,16 @@ export default function Timetable({
                       {uniqueStaff.map(s => {
                         const count = byDateStaff[`${str}_${s.id}`] || 0
                         return (
-                          <td key={s.id} className="px-2 py-1.5 text-center">
-                            <div className={`mx-auto w-full aspect-square max-w-12 rounded-xl flex flex-col items-center justify-center text-sm font-semibold transition-colors ${count > 0 ? heatBg(count) : "bg-panel-surface border border-panel-border-subtle shadow-sm"} ${count > 0 ? "text-panel-text border border-transparent" : "text-panel-text-subtle"}`}>
-                              {count > 0 ? count : ""}
-                            </div>
+                          <td key={s.id} className="px-2 py-1.5 text-center align-middle">
+                            {count > 0 ? (
+                              <div className={`mx-auto w-full aspect-square max-w-12 rounded-xl flex flex-col items-center justify-center text-sm font-semibold transition-colors ${heatBg(count)} text-panel-text`}>
+                                {count}
+                              </div>
+                            ) : (
+                              <div className="mx-auto flex items-center justify-center h-10 text-panel-border-subtle text-xs">
+                                &mdash;
+                              </div>
+                            )}
                           </td>
                         )
                       })}
