@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Loader2, Users, Package, UserCheck, BarChart2, Clock, ClipboardList, List } from "lucide-react"
 import WorkspaceHeader from "./WorkspaceHeader"
@@ -17,6 +17,10 @@ export default function WorkspacePage({ id }: WorkspacePageProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>("overview")
   const { can } = usePermissions(id)
+
+  useEffect(() => {
+    setActiveSection("overview")
+  }, [id])
 
   const { data: workspace, isLoading } = useQuery({
     queryKey: ["workspace", id],
