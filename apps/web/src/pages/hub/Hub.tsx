@@ -106,7 +106,7 @@ export default function Hub() {
           {/* White panel */}
           <div className="pointer-events-auto flex-1 flex flex-col bg-panel-base rounded-t-[32px] pt-4 pb-4 px-4 sm:px-6 gap-6 shadow-[0_-8px_32px_rgba(0,0,0,0.18)]">
 
-            <div className="w-12 h-1.5 bg-panel-border-subtle rounded-full mx-auto shrink-0 mb-2" />
+            <div className="w-12 h-1.5 bg-panel-border rounded-full mx-auto shrink-0 -mb-2" />
 
             {/* Workspaces */}
             <div className="flex flex-col bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden shrink-0">
