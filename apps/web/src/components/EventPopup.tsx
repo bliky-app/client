@@ -13,7 +13,7 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
   if (!event) return null
 
   const totalDuration = event.stages.reduce((acc, stage) => acc + stage.durationMinutes, 0)
-  
+
   const startTimeStr = formatTime(event.startDateTime, workspaceTimezone)
   const endTimeStr = formatTime(addMinutes(event.startDateTime, totalDuration), workspaceTimezone)
 

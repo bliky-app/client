@@ -2,6 +2,7 @@
 import type { HubOverviewData } from "@/types/models"
 import { usePermissions } from "@/lib/permissions"
 import { formatCurrency, pluralize, formatTime, getGreeting } from "@/lib/formatters"
+import { ClipboardList, Clock, CheckCircle2, Inbox, Layers } from "lucide-react"
 
 interface HubOverviewProps {
   data: HubOverviewData
@@ -59,9 +60,10 @@ export default function HubOverview({ data }: HubOverviewProps) {
 
     if (completeAppointments === 0) {
       return (
-        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
           Сегодня предстоит{" "}
-          <span className="text-hub-text font-semibold">
+          <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+            <ClipboardList className="w-4 h-4" />
             {todayAppointments} {pluralize(todayAppointments, ["запись", "записи", "записей"])}
           </span>{" "}
           на общую сумму{" "}
@@ -73,7 +75,8 @@ export default function HubOverview({ data }: HubOverviewProps) {
             <>
               {" "}
               {verbFree} после{" "}
-              <span className="text-hub-text font-semibold">
+              <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+                <Clock className="w-4 h-4" />
                 {formatTime(lastAppointmentEndTime)}
               </span>
               .
@@ -84,23 +87,26 @@ export default function HubOverview({ data }: HubOverviewProps) {
     }
 
     return (
-      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
         Сегодня {verbEarned}{" "}
         <span className="text-hub-text font-semibold">
           {formatCurrency(todayRevenue)}
         </span>
         . Из{" "}
-        <span className="text-hub-text font-semibold">
+        <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+          <ClipboardList className="w-4 h-4" />
           {todayAppointments} {pluralize(todayAppointments, ["записи", "записей", "записей"])}
         </span>{" "}
         на сегодня {verbCompleted}{" "}
-        <span className="text-hub-text font-semibold">
+        <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+          <CheckCircle2 className="w-4 h-4" />
           {completeAppointments}
         </span>
         {remainingAppointments > 0 ? (
           <>
             , осталось ещё{" "}
-            <span className="text-hub-text font-semibold">
+            <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+              <Inbox className="w-4 h-4" />
               {remainingAppointments}
             </span>
             .
@@ -112,7 +118,8 @@ export default function HubOverview({ data }: HubOverviewProps) {
           <>
             {" "}
             {verbFree} после{" "}
-            <span className="text-hub-text font-semibold">
+            <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+              <Clock className="w-4 h-4" />
               {formatTime(lastAppointmentEndTime)}
             </span>
             .
@@ -134,9 +141,10 @@ export default function HubOverview({ data }: HubOverviewProps) {
     }
 
     return (
-      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
         {pronounDative} нужно обработать{" "}
-        <span className="text-hub-text font-semibold">
+        <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+          <Inbox className="w-4 h-4" />
           {unconfirmedAppointments} {pluralize(unconfirmedAppointments, ["неподтвержденную заявку", "неподтвержденные заявки", "неподтвержденных заявок"])}
         </span>
         .
@@ -149,19 +157,20 @@ export default function HubOverview({ data }: HubOverviewProps) {
 
     if (totalWorkspaceAppointments === 0) {
       return (
-        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
-          В <span className="text-hub-text font-semibold">{totalWorkspaces} {pluralize(totalWorkspaces, ["пространстве", "пространствах", "пространствах"])}</span> пока нет записей.
+        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
+          В <span className="text-hub-text font-semibold inline-flex items-center gap-1"><Layers className="w-4 h-4" /> {totalWorkspaces} {pluralize(totalWorkspaces, ["пространстве", "пространствах", "пространствах"])}</span> пока нет записей.
         </span>
       )
     }
 
     return (
-      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
-        По <span className="text-hub-text font-semibold">{pronounPossessive} {totalWorkspaces} {pluralize(totalWorkspaces, ["пространству", "пространствам", "пространствам"])}</span>
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
+        По <span className="text-hub-text font-semibold inline-flex items-center gap-1"><Layers className="w-4 h-4" /> {pronounPossessive} {totalWorkspaces} {pluralize(totalWorkspaces, ["пространству", "пространствам", "пространствам"])}</span>
         {canViewAnalytics ? (
           <>
             {" "}сегодня{" "}
-            <span className="text-hub-text font-semibold">
+            <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+              <ClipboardList className="w-4 h-4" />
               {totalWorkspaceAppointments} {pluralize(totalWorkspaceAppointments, ["запись", "записи", "записей"])}
             </span>
           </>
