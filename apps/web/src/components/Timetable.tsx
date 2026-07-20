@@ -262,7 +262,7 @@ export default function Timetable({
                                 {count}
                               </div>
                             ) : (
-                              <div className="mx-auto w-full aspect-square max-w-12 rounded-xl bg-panel-border-subtle/30" />
+                              <div className="mx-auto w-full aspect-square max-w-12 rounded-xl bg-panel-surface border border-panel-border-subtle" />
                             )}
                           </td>
                         )
