@@ -37,13 +37,13 @@ export const hubApi = {
     return MOCK_WORKSPACES
   },
 
-  getTimetableColumns: async (startDate: Date): Promise<TimetableColumn[]> => {
+  getTimetableColumns: async (startDate: Date, days = 3): Promise<TimetableColumn[]> => {
     await delay(400)
 
     const cols: TimetableColumn[] = []
-    const defaultTz = "+03:00" // Fallback TZ
+    const defaultTz = "+03:00"
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < days; i++) {
       const d = new Date(startDate)
       d.setDate(d.getDate() + i)
       const dateString = d.toISOString().split('T')[0]

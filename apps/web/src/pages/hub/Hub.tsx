@@ -1,13 +1,14 @@
 import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
 import HubOverview from "./HubOverview"
 import HubHeader from "./HubHeader"
 import WorkspaceList from "./WorkspaceList"
-import Timetable from "@/components/Timetable"
+import Timetable, { type TimetableViewMode } from "@/components/Timetable"
+import EventPopup from "@/components/EventPopup"
 import { hubApi } from "@/lib/api/hubApi"
 import { MOCK_USER } from "@/lib/api/mockData"
-import type { User } from "@/types/models"
+import type { User, Appointment } from "@/types/models"
 
 export default function Hub() {
   useQuery<User>({ queryKey: ["user"], queryFn: async () => MOCK_USER })
@@ -24,18 +25,24 @@ export default function Hub() {
 
   const [calendarDate, setCalendarDate] = useState(new Date())
   const [isWorkspacesExpanded, setIsWorkspacesExpanded] = useState(true)
+  const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
+  const [viewMode, setViewMode] = useState<TimetableViewMode>("3days")
+
+  const step = viewMode === "month" ? 28 : viewMode === "week" ? 7 : 3
 
   // These are fetched independently — NOT included in the top-level loading
   // guard so that navigating the calendar doesn't remount the whole page and
   // kill Timetable's modal state.
   const { data: columns = [] } = useQuery({
-    queryKey: ["hubTimetableColumns", calendarDate.toISOString()],
-    queryFn: () => hubApi.getTimetableColumns(calendarDate),
+    queryKey: ["hubTimetableColumns", calendarDate.toISOString(), viewMode],
+    queryFn: () => hubApi.getTimetableColumns(calendarDate, step),
+    placeholderData: keepPreviousData,
   })
 
   const { data: events = [] } = useQuery({
     queryKey: ["hubTimetableEvents", calendarDate.toISOString()],
     queryFn: () => hubApi.getTimetableEvents(calendarDate),
+    placeholderData: keepPreviousData,
   })
 
   if (isOverviewLoading || !overview) {
@@ -127,19 +134,15 @@ export default function Hub() {
             <div className="flex flex-col flex-1 bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden min-h-[500px] shrink-0">
               <Timetable
                 viewType="personal"
+                viewMode={viewMode}
                 currentDate={calendarDate}
                 columns={columns}
                 events={events}
-                onPrev={() => {
-                  const d = new Date(calendarDate)
-                  d.setDate(d.getDate() - 3)
-                  setCalendarDate(d)
-                }}
-                onNext={() => {
-                  const d = new Date(calendarDate)
-                  d.setDate(d.getDate() + 3)
-                  setCalendarDate(d)
-                }}
+                onEventClick={setSelectedEvent}
+                onViewModeChange={setViewMode}
+                onDateSelect={(date) => setCalendarDate(date)}
+                onPrev={() => { const d = new Date(calendarDate); d.setDate(d.getDate() - step); setCalendarDate(d) }}
+                onNext={() => { const d = new Date(calendarDate); d.setDate(d.getDate() + step); setCalendarDate(d) }}
               />
             </div>
 
@@ -147,6 +150,8 @@ export default function Hub() {
         </div>
 
       </div>
+
+      <EventPopup event={selectedEvent} onClose={() => setSelectedEvent(null)} />
     </div>
   )
 }

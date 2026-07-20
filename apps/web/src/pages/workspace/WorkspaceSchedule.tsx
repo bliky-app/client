@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useQuery, keepPreviousData } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
-import Timetable from "@/components/Timetable"
+import Timetable, { type TimetableViewMode } from "@/components/Timetable"
 import EventPopup from "@/components/EventPopup"
 import { workspaceApi } from "@/lib/api/workspaceApi"
 import type { Workspace, Appointment } from "@/types/models"
@@ -14,15 +14,15 @@ interface WorkspaceScheduleProps {
 export default function WorkspaceSchedule({ workspace }: WorkspaceScheduleProps) {
   const [calendarDate, setCalendarDate] = useState<Date>(new Date())
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
+  const [viewMode, setViewMode] = useState<TimetableViewMode>("3days")
 
   const { can } = usePermissions(workspace.id)
-  
-  // If individual workspace, there's no team schedule, only personal
   const canViewGlobalSchedule = workspace.type === "individual" ? false : can("view_global_schedule")
   const viewType = canViewGlobalSchedule ? "team" : "personal"
+  const step = viewMode === "month" ? 28 : viewMode === "week" ? 7 : (viewType === "team" ? 1 : 3)
 
   const { data: columns = [], isLoading: columnsLoading } = useQuery({
-    queryKey: ["workspaceColumns", workspace.id, calendarDate.toISOString(), viewType],
+    queryKey: ["workspaceColumns", workspace.id, calendarDate.toISOString(), viewType, viewMode],
     queryFn: () => viewType === "team" 
       ? workspaceApi.getTeamDayColumns(workspace.id, calendarDate)
       : workspaceApi.getTimetableColumns(workspace.id, calendarDate),
@@ -48,21 +48,16 @@ export default function WorkspaceSchedule({ workspace }: WorkspaceScheduleProps)
           <div className="flex-1 flex flex-col">
             <Timetable
               viewType={viewType}
+              viewMode={viewMode}
               currentDate={calendarDate}
               columns={columns}
               events={events}
               hideWorkspaceTags={true}
               workspaceTimezone={workspace.timezone}
-              onPrev={() => {
-                const d = new Date(calendarDate)
-                d.setDate(d.getDate() - (viewType === "team" ? 1 : 3))
-                setCalendarDate(d)
-              }}
-              onNext={() => {
-                const d = new Date(calendarDate)
-                d.setDate(d.getDate() + (viewType === "team" ? 1 : 3))
-                setCalendarDate(d)
-              }}
+              onViewModeChange={setViewMode}
+              onDateSelect={(date) => setCalendarDate(date)}
+              onPrev={() => { const d = new Date(calendarDate); d.setDate(d.getDate() - step); setCalendarDate(d) }}
+              onNext={() => { const d = new Date(calendarDate); d.setDate(d.getDate() + step); setCalendarDate(d) }}
               onEventClick={setSelectedEvent}
             />
           </div>
