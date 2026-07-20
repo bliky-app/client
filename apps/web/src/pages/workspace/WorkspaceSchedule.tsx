@@ -38,14 +38,14 @@ export default function WorkspaceSchedule({ workspace }: WorkspaceScheduleProps)
   const isLoading = columnsLoading || eventsLoading
 
   return (
-    <div className="flex flex-col flex-1 pb-12">
-      <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 pb-12 min-h-0">
+      <div className="flex flex-col flex-1 min-h-0">
         {isLoading ? (
           <div className="flex items-center justify-center flex-1 min-h-50">
             <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
           </div>
         ) : (
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0">
             <Timetable
               viewType={viewType}
               viewMode={viewMode}
