@@ -61,7 +61,7 @@ export default function SettingsDropdown({
 
         <div className="px-4 py-3 flex flex-col gap-2">
           <span className="text-[11px] font-semibold text-hub-text-muted uppercase tracking-wider">
-            Тема
+            Оформление
           </span>
           <div className="grid grid-cols-3 gap-1 p-1 bg-hub-base rounded-xl border border-hub-border">
             <button

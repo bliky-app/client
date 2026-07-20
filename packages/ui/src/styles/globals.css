@@ -130,20 +130,20 @@
   }
 
   .dark {
-    --color-panel-base: var(--color-zinc-950);
-    --color-panel-surface: var(--color-zinc-900);
-    --color-panel-surface-hover: var(--color-zinc-800);
-    --color-panel-border: var(--color-zinc-800);
-    --color-panel-border-subtle: var(--color-zinc-800); /* Will use opacity variants if needed */
-    --color-panel-text: var(--color-zinc-50);
-    --color-panel-text-muted: var(--color-zinc-400);
-    --color-panel-text-subtle: var(--color-zinc-500);
-    --color-panel-text-muted-dark: var(--color-zinc-400);
+    --color-panel-base: #09090b; /* zinc-950 */
+    --color-panel-surface: #18181b; /* zinc-900 */
+    --color-panel-surface-hover: #27272a; /* zinc-800 */
+    --color-panel-border: #27272a; /* zinc-800 */
+    --color-panel-border-subtle: #27272a; /* zinc-800 */
+    --color-panel-text: #fafafa; /* zinc-50 */
+    --color-panel-text-muted: #a1a1aa; /* zinc-400 */
+    --color-panel-text-subtle: #71717a; /* zinc-500 */
+    --color-panel-text-muted-dark: #a1a1aa; /* zinc-400 */
 
-    --color-timetable-today: var(--color-zinc-900);
-    --color-timetable-busy: var(--color-zinc-800);
-    --color-timetable-divider: var(--color-zinc-800);
-    --color-timetable-slot: var(--color-zinc-950);
+    --color-timetable-today: #18181b; /* zinc-900 */
+    --color-timetable-busy: #27272a; /* zinc-800 */
+    --color-timetable-divider: #27272a; /* zinc-800 */
+    --color-timetable-slot: #09090b; /* zinc-950 */
 
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
