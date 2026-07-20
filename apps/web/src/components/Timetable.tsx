@@ -198,8 +198,8 @@ export default function Timetable({
                 return (
                   <button key={ds}
                     onClick={() => { onDateSelect?.(day); setShowCal(false) }}
-                    className={`relative aspect-square flex flex-col items-center justify-center rounded-xl transition-colors ${heatBg(count)} ${ds === curStr ? "ring-2 ring-panel-text ring-inset" : ""} ${ds === todayStr ? "font-bold text-panel-text" : "text-panel-text-muted"} hover:bg-panel-surface text-sm`}>
-                    <span className="z-10">
+                    className={`relative aspect-square flex flex-col items-center justify-center rounded-xl transition-colors ${heatBg(count)} ${ds === curStr ? "ring-2 ring-panel-text ring-inset" : ""} hover:bg-panel-surface text-sm`}>
+                    <span className={`z-10 flex items-center justify-center ${ds === todayStr ? "bg-panel-text text-panel-base rounded-full w-6 h-6 font-bold" : "text-panel-text"}`}>
                       {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}
                     </span>
                     {count > 0 && (
@@ -276,8 +276,8 @@ export default function Timetable({
                           return (
                             <button key={ds}
                               onClick={() => { onDateSelect?.(day); onViewModeChange?.("3days") }}
-                              className={`relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all hover:opacity-80 ${heatBg(count)} ${isToday ? "ring-2 ring-panel-text ring-inset" : ""}`}>
-                              <span className={`text-sm font-semibold z-10 ${count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
+                              className={`relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all hover:opacity-80 ${heatBg(count)}`}>
+                              <span className={`text-sm font-semibold z-10 flex items-center justify-center ${isToday ? "bg-panel-text text-panel-base rounded-full w-7 h-7" : count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
                                 {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}
                               </span>
                               {count > 0 && (
@@ -317,7 +317,7 @@ export default function Timetable({
                   return (
                     <div key={col.id} className="flex-1 border-r border-panel-border-subtle relative min-w-50">
                       <div
-                        className={`${headerHeightClass} border-b border-panel-border-subtle sticky top-0 z-10 flex flex-col items-center justify-center cursor-pointer hover:bg-panel-surface-hover transition-colors ${col.isToday ? "bg-timetable-today" : "bg-panel-surface"}`}
+                        className={`${headerHeightClass} border-b border-panel-border-subtle sticky top-0 z-10 flex flex-col items-center justify-center cursor-pointer hover:bg-panel-surface-hover transition-colors bg-panel-surface`}
                         onClick={() => { 
                           if (!col.dateString) return; 
                           const [y,m,d] = col.dateString.split("-").map(Number); 
@@ -328,8 +328,12 @@ export default function Timetable({
                           <Avatar type="user" name={col.staff.shortName || col.staff.user?.shortName || "?"} avatarUrl={col.staff.user?.avatarUrl} color={col.staff.color || col.staff.user?.color} className="w-8 h-8 rounded-full text-[10px] mb-1 shrink-0" />
                         )}
                         <span className={`text-sm font-semibold ${col.isToday ? "text-panel-text" : "text-panel-text-muted"}`}>{col.label}</span>
-                        {col.subLabel && <span className={`text-xs ${col.isToday ? "text-panel-text-muted" : "text-panel-text-subtle"}`}>{col.subLabel}</span>}
-                        {(viewType === "team" ? (currentUserId && col.staff?.user?.id === currentUserId) : col.isToday) && (
+                        {col.subLabel && (
+                          <span className={`text-xs mt-0.5 ${col.isToday ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-medium" : "text-panel-text-subtle"}`}>
+                            {col.subLabel}
+                          </span>
+                        )}
+                        {(viewType === "team" && currentUserId && col.staff?.user?.id === currentUserId) && (
                           <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-panel-text" />
                         )}
                       </div>
