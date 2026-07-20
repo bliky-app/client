@@ -1,0 +1,59 @@
+export const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "RUB",
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+export const formatTime = (isoString: string, timezone?: string): string => {
+  if (!isoString) return ""
+  
+  const date = new Date(isoString)
+  if (isNaN(date.getTime())) return ""
+
+  return new Intl.DateTimeFormat("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+  }).format(date)
+}
+
+export const addMinutes = (isoString: string, durationMinutes: number): string => {
+  const date = new Date(isoString)
+  date.setMinutes(date.getMinutes() + durationMinutes)
+  return date.toISOString()
+}
+
+export const formatDuration = (minutes: number): string => {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h > 0 && m > 0) return `${h} ч ${m} мин`
+  if (h > 0) return `${h} ч`
+  return `${m} мин`
+}
+
+export const pluralize = (count: number, words: [string, string, string]): string => {
+  const cases = [2, 0, 1, 1, 1, 2]
+  return words[count % 100 > 4 && count % 100 < 20 ? 2 : cases[count % 10 < 5 ? count % 10 : 5]]
+}
+
+export const MONTHS = [
+  "января", "февраля", "марта", "апреля", "мая", "июня",
+  "июля", "августа", "сентября", "октября", "ноября", "декабря"
+]
+
+export const getGreeting = (date: Date, timezone: string = "Europe/Moscow"): string => {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    hourCycle: "h23",
+    timeZone: timezone,
+  })
+  
+  const hours = parseInt(formatter.format(date), 10)
+  
+  if (hours >= 5 && hours < 12) return "Доброе утро!"
+  if (hours >= 12 && hours < 18) return "Добрый день!"
+  if (hours >= 18 && hours < 23) return "Добрый вечер!"
+  return "Доброй ночи!"
+}

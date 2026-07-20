@@ -1,0 +1,211 @@
+import HubHeader from "./HubHeader"
+import type { HubOverviewData } from "@/types/models"
+import { usePermissions } from "@/lib/permissions"
+import { formatCurrency, pluralize, formatTime, getGreeting } from "@/lib/formatters"
+
+interface HubOverviewProps {
+  data: HubOverviewData
+}
+
+export default function HubOverview({ data }: HubOverviewProps) {
+  const {
+    requestAt,
+    user,
+    todayAppointments = 0,
+    completeAppointments = 0,
+    todayRevenue = 0,
+    expectedRevenue = 0,
+    lastAppointmentEndTime,
+    totalWorkspaceAppointments = 0,
+    totalWorkspaceRevenue = 0,
+    unconfirmedAppointments = 0,
+    totalWorkspaces = 0,
+  } = data
+
+  const clientDate = requestAt ? new Date(requestAt) : new Date()
+  const { gender, isFormal } = user
+
+  const { canInAnyWorkspace } = usePermissions()
+  const canViewFinancials = canInAnyWorkspace("view_financials")
+  const canViewAnalytics = canInAnyWorkspace("view_analytics")
+  
+  const isAdmin = canInAnyWorkspace("is_administrator")
+  const isOwner = canInAnyWorkspace("is_owner")
+
+  const greeting = getGreeting(clientDate, user.timezone)
+  const remainingAppointments = todayAppointments - completeAppointments
+
+  const pronounGenitive = isFormal ? "вас" : "тебя"
+  const pronounPossessive = isFormal ? "вашим" : "твоим"
+  const pronounDative = isFormal ? "Вам" : "Тебе"
+
+  const verbEarned = isFormal
+    ? "вы заработали"
+    : gender === "female"
+    ? "ты заработала"
+    : "ты заработал"
+
+  const verbCompleted = isFormal
+    ? "вы выполнили"
+    : gender === "female"
+    ? "ты выполнила"
+    : "ты выполнил"
+
+  const verbFree = isFormal ? "Вы освободитесь" : "Ты освободишься"
+
+  const renderMasterBlock = () => {
+    // Only render master block if they have appointments
+    if (todayAppointments === 0) return null
+
+    if (completeAppointments === 0) {
+      return (
+        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+          Сегодня предстоит{" "}
+          <span className="text-hub-text font-semibold">
+            {todayAppointments} {pluralize(todayAppointments, ["запись", "записи", "записей"])}
+          </span>{" "}
+          на общую сумму{" "}
+          <span className="text-hub-text font-semibold">
+            {formatCurrency(expectedRevenue)}
+          </span>
+          .
+          {lastAppointmentEndTime && (
+            <>
+              {" "}
+              {verbFree} после{" "}
+              <span className="text-hub-text font-semibold">
+                {formatTime(lastAppointmentEndTime)}
+              </span>
+              .
+            </>
+          )}
+        </span>
+      )
+    }
+
+    return (
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+        Сегодня {verbEarned}{" "}
+        <span className="text-hub-text font-semibold">
+          {formatCurrency(todayRevenue)}
+        </span>
+        . Из{" "}
+        <span className="text-hub-text font-semibold">
+          {todayAppointments} {pluralize(todayAppointments, ["записи", "записей", "записей"])}
+        </span>{" "}
+        на сегодня {verbCompleted}{" "}
+        <span className="text-hub-text font-semibold">
+          {completeAppointments}
+        </span>
+        {remainingAppointments > 0 ? (
+          <>
+            , осталось ещё{" "}
+            <span className="text-hub-text font-semibold">
+              {remainingAppointments}
+            </span>
+            .
+          </>
+        ) : (
+          ". Все запланированные записи завершены!"
+        )}
+        {lastAppointmentEndTime && remainingAppointments > 0 && (
+          <>
+            {" "}
+            {verbFree} после{" "}
+            <span className="text-hub-text font-semibold">
+              {formatTime(lastAppointmentEndTime)}
+            </span>
+            .
+          </>
+        )}
+      </span>
+    )
+  }
+
+  const renderAdminBlock = () => {
+    if (!isAdmin) return null
+
+    if (unconfirmedAppointments === 0) {
+      return (
+        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+          Все заявки от клиентов обработаны.
+        </span>
+      )
+    }
+
+    return (
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+        {pronounDative} нужно обработать{" "}
+        <span className="text-hub-text font-semibold">
+          {unconfirmedAppointments} {pluralize(unconfirmedAppointments, ["неподтвержденную заявку", "неподтвержденные заявки", "неподтвержденных заявок"])}
+        </span>
+        .
+      </span>
+    )
+  }
+
+  const renderOwnerBlock = () => {
+    if (!isOwner) return null
+
+    if (totalWorkspaceAppointments === 0) {
+      return (
+        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+          В <span className="text-hub-text font-semibold">{totalWorkspaces} {pluralize(totalWorkspaces, ["пространстве", "пространствах", "пространствах"])}</span> пока нет записей.
+        </span>
+      )
+    }
+
+    return (
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+        По <span className="text-hub-text font-semibold">{pronounPossessive} {totalWorkspaces} {pluralize(totalWorkspaces, ["пространству", "пространствам", "пространствам"])}</span>
+        {canViewAnalytics ? (
+          <>
+            {" "}сегодня{" "}
+            <span className="text-hub-text font-semibold">
+              {totalWorkspaceAppointments} {pluralize(totalWorkspaceAppointments, ["запись", "записи", "записей"])}
+            </span>
+          </>
+        ) : (
+          " сегодня"
+        )}
+        {canViewFinancials && (
+          <>
+            {" "}на общую сумму{" "}
+            <span className="text-white font-semibold">
+              {formatCurrency(totalWorkspaceRevenue)}
+            </span>
+          </>
+        )}
+        .
+      </span>
+    )
+  }
+
+  const renderFallbackBlock = () => {
+    if (todayAppointments > 0 || isAdmin || isOwner) return null
+    
+    return (
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+        У {pronounGenitive} пока нет активных ролей. Создайте своё пространство или расскажите работодателю о нашей платформе.
+      </span>
+    )
+  }
+
+  return (
+    <div className="bg-hub-base text-hub-text px-6 py-8 flex flex-col gap-10">
+      <HubHeader user={user} date={clientDate} />
+
+      <div className="flex flex-col gap-3">
+        <h1 className="text-2xl text-white font-medium tracking-tight flex items-center gap-2.5">
+          <span className="text-white">—</span> {greeting}
+        </h1>
+        <div className="text-xl font-medium leading-relaxed">
+          {renderMasterBlock()}
+          {renderAdminBlock()}
+          {renderOwnerBlock()}
+          {renderFallbackBlock()}
+        </div>
+      </div>
+    </div>
+  )
+}

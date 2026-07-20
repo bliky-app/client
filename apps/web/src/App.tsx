@@ -1,19 +1,48 @@
-import { Button } from "@workspace/ui/components/button"
+import { createBrowserRouter, RouterProvider, useParams } from "react-router-dom"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import MasterLayout from "@/layouts/MasterLayout"
+import Hub from "@/pages/hub/Hub"
+import WorkspacePage from "@/pages/workspace/WorkspacePage"
+import { AuthProvider } from "@/lib/AuthProvider"
+
+function WorkspaceRoute() {
+  const { id } = useParams<{ id: string }>()
+  if (!id) return null
+  return <WorkspacePage id={id} />
+}
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <MasterLayout />,
+    children: [
+      {
+        index: true,
+        element: <Hub />
+      },
+      {
+        path: "workspace/:id",
+        element: <WorkspaceRoute />
+      },
+    ],
+  },
+])
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+})
 
 export function App() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="text-muted-foreground font-mono text-xs">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
