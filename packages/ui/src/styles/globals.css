@@ -50,39 +50,54 @@
     --font-sans: 'Inter Variable', sans-serif;
     --color-brand: var(--brand);
     
-    /* Dark Theme (Hub, Modals, Overlays) */
+    /* Dark Theme (Hub, Modals, Overlays) - Always dark */
     --color-hub-base: var(--color-zinc-950);
     --color-hub-surface: var(--color-zinc-900);
     --color-hub-surface-hover: var(--color-zinc-800);
     --color-hub-border: var(--color-zinc-800);
     --color-hub-border-light: var(--color-zinc-700);
-    --color-hub-border-subtle: var(--color-zinc-800); /* Was zinc-800/50, handled with /opacity */
+    --color-hub-border-subtle: var(--color-zinc-800);
     --color-hub-text: var(--color-white);
     --color-hub-text-muted: var(--color-zinc-400);
     --color-hub-text-subtle: var(--color-zinc-500);
 
-    /* Light Theme (Workspace, Timetable, Lists) */
-    --color-panel-base: var(--color-white);
-    --color-panel-surface: var(--color-white);
-    --color-panel-surface-hover: var(--color-zinc-50);
-    --color-panel-border: var(--color-zinc-200);
-    --color-panel-border-subtle: var(--color-zinc-100);
-    --color-panel-text: var(--color-zinc-900);
-    --color-panel-text-muted: var(--color-zinc-600);
-    --color-panel-text-subtle: var(--color-zinc-400);
-    --color-panel-text-muted-dark: var(--color-zinc-500); /* Some places use zinc-500 */
+    /* Light/Dark Theme variables map to --theme-* which we toggle */
+    --color-panel-base: var(--theme-panel-base);
+    --color-panel-surface: var(--theme-panel-surface);
+    --color-panel-surface-hover: var(--theme-panel-surface-hover);
+    --color-panel-border: var(--theme-panel-border);
+    --color-panel-border-subtle: var(--theme-panel-border-subtle);
+    --color-panel-text: var(--theme-panel-text);
+    --color-panel-text-muted: var(--theme-panel-text-muted);
+    --color-panel-text-subtle: var(--theme-panel-text-subtle);
+    --color-panel-text-muted-dark: var(--theme-panel-text-muted-dark);
 
-    /* Timetable Specifics */
-    --color-timetable-today: var(--color-zinc-50);
-    --color-timetable-busy: var(--color-zinc-200);
-    --color-timetable-divider: var(--color-zinc-400);
-    --color-timetable-slot: var(--color-white);
+    --color-timetable-today: var(--theme-timetable-today);
+    --color-timetable-busy: var(--theme-timetable-busy);
+    --color-timetable-divider: var(--theme-timetable-divider);
+    --color-timetable-slot: var(--theme-timetable-slot);
     
     /* General Overlay */
     --color-overlay: var(--color-black);
 }
 
 :root {
+    /* Default (Light) Theme Variables */
+    --theme-panel-base: var(--color-white);
+    --theme-panel-surface: var(--color-white);
+    --theme-panel-surface-hover: var(--color-zinc-50);
+    --theme-panel-border: var(--color-zinc-200);
+    --theme-panel-border-subtle: var(--color-zinc-100);
+    --theme-panel-text: var(--color-zinc-900);
+    --theme-panel-text-muted: var(--color-zinc-600);
+    --theme-panel-text-subtle: var(--color-zinc-400);
+    --theme-panel-text-muted-dark: var(--color-zinc-500);
+
+    --theme-timetable-today: var(--color-zinc-50);
+    --theme-timetable-busy: var(--color-zinc-200);
+    --theme-timetable-divider: var(--color-zinc-400);
+    --theme-timetable-slot: var(--color-white);
+
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -118,32 +133,21 @@
     --brand: oklch(0.546 0.245 262.881); /* Blue accent */
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  button:not(:disabled), [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
+.dark {
+    --theme-panel-base: #09090b; /* zinc-950 */
+    --theme-panel-surface: #18181b; /* zinc-900 */
+    --theme-panel-surface-hover: #27272a; /* zinc-800 */
+    --theme-panel-border: #27272a; /* zinc-800 */
+    --theme-panel-border-subtle: #27272a; /* zinc-800 */
+    --theme-panel-text: #fafafa; /* zinc-50 */
+    --theme-panel-text-muted: #a1a1aa; /* zinc-400 */
+    --theme-panel-text-subtle: #71717a; /* zinc-500 */
+    --theme-panel-text-muted-dark: #a1a1aa; /* zinc-400 */
 
-  .dark {
-    --color-panel-base: #09090b; /* zinc-950 */
-    --color-panel-surface: #18181b; /* zinc-900 */
-    --color-panel-surface-hover: #27272a; /* zinc-800 */
-    --color-panel-border: #27272a; /* zinc-800 */
-    --color-panel-border-subtle: #27272a; /* zinc-800 */
-    --color-panel-text: #fafafa; /* zinc-50 */
-    --color-panel-text-muted: #a1a1aa; /* zinc-400 */
-    --color-panel-text-subtle: #71717a; /* zinc-500 */
-    --color-panel-text-muted-dark: #a1a1aa; /* zinc-400 */
-
-    --color-timetable-today: #18181b; /* zinc-900 */
-    --color-timetable-busy: #27272a; /* zinc-800 */
-    --color-timetable-divider: #27272a; /* zinc-800 */
-    --color-timetable-slot: #09090b; /* zinc-950 */
+    --theme-timetable-today: #18181b; /* zinc-900 */
+    --theme-timetable-busy: #27272a; /* zinc-800 */
+    --theme-timetable-divider: #27272a; /* zinc-800 */
+    --theme-timetable-slot: #09090b; /* zinc-950 */
 
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
@@ -172,5 +176,16 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: oklch(0.439 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }

@@ -36,12 +36,16 @@ export default function SettingsDropdown({
             onClose()
             // Future: Navigate to account
           }}
-          className="flex items-center px-4 py-3 hover:bg-hub-surface-hover transition-colors text-left gap-3 w-full"
+          className="flex items-center justify-between px-4 py-3 hover:bg-hub-surface-hover transition-colors text-left gap-3 w-full group"
         >
-          <User className="w-4 h-4 text-hub-text-muted" />
-          <span className="text-sm font-medium text-hub-text-subtle group-hover:text-hub-text transition-colors">
-            Аккаунт
-          </span>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-hub-surface-hover flex items-center justify-center shrink-0 border border-hub-border-light/50 group-hover:border-hub-border transition-colors">
+              <User className="w-5 h-5 text-hub-text-muted group-hover:text-hub-text transition-colors" />
+            </div>
+            <span className="text-sm font-medium text-hub-text-subtle group-hover:text-hub-text transition-colors">
+              Аккаунт
+            </span>
+          </div>
         </button>
 
         <button
@@ -49,12 +53,16 @@ export default function SettingsDropdown({
             onClose()
             // Future: Logout logic
           }}
-          className="flex items-center px-4 py-3 hover:bg-hub-surface-hover transition-colors text-left gap-3 w-full"
+          className="flex items-center justify-between px-4 py-3 hover:bg-hub-surface-hover transition-colors text-left gap-3 w-full group"
         >
-          <LogOut className="w-4 h-4 text-red-500/80" />
-          <span className="text-sm font-medium text-red-500/90">
-            Выйти
-          </span>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0 border border-red-500/20 group-hover:border-red-500/40 group-hover:bg-red-500/20 transition-colors">
+              <LogOut className="w-5 h-5 text-red-500/80 group-hover:text-red-400 transition-colors" />
+            </div>
+            <span className="text-sm font-medium text-red-500/90 group-hover:text-red-400 transition-colors">
+              Выйти
+            </span>
+          </div>
         </button>
 
         <div className="h-px bg-hub-border mx-4 my-1" />
