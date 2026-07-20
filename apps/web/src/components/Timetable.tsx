@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react"
+import { getTzDateString } from "@/lib/formatters"
 import type { Appointment, TimetableColumn, TimetableViewType } from "@/types/models"
 import Avatar from "@/components/Avatar"
 import { formatTime } from "@/lib/formatters"
@@ -16,6 +17,7 @@ interface TimetableProps {
   onEventClick?: (event: Appointment) => void
   onDateSelect?: (date: Date) => void
   onViewModeChange?: (mode: TimetableViewMode) => void
+  timezone: string
   viewMode?: TimetableViewMode
   hideWorkspaceTags?: boolean
   workspaceTimezone?: string
@@ -52,6 +54,7 @@ function pad(n: number) {
 export default function Timetable({
   viewType, currentDate, events, columns,
   onPrev, onNext, onEventClick, onDateSelect, onViewModeChange,
+  timezone,
   viewMode = "3days", hideWorkspaceTags = false,
   workspaceTimezone = "Europe/Moscow", headerTitle: propHeaderTitle,
   currentUserId,
@@ -111,9 +114,8 @@ export default function Timetable({
   ]
   while (calDays.length % 7 !== 0) calDays.push(null)
 
-  const getLocalYMD = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split("T")[0]
-  const todayStr = getLocalYMD(new Date())
-  const curStr = getLocalYMD(currentDate)
+  const todayStr = getTzDateString(new Date(), timezone)
+  const curStr = getTzDateString(currentDate, timezone)
 
   const uniqueStaff = useMemo(() => {
     if (viewType !== "team") return []
@@ -191,13 +193,15 @@ export default function Timetable({
             <div className="grid grid-cols-7 gap-2">
               {calDays.map((day, i) => {
                 if (!day) return <div key={i} className="aspect-square" />
-                const ds = `${day.getFullYear()}-${pad(day.getMonth()+1)}-${pad(day.getDate())}`
+                const ds = getTzDateString(day, timezone)
                 const count = byDate[ds] || 0
                 return (
                   <button key={ds}
                     onClick={() => { onDateSelect?.(day); setShowCal(false) }}
                     className={`relative aspect-square flex flex-col items-center justify-center rounded-xl transition-colors ${heatBg(count)} ${ds === curStr ? "ring-2 ring-panel-text ring-inset" : ""} ${ds === todayStr ? "font-bold text-panel-text" : "text-panel-text-muted"} hover:bg-panel-surface text-sm`}>
-                    <span className="z-10">{day.getDate()}</span>
+                    <span className="z-10">
+                      {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}
+                    </span>
                     {count > 0 && (
                       <span className="absolute bottom-0.5 text-[9px] font-medium text-panel-text/90">{count}</span>
                     )}
@@ -257,21 +261,25 @@ export default function Timetable({
                   while (days.length % 7 !== 0) days.push(null)
                   return (
                     <>
-                      <div className="text-center text-sm font-semibold text-panel-text mb-4">{MONTHS_RU[m]} {y}</div>
+                      <div className="text-center text-sm font-semibold text-panel-text mb-4">
+                        {new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: timezone }).format(currentDate)}
+                      </div>
                       <div className="grid grid-cols-7 mb-2">
                         {WEEKDAYS.map(d => <div key={d} className="text-center text-xs font-medium text-panel-text-subtle py-1">{d}</div>)}
                       </div>
                       <div className="grid grid-cols-7 gap-2">
                         {days.map((day, i) => {
                           if (!day) return <div key={i} className="aspect-square" />
-                          const ds = `${day.getFullYear()}-${pad(day.getMonth()+1)}-${pad(day.getDate())}`
+                          const ds = getTzDateString(day, timezone)
                           const count = byDate[ds] || 0
                           const isToday = ds === todayStr
                           return (
                             <button key={ds}
                               onClick={() => { onDateSelect?.(day); onViewModeChange?.("3days") }}
                               className={`relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all hover:opacity-80 ${heatBg(count)} ${isToday ? "ring-2 ring-panel-text ring-inset" : ""}`}>
-                              <span className={`text-sm font-semibold z-10 ${count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>{day.getDate()}</span>
+                              <span className={`text-sm font-semibold z-10 ${count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
+                                {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}
+                              </span>
                               {count > 0 && (
                                 <span className="absolute bottom-0.5 text-[9px] font-medium text-panel-text/90">{count}</span>
                               )}

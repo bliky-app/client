@@ -133,6 +133,7 @@ export default function Hub() {
             {/* Timetable */}
             <div className="flex flex-col flex-1 bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden min-h-0 shrink-0">
               <Timetable
+                timezone={MOCK_USER.timezone || "Europe/Moscow"}
                 viewType="personal"
                 viewMode={viewMode}
                 currentDate={calendarDate}

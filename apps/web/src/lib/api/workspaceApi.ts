@@ -1,9 +1,8 @@
 import { MOCK_WORKSPACES, MOCK_APPOINTMENTS, MOCK_USER, STAFF_SCHEDULE_HOURS } from "./mockData"
 import type { Workspace, TimetableColumn, Appointment, TimetableViewType } from "@/types/models"
+import { getTzDateString } from "../formatters"
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
-
 
 export const workspaceApi = {
   getWorkspace: async (id: string): Promise<Workspace | null> => {
@@ -22,10 +21,10 @@ export const workspaceApi = {
     for (let i = 0; i < 3; i++) {
       const d = new Date(startDate)
       d.setDate(d.getDate() + i)
-      const getLocalYMD = (dateObj: Date) => new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split("T")[0]
-      const dateString = getLocalYMD(d)
+      const wsTz = ws?.timezone || "Europe/Moscow"
+      const dateString = getTzDateString(d, wsTz)
       const dayOfWeek = d.getDay()
-      const todayString = getLocalYMD(new Date())
+      const todayString = getTzDateString(new Date(), wsTz)
       const isToday = dateString === todayString
       
       const workspaceSchedule = ws?.schedule[dayOfWeek] ?? []
@@ -38,8 +37,8 @@ export const workspaceApi = {
 
       cols.push({
         id: `ws-${workspaceId}-day-${dateString}`,
-        label: new Intl.DateTimeFormat("ru-RU", { weekday: "long" }).format(d),
-        subLabel: new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long" }).format(d),
+        label: new Intl.DateTimeFormat("ru-RU", { weekday: "long", timeZone: wsTz }).format(d),
+        subLabel: new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", timeZone: wsTz }).format(d),
         dateString: dateString,
         isToday,
         schedule: slots,
@@ -54,9 +53,9 @@ export const workspaceApi = {
     if (!ws || !ws.staff) return []
 
     const dayOfWeek = date.getDay()
-    const getLocalYMD = (dateObj: Date) => new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split("T")[0]
-    const dateString = getLocalYMD(date)
-    const todayString = getLocalYMD(new Date())
+    const wsTz = ws.timezone || "Europe/Moscow"
+    const dateString = getTzDateString(date, wsTz)
+    const todayString = getTzDateString(new Date(), wsTz)
     const isToday = dateString === todayString
     const tz = "+03:00" // Use valid ISO 8601 offset
 

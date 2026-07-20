@@ -19,6 +19,15 @@ export const formatTime = (isoString: string, timezone?: string): string => {
   }).format(date)
 }
 
+export const getTzDateString = (date: Date, timezone: string): string => {
+  return new Intl.DateTimeFormat('en-CA', { 
+    timeZone: timezone,
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit' 
+  }).format(date)
+}
+
 export const addMinutes = (isoString: string, durationMinutes: number): string => {
   const date = new Date(isoString)
   date.setMinutes(date.getMinutes() + durationMinutes)

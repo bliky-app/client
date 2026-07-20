@@ -49,6 +49,7 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
         ) : (
           <div className="flex-1 flex flex-col min-h-0">
             <Timetable
+              timezone={workspace.timezone || "Europe/Moscow"}
               viewType={viewType}
               viewMode={viewMode}
               currentDate={calendarDate}

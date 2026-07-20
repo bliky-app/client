@@ -1,5 +1,6 @@
 import { MOCK_HUB_OVERVIEW, MOCK_WORKSPACES, MOCK_APPOINTMENTS, MOCK_USER } from "./mockData"
 import type { HubOverviewData, Workspace, TimetableColumn, Appointment } from "@/types/models"
+import { getTzDateString } from "../formatters"
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -46,10 +47,10 @@ export const hubApi = {
     for (let i = 0; i < days; i++) {
       const d = new Date(startDate)
       d.setDate(d.getDate() + i)
-      const getLocalYMD = (dateObj: Date) => new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split("T")[0]
-      const dateString = getLocalYMD(d)
+      const userTz = MOCK_USER.timezone || "Europe/Moscow"
+      const dateString = getTzDateString(d, userTz)
       const dayOfWeek = d.getDay()
-      const todayString = getLocalYMD(new Date())
+      const todayString = getTzDateString(new Date(), userTz)
       const isToday = dateString === todayString
       
       const allUserShifts = MOCK_WORKSPACES.flatMap(ws => {
@@ -65,9 +66,9 @@ export const hubApi = {
       }))
 
       cols.push({
-        id: `day-${dateString}`,
-        label: new Intl.DateTimeFormat("ru-RU", { weekday: "long" }).format(d),
-        subLabel: new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long" }).format(d),
+        id: `hub-day-${dateString}`,
+        label: new Intl.DateTimeFormat("ru-RU", { weekday: "long", timeZone: userTz }).format(d),
+        subLabel: new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", timeZone: userTz }).format(d),
         dateString: dateString,
         isToday,
         schedule: slots,
