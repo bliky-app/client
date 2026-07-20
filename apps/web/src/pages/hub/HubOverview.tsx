@@ -62,7 +62,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
       return (
         <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
           Сегодня предстоит{" "}
-          <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+          <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
             <ClipboardList className="w-4 h-4" />
             {todayAppointments} {pluralize(todayAppointments, ["запись", "записи", "записей"])}
           </span>{" "}
@@ -76,7 +76,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
               {" "}
               {verbFree} после{" "}
               <span className="whitespace-nowrap">
-                <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+                <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
                   {formatTime(lastAppointmentEndTime)}
                 </span>
@@ -95,13 +95,13 @@ export default function HubOverview({ data }: HubOverviewProps) {
           {formatCurrency(todayRevenue)}
         </span>
         . Из{" "}
-        <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+        <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
           <ClipboardList className="w-4 h-4" />
           {todayAppointments} {pluralize(todayAppointments, ["записи", "записей", "записей"])}
         </span>{" "}
         на сегодня {verbCompleted}{" "}
         <span className="whitespace-nowrap">
-          <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+          <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4" />
             {completeAppointments}
           </span>
@@ -111,7 +111,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
           <>
             {" "}осталось ещё{" "}
             <span className="whitespace-nowrap">
-              <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+              <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
                 <Inbox className="w-4 h-4" />
                 {remainingAppointments}
               </span>
@@ -126,7 +126,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
             {" "}
             {verbFree} после{" "}
             <span className="whitespace-nowrap">
-              <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+              <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
                 <Clock className="w-4 h-4" />
                 {formatTime(lastAppointmentEndTime)}
               </span>
@@ -153,7 +153,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
       <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
         {pronounDative} нужно обработать{" "}
         <span className="whitespace-nowrap">
-          <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+          <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
             <Inbox className="w-4 h-4" />
             {unconfirmedAppointments} {pluralize(unconfirmedAppointments, ["неподтвержденную заявку", "неподтвержденные заявки", "неподтвержденных заявок"])}
           </span>
@@ -169,18 +169,18 @@ export default function HubOverview({ data }: HubOverviewProps) {
     if (totalWorkspaceAppointments === 0) {
       return (
         <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
-          В <span className="text-hub-text font-semibold inline-flex items-center gap-1"><Layers className="w-4 h-4" /> {totalWorkspaces} {pluralize(totalWorkspaces, ["пространстве", "пространствах", "пространствах"])}</span> пока нет записей.
+          В <span className="text-hub-text font-semibold inline-flex items-center gap-1.5"><Layers className="w-4 h-4" /> {totalWorkspaces} {pluralize(totalWorkspaces, ["пространстве", "пространствах", "пространствах"])}</span> пока нет записей.
         </span>
       )
     }
 
     return (
       <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
-        По {pronounPossessive} <span className="text-hub-text font-semibold inline-flex items-center gap-1"><Layers className="w-4 h-4" /> {totalWorkspaces} {pluralize(totalWorkspaces, ["пространству", "пространствам", "пространствам"])}</span>
+        По {pronounPossessive} <span className="text-hub-text font-semibold inline-flex items-center gap-1.5"><Layers className="w-4 h-4" /> {totalWorkspaces} {pluralize(totalWorkspaces, ["пространству", "пространствам", "пространствам"])}</span>
         {canViewAnalytics ? (
           <>
             {" "}сегодня{" "}
-            <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+            <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
               <ClipboardList className="w-4 h-4" />
               {totalWorkspaceAppointments} {pluralize(totalWorkspaceAppointments, ["запись", "записи", "записей"])}
             </span>
