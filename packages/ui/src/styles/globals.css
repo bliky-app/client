@@ -134,21 +134,21 @@
 }
 
 .dark {
-    /* Pure black background, slightly elevated surfaces */
-    --theme-panel-base: #000000;
-    --theme-panel-surface: #09090b; /* zinc-950 */
-    --theme-panel-surface-hover: #18181b; /* zinc-900 */
-    --theme-panel-border: #18181b; /* zinc-900 */
-    --theme-panel-border-subtle: #09090b; /* zinc-950 */
-    --theme-panel-text: #fafafa; /* zinc-50 */
+    /* Clearly separate from the black Hub */
+    --theme-panel-base: #18181b; /* zinc-900 */
+    --theme-panel-surface: #27272a; /* zinc-800 */
+    --theme-panel-surface-hover: #3f3f46; /* zinc-700 */
+    --theme-panel-border: #3f3f46; /* zinc-700 */
+    --theme-panel-border-subtle: #27272a; /* zinc-800 */
+    --theme-panel-text: #ffffff; /* white */
     --theme-panel-text-muted: #a1a1aa; /* zinc-400 */
-    --theme-panel-text-subtle: #71717a; /* zinc-500 */
-    --theme-panel-text-muted-dark: #71717a; /* zinc-500 */
+    --theme-panel-text-subtle: #a1a1aa; /* zinc-400 */
+    --theme-panel-text-muted-dark: #d4d4d8; /* zinc-300 */
 
-    --theme-timetable-today: #09090b; /* zinc-950 */
-    --theme-timetable-busy: #18181b; /* zinc-900 */
-    --theme-timetable-divider: #18181b; /* zinc-900 */
-    --theme-timetable-slot: #000000;
+    --theme-timetable-today: #27272a; /* zinc-800 */
+    --theme-timetable-busy: #3f3f46; /* zinc-700 */
+    --theme-timetable-divider: #3f3f46; /* zinc-700 */
+    --theme-timetable-slot: #18181b; /* zinc-900 */
 
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
