@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Bell, Settings, ChevronDown, Calendar as CalendarIcon } from "lucide-react"
 import Avatar from "@/components/Avatar"
 import WorkspaceDropdown from "@/components/WorkspaceDropdown"
+import GlobalSettingsModal from "@/components/GlobalSettingsModal"
 import type { User } from "@/types/models"
 import { MONTHS } from "@/lib/formatters"
 
@@ -12,6 +13,7 @@ interface HubHeaderProps {
 
 export default function HubHeader({ user, date }: HubHeaderProps) {
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   // Capture the button's rect synchronously on click — no useEffect, no jump
   const [triggerRect, setTriggerRect] = useState<DOMRect | undefined>()
 
@@ -65,10 +67,12 @@ export default function HubHeader({ user, date }: HubHeaderProps) {
         <button className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 transition-transform">
           <Bell className="h-5 w-5 text-hub-text-muted" />
         </button>
-        <button className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 transition-transform">
+        <button onClick={() => setShowSettings(true)} className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 transition-transform">
           <Settings className="h-5 w-5 text-hub-text-muted" />
         </button>
       </div>
+      
+      <GlobalSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   )
 }

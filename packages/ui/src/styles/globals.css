@@ -121,11 +121,56 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+  }
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
-    }
+  }
+
+  .dark {
+    --color-panel-base: var(--color-zinc-950);
+    --color-panel-surface: var(--color-zinc-900);
+    --color-panel-surface-hover: var(--color-zinc-800);
+    --color-panel-border: var(--color-zinc-800);
+    --color-panel-border-subtle: var(--color-zinc-800); /* Will use opacity variants if needed */
+    --color-panel-text: var(--color-zinc-50);
+    --color-panel-text-muted: var(--color-zinc-400);
+    --color-panel-text-subtle: var(--color-zinc-500);
+    --color-panel-text-muted-dark: var(--color-zinc-400);
+
+    --color-timetable-today: var(--color-zinc-900);
+    --color-timetable-busy: var(--color-zinc-800);
+    --color-timetable-divider: var(--color-zinc-800);
+    --color-timetable-slot: var(--color-zinc-950);
+
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.145 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.145 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.985 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.396 0.141 25.723);
+    --destructive-foreground: oklch(0.637 0.237 25.331);
+    --border: oklch(0.269 0 0);
+    --input: oklch(0.269 0 0);
+    --ring: oklch(0.439 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(0.269 0 0);
+    --sidebar-ring: oklch(0.439 0 0);
+  }
 }
