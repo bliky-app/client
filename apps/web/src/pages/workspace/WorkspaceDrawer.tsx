@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom"
 import {
   Calendar,
   Clock,
@@ -7,7 +6,6 @@ import {
   UserCheck,
   BarChart2,
   ClipboardList,
-  Home,
   Settings,
   X,
   List,
@@ -53,7 +51,6 @@ export default function WorkspaceDrawer({
   onClose,
   onSelectSection,
 }: WorkspaceDrawerProps) {
-  const navigate = useNavigate()
   const { can, user } = usePermissions(workspace.id)
 
   const visibleSections = SECTIONS.filter(section => {
@@ -135,15 +132,6 @@ export default function WorkspaceDrawer({
                 <span className="text-[11px] text-hub-text-subtle truncate">{roleName}</span>
               </div>
             </div>
-            <button
-              onClick={() => {
-                onClose()
-                navigate("/")
-              }}
-              className="h-10 w-10 rounded-full hover:bg-hub-surface flex items-center justify-center transition-colors"
-            >
-              <Home className="h-4 w-4 text-hub-text-muted hover:text-hub-text-subtle" />
-            </button>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { Bell, Menu, MapPin, ChevronDown, ArrowLeft } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { Home, Menu, MapPin, ChevronDown } from "lucide-react"
 import type { Workspace } from "@/types/models"
 import Avatar from "@/components/Avatar"
 import WorkspaceDropdown from "@/components/WorkspaceDropdown"
@@ -21,20 +21,11 @@ export default function WorkspaceHeader({ workspace, onMenuOpen }: WorkspaceHead
 
   return (
     <div className="flex justify-between items-center w-full relative z-30">
-      <div className="flex items-center gap-3">
+      <div className="relative">
         <button 
-          onClick={() => navigate("/")}
-          className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 transition-transform shrink-0"
-          title="Вернуться в Хаб"
+          onClick={() => setShowDropdown(!showDropdown)}
+          className="flex items-center gap-3 w-full text-left group"
         >
-          <ArrowLeft className="h-5 w-5 text-hub-text-muted" />
-        </button>
-
-        <div className="relative">
-          <button 
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="flex items-center gap-3 w-full text-left group"
-          >
           <Avatar
             type="workspace"
             name={workspace.name}
@@ -69,11 +60,13 @@ export default function WorkspaceHeader({ workspace, onMenuOpen }: WorkspaceHead
           className="top-14 left-0 w-64"
         />
       </div>
-    </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        <button className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 transition-transform shrink-0">
-          <Bell className="h-5 w-5 text-hub-text-muted" />
+        <button 
+          onClick={() => navigate("/")}
+          className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 hover:bg-hub-surface-hover transition-colors shrink-0"
+        >
+          <Home className="h-5 w-5 text-hub-text-muted" />
         </button>
         <button
           id="workspace-menu-button"
