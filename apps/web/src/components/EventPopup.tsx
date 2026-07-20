@@ -137,9 +137,7 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
                 <div key={stage.id} className="flex gap-4 min-h-12">
                   <div className="flex flex-col items-center">
                     <div className={`w-3 h-3 rounded-full mt-1.5 z-10 ${stage.isActive ? 'bg-panel-text' : 'bg-panel-border'}`} />
-                    {idx !== event.stages.length - 1 && (
-                      <div className={`w-0.5 flex-1 -mt-1.5 mb-1 ${stage.isActive ? 'bg-panel-border-subtle' : 'border-l-2 border-dashed border-panel-border bg-transparent'}`} />
-                    )}
+                    <div className={`w-0.5 flex-1 -mt-1.5 mb-1 ${stage.isActive ? 'bg-panel-border-subtle' : 'border-l-2 border-dashed border-panel-border bg-transparent'}`} />
                   </div>
 
                   <div className="flex flex-col pb-5">
@@ -156,6 +154,20 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
                 </div>
               )
             })}
+            
+            <div className="flex gap-4">
+              <div className="flex flex-col items-center">
+                <div className="w-3 h-3 rounded-full mt-1.5 z-10 bg-panel-surface border-2 border-panel-text" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-base font-medium leading-tight text-panel-text">
+                  Завершение
+                </span>
+                <span className="text-sm text-panel-text-subtle mt-1 flex items-center gap-1.5">
+                  <span className="font-medium text-panel-text-muted-dark">≈ {endTimeStr}</span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
