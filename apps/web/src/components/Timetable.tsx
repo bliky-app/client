@@ -236,7 +236,7 @@ export default function Timetable({
                     <tr key={str} className="border-b border-panel-border-subtle/50 hover:bg-panel-base/50 transition-colors cursor-pointer"
                       onClick={() => { onDateSelect?.(date); onViewModeChange?.("1day") }}>
                       <td className="px-4 py-2 text-xs font-medium text-panel-text-muted whitespace-nowrap">
-                        <span className={`inline-flex items-center justify-center ${str === todayStr ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-semibold" : ""}`}>
+                        <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full -ml-2 ${str === todayStr ? "bg-panel-text text-panel-base font-semibold" : ""}`}>
                           {label}
                         </span>
                       </td>
@@ -331,9 +331,9 @@ export default function Timetable({
                         {viewType === "team" && col.staff && (
                           <Avatar type="user" name={col.staff.shortName || col.staff.user?.shortName || "?"} avatarUrl={col.staff.user?.avatarUrl} color={col.staff.color || col.staff.user?.color} className="w-8 h-8 rounded-full text-[10px] mb-1 shrink-0" />
                         )}
-                        <span className={`text-sm font-semibold ${col.isToday ? "text-panel-text" : "text-panel-text-muted"}`}>{col.label}</span>
+                        <span className={`text-sm font-semibold ${col.isToday && viewType !== "team" ? "text-panel-text" : "text-panel-text-muted"}`}>{col.label}</span>
                         {col.subLabel && (
-                          <span className={`text-xs mt-0.5 ${col.isToday ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-medium" : "text-panel-text-subtle"}`}>
+                          <span className={`text-xs mt-0.5 ${(col.isToday && viewType !== "team") ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-medium" : "text-panel-text-subtle"}`}>
                             {col.subLabel}
                           </span>
                         )}
