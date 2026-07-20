@@ -1,4 +1,5 @@
-import { X, Clock, User, Store, Wallet, Calendar as CalendarIcon, Phone, UserCircle } from "lucide-react"
+import { X, Clock, User, Wallet, Calendar as CalendarIcon, Phone } from "lucide-react"
+import Avatar from "@/components/Avatar"
 import type { Appointment } from "@/types/models"
 import { formatCurrency, addMinutes, formatDuration, formatTime } from "@/lib/formatters"
 
@@ -35,9 +36,12 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
       >
         <div className="p-6 flex flex-col gap-6">
           <div className="flex items-start justify-between gap-4">
-            <h2 className="text-xl font-bold text-panel-text leading-tight">
-              {event.serviceName}
-            </h2>
+            <div className="flex items-center gap-3">
+              {event.color && <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: event.color }} />}
+              <h2 className="text-xl font-bold text-panel-text leading-tight">
+                {event.serviceName}
+              </h2>
+            </div>
             <button
               onClick={onClose}
               className="p-2 -mt-1.5 -mr-2 text-panel-text-subtle hover:text-panel-text-muted hover:bg-panel-surface-hover rounded-full transition-colors shrink-0"
@@ -91,9 +95,7 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
 
             {event.workspace.name && (
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-panel-border-subtle flex items-center justify-center shrink-0">
-                  <Store className="w-4 h-4 text-panel-text-muted-dark" />
-                </div>
+                <Avatar type="workspace" name={event.workspace.name} avatarUrl={event.workspace.avatarUrl} color={event.workspace.color} className="w-8 h-8 rounded-full text-[10px] shrink-0" />
                 <div className="flex flex-col min-w-0 leading-tight">
                   <span className="font-medium text-panel-text truncate">{event.workspace.name}</span>
                   {event.workspace.address && (
@@ -105,9 +107,7 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
 
             {event.staff && (
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-panel-border-subtle flex items-center justify-center shrink-0">
-                  <UserCircle className="w-4 h-4 text-panel-text-muted-dark" />
-                </div>
+                <Avatar type="user" name={event.staff.shortName || event.staff.user?.shortName || "?"} avatarUrl={event.staff.user?.avatarUrl} color={event.staff.color || event.staff.user?.color} className="w-8 h-8 rounded-full text-[10px] shrink-0" />
                 <div className="flex flex-col min-w-0 leading-tight">
                   <span className="font-medium text-panel-text truncate">{event.staff.shortName || event.staff.user?.shortName}</span>
                   <span className="text-xs text-panel-text-muted-dark">{event.staff.mainCategory.name}</span>

@@ -131,7 +131,7 @@ export default function Hub() {
             </div>
 
             {/* Timetable */}
-            <div className="flex flex-col flex-1 bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden min-h-[500px] shrink-0">
+            <div className="flex flex-col flex-1 bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden min-h-0 shrink-0">
               <Timetable
                 viewType="personal"
                 viewMode={viewMode}
