@@ -10,16 +10,17 @@ import { usePermissions } from "@/lib/permissions"
 
 interface WorkspaceScheduleProps {
   workspace: Workspace
+  forcedViewType?: "personal" | "team"
 }
 
-export default function WorkspaceSchedule({ workspace }: WorkspaceScheduleProps) {
+export default function WorkspaceSchedule({ workspace, forcedViewType }: WorkspaceScheduleProps) {
   const [calendarDate, setCalendarDate] = useState<Date>(new Date())
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
   const [viewMode, setViewMode] = useState<TimetableViewMode>("3days")
 
   const { can } = usePermissions(workspace.id)
   const canViewGlobalSchedule = workspace.type === "individual" ? false : can("view_global_schedule")
-  const viewType = canViewGlobalSchedule ? "team" : "personal"
+  const viewType = forcedViewType || (canViewGlobalSchedule ? "team" : "personal")
   const step = viewMode === "month" ? 30 : viewMode === "week" ? 7 : (viewType === "team" ? 1 : 3)
 
   const { data: columns = [], isLoading: columnsLoading } = useQuery({
@@ -39,7 +40,7 @@ export default function WorkspaceSchedule({ workspace }: WorkspaceScheduleProps)
   const isLoading = columnsLoading || eventsLoading
 
   return (
-    <div className="flex flex-col flex-1 pb-12 min-h-0">
+    <div className="flex flex-col flex-1 min-h-0">
       <div className="flex flex-col flex-1 min-h-0">
         {isLoading ? (
           <div className="flex items-center justify-center flex-1 min-h-50">

@@ -15,7 +15,7 @@ interface WorkspacePageProps {
 
 export default function WorkspacePage({ id }: WorkspacePageProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState<WorkspaceSectionId>("schedule")
+  const [activeSection, setActiveSection] = useState<WorkspaceSectionId>("overview")
   const { can } = usePermissions(id)
 
   const { data: workspace, isLoading } = useQuery({
@@ -41,8 +41,10 @@ export default function WorkspacePage({ id }: WorkspacePageProps) {
 
   const renderSection = () => {
     switch (activeSection) {
+      case "overview":
+        return <WorkspaceSchedule workspace={workspace} forcedViewType="personal" />
       case "schedule":
-        return <WorkspaceSchedule workspace={workspace} />
+        return <WorkspaceSchedule workspace={workspace} forcedViewType="team" />
       case "appointments":
         return <WorkspaceStub icon={ClipboardList} title="Записи" description="История всех записей, подтверждение и управление визитами." />
       case "work_schedule":

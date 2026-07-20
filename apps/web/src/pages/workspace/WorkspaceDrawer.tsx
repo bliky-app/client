@@ -25,7 +25,8 @@ interface SectionConfig {
 }
 
 const SECTIONS: SectionConfig[] = [
-  { id: "schedule", label: "Расписание", icon: Calendar, permission: null },
+  { id: "overview", label: "Обзор", icon: Home, permission: null },
+  { id: "schedule", label: "Расписание", icon: Calendar, permission: "view_global_schedule" },
   { id: "appointments", label: "Записи", icon: ClipboardList, permission: null },
   { id: "work_schedule", label: "График", icon: Clock, permission: null },
   { id: "services", label: "Услуги", icon: List, permission: null }, // services doesn't require permission to view own services
@@ -55,8 +56,8 @@ export default function WorkspaceDrawer({
   const { can, user } = usePermissions(workspace.id)
 
   const visibleSections = SECTIONS.filter(section => {
-    // Hide 'staff' for individual workspaces entirely
-    if (section.id === "staff" && workspace.type === "individual") return false
+    // Hide 'staff' and 'schedule' for individual workspaces entirely
+    if ((section.id === "staff" || section.id === "schedule") && workspace.type === "individual") return false
     
     // Fallback to permission check
     return section.permission === null || can(section.permission)
