@@ -46,9 +46,10 @@ export const hubApi = {
     for (let i = 0; i < days; i++) {
       const d = new Date(startDate)
       d.setDate(d.getDate() + i)
-      const dateString = d.toISOString().split('T')[0]
+      const getLocalYMD = (dateObj: Date) => new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split("T")[0]
+      const dateString = getLocalYMD(d)
       const dayOfWeek = d.getDay()
-      const todayString = new Date().toISOString().split('T')[0]
+      const todayString = getLocalYMD(new Date())
       const isToday = dateString === todayString
       
       const allUserShifts = MOCK_WORKSPACES.flatMap(ws => {

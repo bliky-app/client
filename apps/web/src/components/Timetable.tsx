@@ -111,8 +111,9 @@ export default function Timetable({
   ]
   while (calDays.length % 7 !== 0) calDays.push(null)
 
-  const todayStr = new Date().toISOString().split("T")[0]
-  const curStr = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000).toISOString().split("T")[0]
+  const getLocalYMD = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split("T")[0]
+  const todayStr = getLocalYMD(new Date())
+  const curStr = getLocalYMD(currentDate)
 
   const uniqueStaff = useMemo(() => {
     if (viewType !== "team") return []

@@ -22,9 +22,10 @@ export const workspaceApi = {
     for (let i = 0; i < 3; i++) {
       const d = new Date(startDate)
       d.setDate(d.getDate() + i)
-      const dateString = d.toISOString().split("T")[0]
+      const getLocalYMD = (dateObj: Date) => new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split("T")[0]
+      const dateString = getLocalYMD(d)
       const dayOfWeek = d.getDay()
-      const todayString = new Date().toISOString().split("T")[0]
+      const todayString = getLocalYMD(new Date())
       const isToday = dateString === todayString
       
       const workspaceSchedule = ws?.schedule[dayOfWeek] ?? []
@@ -53,8 +54,9 @@ export const workspaceApi = {
     if (!ws || !ws.staff) return []
 
     const dayOfWeek = date.getDay()
-    const dateString = date.toISOString().split("T")[0]
-    const todayString = new Date().toISOString().split("T")[0]
+    const getLocalYMD = (dateObj: Date) => new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split("T")[0]
+    const dateString = getLocalYMD(date)
+    const todayString = getLocalYMD(new Date())
     const isToday = dateString === todayString
     const tz = "+03:00" // Use valid ISO 8601 offset
 
