@@ -211,17 +211,13 @@ export default function Timetable({
               {calDays.map((day, i) => {
                 if (!day) return <div key={i} className="aspect-square" />
                 const ds = getTzDateString(day, timezone)
-                const count = byDate[ds] || 0
                 return (
                   <button key={ds}
                     onClick={() => { onDateSelect?.(day); setShowCal(false) }}
-                    className={`relative aspect-square flex flex-col items-center justify-center rounded-xl transition-colors ${heatBg(count)} ${ds === curStr ? "ring-2 ring-panel-text ring-inset" : ""} hover:bg-panel-surface text-sm`}>
+                    className={`aspect-square flex flex-col items-center justify-center rounded-xl transition-colors ${ds === curStr ? "ring-2 ring-panel-text ring-inset bg-panel-surface" : "bg-panel-base"} hover:bg-panel-surface text-sm`}>
                     <span className={`z-10 flex items-center justify-center ${ds === todayStr ? "bg-panel-text text-panel-base rounded-full w-6 h-6 font-bold" : "text-panel-text"}`}>
                       {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}
                     </span>
-                    {count > 0 && (
-                      <span className="absolute top-1 right-1 text-[9px] font-bold text-panel-text/90">{count}</span>
-                    )}
                   </button>
                 )
               })}
@@ -290,19 +286,19 @@ export default function Timetable({
                       </div>
                       <div className="grid grid-cols-7 gap-2">
                         {days.map((day, i) => {
-                          if (!day) return <div key={i} className="aspect-square" />
+                          if (!day) return <div key={i} className="aspect-[4/5]" />
                           const ds = getTzDateString(day, timezone)
                           const count = byDate[ds] || 0
                           const isToday = ds === todayStr
                           return (
                             <button key={ds}
                               onClick={() => { onDateSelect?.(day); onViewModeChange?.("week") }}
-                              className={`relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all hover:opacity-80 ${heatBg(count)}`}>
+                              className={`relative aspect-[4/5] rounded-xl flex flex-col items-center justify-start pt-2 transition-all hover:opacity-80 ${heatBg(count)}`}>
                               <span className={`text-sm font-semibold z-10 flex items-center justify-center ${isToday ? "bg-panel-text text-panel-base rounded-full w-7 h-7" : count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
                                 {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}
                               </span>
                               {count > 0 && (
-                                <span className="absolute top-1.5 right-2 text-[10px] font-bold text-panel-text/90">{count}</span>
+                                <span className="absolute bottom-2 text-[10px] font-bold text-panel-text/90">{count}</span>
                               )}
                             </button>
                           )
