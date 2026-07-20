@@ -60,7 +60,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
 
     if (completeAppointments === 0) {
       return (
-        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
+        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-400 leading-normal">
           Сегодня предстоит{" "}
           <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
             <ClipboardList className="w-4 h-4" />
@@ -143,14 +143,14 @@ export default function HubOverview({ data }: HubOverviewProps) {
 
     if (unconfirmedAppointments === 0) {
       return (
-        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-400">
           Все заявки от клиентов обработаны.
         </span>
       )
     }
 
     return (
-      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-400 leading-normal">
         {pronounDative} нужно обработать{" "}
         <span className="whitespace-nowrap">
           <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
@@ -168,14 +168,14 @@ export default function HubOverview({ data }: HubOverviewProps) {
 
     if (totalWorkspaceAppointments === 0) {
       return (
-        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
+        <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-400 leading-normal">
           В <span className="text-hub-text font-semibold inline-flex items-center gap-1.5"><Layers className="w-4 h-4" /> {totalWorkspaces} {pluralize(totalWorkspaces, ["пространстве", "пространствах", "пространствах"])}</span> пока нет записей.
         </span>
       )
     }
 
     return (
-      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-400 leading-normal">
         По {pronounPossessive} <span className="text-hub-text font-semibold inline-flex items-center gap-1.5"><Layers className="w-4 h-4" /> {totalWorkspaces} {pluralize(totalWorkspaces, ["пространству", "пространствам", "пространствам"])}</span>
         {canViewAnalytics ? (
           <>
@@ -205,7 +205,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
     if (todayAppointments > 0 || isAdmin || isOwner) return null
     
     return (
-      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500">
+      <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-400">
         У {pronounGenitive} пока нет активных ролей. Создайте своё пространство или расскажите работодателю о нашей платформе.
       </span>
     )
@@ -216,7 +216,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
       <h1 className="text-2xl text-white font-medium tracking-tight flex items-center gap-2.5">
         <span className="text-white">—</span> {greeting}
       </h1>
-      <div className="text-xl font-medium leading-relaxed">
+      <div className="text-lg font-normal leading-normal">
         {renderMasterBlock()}
         {renderAdminBlock()}
         {renderOwnerBlock()}
