@@ -20,6 +20,7 @@ interface TimetableProps {
   hideWorkspaceTags?: boolean
   workspaceTimezone?: string
   headerTitle?: string
+  currentUserId?: string
 }
 
 const PPM = 1.5 // pixels per minute
@@ -53,6 +54,7 @@ export default function Timetable({
   onPrev, onNext, onEventClick, onDateSelect, onViewModeChange,
   viewMode = "3days", hideWorkspaceTags = false,
   workspaceTimezone = "Europe/Moscow", headerTitle: propHeaderTitle,
+  currentUserId,
 }: TimetableProps) {
 
   const [showCal, setShowCal] = useState(false)
@@ -318,7 +320,9 @@ export default function Timetable({
                         )}
                         <span className={`text-sm font-semibold ${col.isToday ? "text-panel-text" : "text-panel-text-muted"}`}>{col.label}</span>
                         {col.subLabel && <span className={`text-xs ${col.isToday ? "text-panel-text-muted" : "text-panel-text-subtle"}`}>{col.subLabel}</span>}
-                        {col.isToday && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-panel-text" />}
+                        {(viewType === "team" ? (currentUserId && col.staff?.user?.id === currentUserId) : col.isToday) && (
+                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-panel-text" />
+                        )}
                       </div>
 
                       <div className="relative" style={{ height: gH }}>

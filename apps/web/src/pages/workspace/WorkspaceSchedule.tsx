@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react"
 import Timetable, { type TimetableViewMode } from "@/components/Timetable"
 import EventPopup from "@/components/EventPopup"
 import { workspaceApi } from "@/lib/api/workspaceApi"
+import { MOCK_USER } from "@/lib/api/mockData"
 import type { Workspace, Appointment } from "@/types/models"
 import { usePermissions } from "@/lib/permissions"
 
@@ -59,6 +60,7 @@ export default function WorkspaceSchedule({ workspace }: WorkspaceScheduleProps)
               onPrev={() => { const d = new Date(calendarDate); d.setDate(d.getDate() - step); setCalendarDate(d) }}
               onNext={() => { const d = new Date(calendarDate); d.setDate(d.getDate() + step); setCalendarDate(d) }}
               onEventClick={setSelectedEvent}
+              currentUserId={MOCK_USER.id}
             />
           </div>
         )}
