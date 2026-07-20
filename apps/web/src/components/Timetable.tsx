@@ -381,8 +381,11 @@ export default function Timetable({
 
                           return (
                             <div key={event.id} onClick={() => onEventClick?.(event)}
-                              className="absolute left-1.5 right-1.5 flex rounded-xl shadow-sm transition-transform hover:scale-[1.01] cursor-pointer overflow-hidden bg-panel-surface border border-panel-border"
+                              className={`absolute left-1.5 right-1.5 flex rounded-xl shadow-sm transition-transform hover:scale-[1.01] cursor-pointer overflow-hidden bg-panel-surface border border-panel-border ${!event.isConfirmed ? "opacity-60" : ""}`}
                               style={{ top, height }}>
+                              {!event.isConfirmed && (
+                                <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-yellow-400 shadow-sm z-10" />
+                              )}
                               <div className="w-1 shrink-0 flex flex-col h-full bg-panel-base/50">
                                 {event.stages.map(s => (
                                   <div key={s.id} 
