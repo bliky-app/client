@@ -217,7 +217,7 @@ export default function Timetable({
                     {uniqueStaff.map(s => (
                       <th key={s.id} className="px-2 py-2 border-b border-panel-border-subtle text-center min-w-16 bg-panel-surface">
                         <div className="flex flex-col items-center gap-1">
-                          <Avatar type="user" name={s.shortName || s.user?.shortName || "?"} avatarUrl={s.user?.avatarUrl} color={s.color} className="w-7 h-7 rounded-full text-[10px]" />
+                          <Avatar type="user" name={s.shortName || s.user?.shortName || "?"} avatarUrl={s.user?.avatarUrl} color={s.color || s.user?.color} className="w-7 h-7 rounded-full text-[10px]" />
                           <span className="text-[10px] font-medium text-panel-text-muted truncate max-w-16">{s.shortName || s.user?.shortName}</span>
                         </div>
                       </th>

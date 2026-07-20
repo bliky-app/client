@@ -19,7 +19,7 @@ export default function WorkspaceSchedule({ workspace }: WorkspaceScheduleProps)
   const { can } = usePermissions(workspace.id)
   const canViewGlobalSchedule = workspace.type === "individual" ? false : can("view_global_schedule")
   const viewType = canViewGlobalSchedule ? "team" : "personal"
-  const step = viewMode === "month" ? 28 : viewMode === "week" ? 7 : (viewType === "team" ? 1 : 3)
+  const step = viewMode === "month" ? 30 : viewMode === "week" ? 7 : (viewType === "team" ? 1 : 3)
 
   const { data: columns = [], isLoading: columnsLoading } = useQuery({
     queryKey: ["workspaceColumns", workspace.id, calendarDate.toISOString(), viewType, viewMode],

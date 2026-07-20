@@ -28,7 +28,7 @@ export default function Hub() {
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
   const [viewMode, setViewMode] = useState<TimetableViewMode>("3days")
 
-  const step = viewMode === "month" ? 28 : viewMode === "week" ? 7 : 3
+  const step = viewMode === "month" ? 30 : viewMode === "week" ? 7 : 3
 
   // These are fetched independently — NOT included in the top-level loading
   // guard so that navigating the calendar doesn't remount the whole page and
