@@ -75,11 +75,13 @@ export default function HubOverview({ data }: HubOverviewProps) {
             <>
               {" "}
               {verbFree} после{" "}
-              <span className="text-hub-text font-semibold inline-flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                {formatTime(lastAppointmentEndTime)}
+              <span className="whitespace-nowrap">
+                <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  {formatTime(lastAppointmentEndTime)}
+                </span>
+                .
               </span>
-              .
             </>
           )}
         </span>
@@ -98,31 +100,38 @@ export default function HubOverview({ data }: HubOverviewProps) {
           {todayAppointments} {pluralize(todayAppointments, ["записи", "записей", "записей"])}
         </span>{" "}
         на сегодня {verbCompleted}{" "}
-        <span className="text-hub-text font-semibold inline-flex items-center gap-1">
-          <CheckCircle2 className="w-4 h-4" />
-          {completeAppointments}
+        <span className="whitespace-nowrap">
+          <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+            <CheckCircle2 className="w-4 h-4" />
+            {completeAppointments}
+          </span>
+          {remainingAppointments > 0 ? "," : "."}
         </span>
         {remainingAppointments > 0 ? (
           <>
-            , осталось ещё{" "}
-            <span className="text-hub-text font-semibold inline-flex items-center gap-1">
-              <Inbox className="w-4 h-4" />
-              {remainingAppointments}
+            {" "}осталось ещё{" "}
+            <span className="whitespace-nowrap">
+              <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+                <Inbox className="w-4 h-4" />
+                {remainingAppointments}
+              </span>
+              .
             </span>
-            .
           </>
         ) : (
-          ". Все запланированные записи завершены!"
+          " Все запланированные записи завершены!"
         )}
         {lastAppointmentEndTime && remainingAppointments > 0 && (
           <>
             {" "}
             {verbFree} после{" "}
-            <span className="text-hub-text font-semibold inline-flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              {formatTime(lastAppointmentEndTime)}
+            <span className="whitespace-nowrap">
+              <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                {formatTime(lastAppointmentEndTime)}
+              </span>
+              .
             </span>
-            .
           </>
         )}
       </span>
@@ -143,11 +152,13 @@ export default function HubOverview({ data }: HubOverviewProps) {
     return (
       <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
         {pronounDative} нужно обработать{" "}
-        <span className="text-hub-text font-semibold inline-flex items-center gap-1">
-          <Inbox className="w-4 h-4" />
-          {unconfirmedAppointments} {pluralize(unconfirmedAppointments, ["неподтвержденную заявку", "неподтвержденные заявки", "неподтвержденных заявок"])}
+        <span className="whitespace-nowrap">
+          <span className="text-hub-text font-semibold inline-flex items-center gap-1">
+            <Inbox className="w-4 h-4" />
+            {unconfirmedAppointments} {pluralize(unconfirmedAppointments, ["неподтвержденную заявку", "неподтвержденные заявки", "неподтвержденных заявок"])}
+          </span>
+          .
         </span>
-        .
       </span>
     )
   }
