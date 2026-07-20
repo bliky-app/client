@@ -285,7 +285,7 @@ export default function Timetable({
                   return (
                     <>
                       <div className="text-center text-sm font-semibold text-panel-text mb-4">
-                        {new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: timezone }).format(currentDate).toLowerCase()}
+                        {new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: timezone }).format(currentDate).replace(/\s*г\./, '').toLowerCase()}
                       </div>
                       <div className="grid grid-cols-7 mb-2">
                         {WEEKDAYS.map(d => <div key={d} className="text-center text-xs font-medium text-panel-text-subtle py-1">{d}</div>)}
