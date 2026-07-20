@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Bell, Settings, ChevronDown, Calendar as CalendarIcon } from "lucide-react"
 import Avatar from "@/components/Avatar"
 import WorkspaceDropdown from "@/components/WorkspaceDropdown"
-import GlobalSettingsModal from "@/components/GlobalSettingsModal"
+import SettingsDropdown from "@/components/SettingsDropdown"
 import type { User } from "@/types/models"
 import { MONTHS } from "@/lib/formatters"
 
@@ -12,28 +12,36 @@ interface HubHeaderProps {
 }
 
 export default function HubHeader({ user, date }: HubHeaderProps) {
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
-  // Capture the button's rect synchronously on click — no useEffect, no jump
-  const [triggerRect, setTriggerRect] = useState<DOMRect | undefined>()
+  const [showWorkspaceDropdown, setShowWorkspaceDropdown] = useState(false)
+  const [showSettingsDropdown, setShowSettingsDropdown] = useState(false)
+  
+  // Capture rects for portal positioning
+  const [workspaceTriggerRect, setWorkspaceTriggerRect] = useState<DOMRect | undefined>()
+  const [settingsTriggerRect, setSettingsTriggerRect] = useState<DOMRect | undefined>()
 
   const dayOfMonth = date.getDate()
   const monthName = MONTHS[date.getMonth()]
   const year = date.getFullYear()
 
-  const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!showDropdown) {
-      // Capture position right now, before anything renders
-      setTriggerRect(e.currentTarget.getBoundingClientRect())
+  const handleWorkspaceToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!showWorkspaceDropdown) {
+      setWorkspaceTriggerRect(e.currentTarget.getBoundingClientRect())
     }
-    setShowDropdown(prev => !prev)
+    setShowWorkspaceDropdown(prev => !prev)
+  }
+
+  const handleSettingsToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!showSettingsDropdown) {
+      setSettingsTriggerRect(e.currentTarget.getBoundingClientRect())
+    }
+    setShowSettingsDropdown(prev => !prev)
   }
 
   return (
     <div className="flex justify-between items-center w-full">
       <div className="relative">
         <button
-          onClick={handleToggle}
+          onClick={handleWorkspaceToggle}
           className="flex items-center gap-3 text-left group"
         >
           <Avatar
@@ -47,7 +55,7 @@ export default function HubHeader({ user, date }: HubHeaderProps) {
               <span className="text-hub-text font-semibold text-lg leading-tight truncate group-hover:text-hub-text-muted transition-colors">
                 {user.shortName}
               </span>
-              <ChevronDown className={`w-4 h-4 text-hub-text-subtle transition-transform ${showDropdown ? "rotate-180" : ""}`} />
+              <ChevronDown className={`w-4 h-4 text-hub-text-subtle transition-transform ${showWorkspaceDropdown ? "rotate-180" : ""}`} />
             </div>
             <span className="text-hub-text-subtle text-xs leading-tight mt-0.5 flex items-center gap-1 truncate">
               <CalendarIcon className="h-3 w-3 shrink-0" />
@@ -57,9 +65,9 @@ export default function HubHeader({ user, date }: HubHeaderProps) {
         </button>
 
         <WorkspaceDropdown
-          isOpen={showDropdown}
-          onClose={() => setShowDropdown(false)}
-          triggerRect={triggerRect}
+          isOpen={showWorkspaceDropdown}
+          onClose={() => setShowWorkspaceDropdown(false)}
+          triggerRect={workspaceTriggerRect}
         />
       </div>
 
@@ -67,12 +75,22 @@ export default function HubHeader({ user, date }: HubHeaderProps) {
         <button className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 transition-transform">
           <Bell className="h-5 w-5 text-hub-text-muted" />
         </button>
-        <button onClick={() => setShowSettings(true)} className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 transition-transform">
-          <Settings className="h-5 w-5 text-hub-text-muted" />
-        </button>
+        
+        <div className="relative">
+          <button 
+            onClick={handleSettingsToggle} 
+            className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <Settings className="h-5 w-5 text-hub-text-muted" />
+          </button>
+          
+          <SettingsDropdown 
+            isOpen={showSettingsDropdown} 
+            onClose={() => setShowSettingsDropdown(false)} 
+            triggerRect={settingsTriggerRect}
+          />
+        </div>
       </div>
-      
-      <GlobalSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   )
 }
