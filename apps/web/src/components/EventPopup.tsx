@@ -125,7 +125,6 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="text-sm font-semibold text-panel-text mb-3">Этапы услуги</span>
             {event.stages.map((stage, idx) => {
               const accumulatedMinutes = event.stages
                 .slice(0, idx)
