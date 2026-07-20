@@ -13,7 +13,7 @@ export default function WorkspaceStub({ icon: Icon, title, description }: Worksp
         <Icon className="h-7 w-7 text-panel-text-subtle" />
       </div>
       <h3 className="text-xl font-semibold text-panel-text tracking-tight">{title}</h3>
-      <p className="text-panel-text-subtle text-sm leading-relaxed max-w-[260px]">{description}</p>
+      <p className="text-panel-text-subtle text-sm leading-relaxed max-w-65">{description}</p>
       <span className="mt-2 text-[11px] font-bold uppercase tracking-widest text-panel-text-muted bg-panel-border-subtle px-3 py-1.5 rounded-full">
         Скоро
       </span>

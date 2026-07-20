@@ -181,7 +181,7 @@ export default function Timetable({
                 className="p-1 hover:bg-panel-surface rounded-lg transition-colors">
                 <ChevronLeft className="h-5 w-5 text-panel-text-muted" />
               </button>
-              <span className="text-base font-semibold text-panel-text">{MONTHS_RU[calM]} {calY}</span>
+              <span className="text-base font-semibold text-panel-text">{MONTHS_RU[calM].toLowerCase()}</span>
               <button onClick={() => setCalMonth(d => new Date(d.getFullYear(), d.getMonth() + 1, 1))}
                 className="p-1 hover:bg-panel-surface rounded-lg transition-colors">
                 <ChevronRight className="h-5 w-5 text-panel-text-muted" />
@@ -262,7 +262,7 @@ export default function Timetable({
                   return (
                     <>
                       <div className="text-center text-sm font-semibold text-panel-text mb-4">
-                        {new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: timezone }).format(currentDate)}
+                        {new Intl.DateTimeFormat("ru-RU", { month: "long", timeZone: timezone }).format(currentDate).toLowerCase()}
                       </div>
                       <div className="grid grid-cols-7 mb-2">
                         {WEEKDAYS.map(d => <div key={d} className="text-center text-xs font-medium text-panel-text-subtle py-1">{d}</div>)}

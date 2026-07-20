@@ -89,7 +89,7 @@ export default function Hub() {
         </div>
 
         {/* LAYER 2 */}
-        <div className="col-start-1 row-start-1 w-full flex flex-col z-20 pointer-events-none">
+        <div className="col-start-1 row-start-1 w-full flex flex-col z-20 pointer-events-none min-h-full">
           {/* Pushers: match the sticky block height exactly */}
           <div className="w-full flex flex-col invisible" aria-hidden="true">
             <div className="px-6 pt-8 pb-4 w-full">
@@ -104,7 +104,7 @@ export default function Hub() {
           <div className="h-1 w-full shrink-0" aria-hidden="true" />
 
           {/* White panel */}
-          <div className="pointer-events-auto flex flex-col bg-panel-base rounded-t-[32px] pt-4 pb-12 min-h-[100svh] px-4 sm:px-6 gap-6 shadow-[0_-8px_32px_rgba(0,0,0,0.18)]">
+          <div className="pointer-events-auto flex-1 flex flex-col bg-panel-base rounded-t-[32px] pt-4 pb-4 px-4 sm:px-6 gap-6 shadow-[0_-8px_32px_rgba(0,0,0,0.18)]">
 
             <div className="w-12 h-1.5 bg-panel-border-subtle rounded-full mx-auto shrink-0 mb-2" />
 
