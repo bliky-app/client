@@ -93,8 +93,8 @@ export default function Timetable({
     t2m(formatTime(s.startDateTime, workspaceTimezone)),
     t2m(formatTime(s.endDateTime, workspaceTimezone)),
   ]))
-  const gStart = allTimes.length > 0 ? Math.floor(Math.min(...allTimes) / 60) : 8
-  const gEnd   = allTimes.length > 0 ? Math.ceil(Math.max(...allTimes) / 60)  : 22
+  const gStart = Math.max(0, (allTimes.length > 0 ? Math.floor(Math.min(...allTimes) / 60) : 8) - 1)
+  const gEnd = Math.min(24, (allTimes.length > 0 ? Math.ceil(Math.max(...allTimes) / 60) : 22) + 1)
   const hours = Array.from({ length: gEnd - gStart }, (_, i) => gStart + i)
   const gH = (gEnd - gStart) * 60 * PPM
   const nowM = now.getHours() * 60 + now.getMinutes()
