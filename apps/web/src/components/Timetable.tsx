@@ -244,7 +244,7 @@ export default function Timetable({
                         const count = byDateStaff[`${str}_${s.id}`] || 0
                         return (
                           <td key={s.id} className="px-2 py-1.5 text-center">
-                            <div className={`mx-auto w-full aspect-square max-w-12 rounded-xl flex flex-col items-center justify-center text-sm font-semibold transition-colors ${heatBg(count)} ${count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
+                            <div className={`mx-auto w-full aspect-square max-w-12 rounded-xl flex flex-col items-center justify-center text-sm font-semibold transition-colors ${count > 0 ? heatBg(count) : "bg-panel-text/[0.03]"} ${count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
                               {count > 0 ? count : ""}
                             </div>
                           </td>
