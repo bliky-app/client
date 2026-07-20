@@ -95,17 +95,9 @@ export default function Timetable({
   const nowM = now.getHours() * 60 + now.getMinutes()
   const headerHeightClass = viewType === "team" ? "h-20" : "h-12"
 
-  // Title logic: MM.DD or MM.DD — MM.DD
-  const formatMD = (d: Date) => `${pad(d.getMonth() + 1)}.${pad(d.getDate())}`
-  const daysCount = viewMode === "week" ? 7 : viewMode === "3days" ? 3 : 1
-  
-  let dynamicTitle = formatMD(currentDate)
-  if (viewMode === "3days" || viewMode === "week") {
-    const endDate = new Date(currentDate)
-    endDate.setDate(endDate.getDate() + daysCount - 1)
-    dynamicTitle = `${formatMD(currentDate)} — ${formatMD(endDate)}`
-  }
-  const headerTitle = propHeaderTitle || dynamicTitle
+  // Title logic: DD.MM
+  const formatMD = (d: Date) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`
+  const headerTitle = propHeaderTitle || formatMD(currentDate)
 
   // Mini calendar days
   const calY = calMonth.getFullYear(), calM = calMonth.getMonth()
@@ -204,7 +196,7 @@ export default function Timetable({
                     className={`relative aspect-square flex flex-col items-center justify-center rounded-xl transition-colors ${heatBg(count)} ${ds === curStr ? "ring-2 ring-panel-text ring-inset" : ""} ${ds === todayStr ? "font-bold text-panel-text" : "text-panel-text-muted"} hover:bg-panel-surface text-sm`}>
                     <span className="z-10">{day.getDate()}</span>
                     {count > 0 && (
-                      <span className="absolute bottom-1 text-[10px] font-medium text-panel-text/70">{count}</span>
+                      <span className="absolute bottom-0.5 text-[9px] font-medium text-panel-text/90">{count}</span>
                     )}
                   </button>
                 )
@@ -278,7 +270,7 @@ export default function Timetable({
                               className={`relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all hover:opacity-80 ${heatBg(count)} ${isToday ? "ring-2 ring-panel-text ring-inset" : ""}`}>
                               <span className={`text-sm font-semibold z-10 ${count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>{day.getDate()}</span>
                               {count > 0 && (
-                                <span className="absolute bottom-1 text-[10px] font-medium text-panel-text/70">{count}</span>
+                                <span className="absolute bottom-0.5 text-[9px] font-medium text-panel-text/90">{count}</span>
                               )}
                             </button>
                           )
