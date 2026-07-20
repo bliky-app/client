@@ -93,9 +93,13 @@ export default function Timetable({
     t2m(formatTime(s.startDateTime, workspaceTimezone)),
     t2m(formatTime(s.endDateTime, workspaceTimezone)),
   ]))
-  const gStart = Math.max(0, (allTimes.length > 0 ? Math.floor(Math.min(...allTimes) / 60) : 8) - 1)
-  const gEnd = Math.min(24, (allTimes.length > 0 ? Math.ceil(Math.max(...allTimes) / 60) : 22) + 1)
-  const hours = Array.from({ length: gEnd - gStart }, (_, i) => gStart + i)
+  const minM = allTimes.length > 0 ? Math.min(...allTimes) : 8 * 60
+  const maxM = allTimes.length > 0 ? Math.max(...allTimes) : 22 * 60
+  const gStart = Math.max(0, (minM - 30) / 60)
+  const gEnd = Math.min(24, (maxM + 30) / 60)
+  const startHour = Math.ceil(gStart)
+  const endHour = Math.floor(gEnd)
+  const hours = Array.from({ length: Math.max(0, endHour - startHour + 1) }, (_, i) => startHour + i)
   const gH = (gEnd - gStart) * 60 * PPM
   const nowM = now.getHours() * 60 + now.getMinutes()
   const headerHeightClass = viewType === "team" ? "h-20" : "h-12"
@@ -369,8 +373,8 @@ export default function Timetable({
                           const height = t2px(formatTime(slot.endDateTime, workspaceTimezone), gStart) - top
                           return <div key={i} className="absolute w-full bg-timetable-slot" style={{ top, height }} />
                         })}
-                        <div className="absolute inset-0 pointer-events-none flex flex-col">
-                          {hours.map(h => <div key={h} className="w-full border-t border-panel-border-subtle" style={{ height: 60 * PPM }} />)}
+                        <div className="absolute inset-0 pointer-events-none">
+                          {hours.map(h => <div key={h} className="absolute w-full border-t border-panel-border-subtle" style={{ top: (h - gStart) * 60 * PPM }} />)}
                         </div>
                         {colEvents.map(event => {
                           const top = t2px(formatTime(event.startDateTime, workspaceTimezone), gStart)
