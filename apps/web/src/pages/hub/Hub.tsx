@@ -26,7 +26,7 @@ export default function Hub() {
   const [calendarDate, setCalendarDate] = useState(new Date())
   const [isWorkspacesExpanded, setIsWorkspacesExpanded] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
-  const [viewMode, setViewMode] = useState<TimetableViewMode>("3days")
+  const [viewMode, setViewMode] = useState<TimetableViewMode>("week")
 
   const step = viewMode === "month" ? 30 : viewMode === "week" ? 7 : 3
 

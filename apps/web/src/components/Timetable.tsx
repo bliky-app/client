@@ -5,7 +5,7 @@ import type { Appointment, TimetableColumn, TimetableViewType } from "@/types/mo
 import Avatar from "@/components/Avatar"
 import { formatTime } from "@/lib/formatters"
 
-export type TimetableViewMode = "1day" | "3days" | "week" | "month"
+export type TimetableViewMode = "1day" | "week" | "month"
 
 interface TimetableProps {
   viewType: TimetableViewType
@@ -55,7 +55,7 @@ export default function Timetable({
   viewType, currentDate, events, columns,
   onPrev, onNext, onEventClick, onDateSelect, onViewModeChange,
   timezone,
-  viewMode = "3days", hideWorkspaceTags = false,
+  viewMode = "week", hideWorkspaceTags = false,
   workspaceTimezone = "Europe/Moscow", headerTitle: propHeaderTitle,
   currentUserId,
 }: TimetableProps) {
@@ -100,9 +100,24 @@ export default function Timetable({
   const nowM = now.getHours() * 60 + now.getMinutes()
   const headerHeightClass = viewType === "team" ? "h-20" : "h-12"
 
-  // Title logic: DD.MM
+  // Title logic: DD.MM or DD.MM - DD.MM
   const formatMD = (d: Date) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`
-  const headerTitle = propHeaderTitle || formatMD(currentDate)
+  let defaultTitle = formatMD(currentDate)
+  if (viewMode === "month") {
+    defaultTitle = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: timezone }).format(currentDate).toLowerCase()
+  } else if (columns.length > 1 && viewType === "personal") {
+    const firstCol = columns[0]
+    const lastCol = columns[columns.length - 1]
+    if (firstCol.dateString && lastCol.dateString) {
+      const [y1, m1, d1] = firstCol.dateString.split("-").map(Number)
+      const [y2, m2, d2] = lastCol.dateString.split("-").map(Number)
+      defaultTitle = `${formatMD(new Date(y1, m1 - 1, d1))} – ${formatMD(new Date(y2, m2 - 1, d2))}`
+    }
+  } else if (columns.length === 1 && columns[0].dateString) {
+    const [y1, m1, d1] = columns[0].dateString.split("-").map(Number)
+    defaultTitle = formatMD(new Date(y1, m1 - 1, d1))
+  }
+  const headerTitle = propHeaderTitle || defaultTitle
 
   // Mini calendar days
   const calY = calMonth.getFullYear(), calM = calMonth.getMonth()
@@ -136,8 +151,8 @@ export default function Timetable({
     })
   }, [currentDate, timezone])
 
-  const VIEW_LABELS: Record<TimetableViewMode, string> = { "1day": "1 день", "3days": "3 дня", week: "Неделя", month: "Месяц" }
-  const allowedModes = viewType === "personal" ? ["3days", "week", "month"] : ["1day", "month"]
+  const VIEW_LABELS: Record<TimetableViewMode, string> = { "1day": "1 день", week: "Неделя", month: "Месяц" }
+  const allowedModes = viewType === "personal" ? ["week", "month"] : ["1day", "month"]
 
   return (
     <div className="flex flex-col bg-panel-surface overflow-hidden flex-1 w-full shrink-0 min-h-0">
@@ -181,7 +196,7 @@ export default function Timetable({
                 className="p-1 hover:bg-panel-surface rounded-lg transition-colors">
                 <ChevronLeft className="h-5 w-5 text-panel-text-muted" />
               </button>
-              <span className="text-base font-semibold text-panel-text">{MONTHS_RU[calM].toLowerCase()}</span>
+              <span className="text-base font-semibold text-panel-text">{MONTHS_RU[calM].toLowerCase()} {calY}</span>
               <button onClick={() => setCalMonth(d => new Date(d.getFullYear(), d.getMonth() + 1, 1))}
                 className="p-1 hover:bg-panel-surface rounded-lg transition-colors">
                 <ChevronRight className="h-5 w-5 text-panel-text-muted" />
@@ -244,7 +259,7 @@ export default function Timetable({
                         const count = byDateStaff[`${str}_${s.id}`] || 0
                         return (
                           <td key={s.id} className="px-2 py-1.5 text-center">
-                            <div className={`mx-auto w-full aspect-square max-w-12 rounded-xl flex flex-col items-center justify-center text-sm font-semibold transition-colors ${count > 0 ? heatBg(count) : "bg-panel-border-subtle/40"} ${count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
+                            <div className={`mx-auto w-full aspect-square max-w-12 rounded-xl flex flex-col items-center justify-center text-sm font-semibold transition-colors ${count > 0 ? heatBg(count) : "bg-panel-surface border border-panel-border-subtle shadow-sm"} ${count > 0 ? "text-panel-text border border-transparent" : "text-panel-text-subtle"}`}>
                               {count > 0 ? count : ""}
                             </div>
                           </td>
@@ -266,7 +281,7 @@ export default function Timetable({
                   return (
                     <>
                       <div className="text-center text-sm font-semibold text-panel-text mb-4">
-                        {new Intl.DateTimeFormat("ru-RU", { month: "long", timeZone: timezone }).format(currentDate).toLowerCase()}
+                        {new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: timezone }).format(currentDate).toLowerCase()}
                       </div>
                       <div className="grid grid-cols-7 mb-2">
                         {WEEKDAYS.map(d => <div key={d} className="text-center text-xs font-medium text-panel-text-subtle py-1">{d}</div>)}
@@ -279,7 +294,7 @@ export default function Timetable({
                           const isToday = ds === todayStr
                           return (
                             <button key={ds}
-                              onClick={() => { onDateSelect?.(day); onViewModeChange?.("3days") }}
+                              onClick={() => { onDateSelect?.(day); onViewModeChange?.("week") }}
                               className={`relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all hover:opacity-80 ${heatBg(count)}`}>
                               <span className={`text-sm font-semibold z-10 flex items-center justify-center ${isToday ? "bg-panel-text text-panel-base rounded-full w-7 h-7" : count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
                                 {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}

@@ -16,12 +16,12 @@ interface WorkspaceScheduleProps {
 export default function WorkspaceSchedule({ workspace, forcedViewType }: WorkspaceScheduleProps) {
   const [calendarDate, setCalendarDate] = useState<Date>(new Date())
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
-  const [viewMode, setViewMode] = useState<TimetableViewMode>("3days")
+  const [viewMode, setViewMode] = useState<TimetableViewMode>("week")
 
   const { can } = usePermissions(workspace.id)
   const canViewGlobalSchedule = workspace.type === "individual" ? false : can("view_global_schedule")
   const viewType = forcedViewType || (canViewGlobalSchedule ? "team" : "personal")
-  const step = viewMode === "month" ? 30 : viewMode === "week" ? 7 : (viewType === "team" ? 1 : 3)
+  const step = viewMode === "month" ? 30 : viewMode === "week" ? 7 : 1
 
   const { data: columns = [], isLoading: columnsLoading } = useQuery({
     queryKey: ["workspaceColumns", workspace.id, calendarDate.toISOString(), viewType, viewMode],
