@@ -100,23 +100,25 @@ export default function Timetable({
   const nowM = now.getHours() * 60 + now.getMinutes()
   const headerHeightClass = viewType === "team" ? "h-20" : "h-12"
 
-  // Title logic: DD.MM or DD.MM - DD.MM
+  // Title logic: DD.MM or DD.MM — DD.MM
   const formatMD = (d: Date) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`
-  let defaultTitle = formatMD(currentDate)
+  let startD = currentDate
+  let endD = currentDate
+
   if (viewMode === "month") {
-    defaultTitle = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric", timeZone: timezone }).format(currentDate).toLowerCase()
-  } else if (columns.length > 1 && viewType === "personal") {
-    const firstCol = columns[0]
-    const lastCol = columns[columns.length - 1]
-    if (firstCol.dateString && lastCol.dateString) {
-      const [y1, m1, d1] = firstCol.dateString.split("-").map(Number)
-      const [y2, m2, d2] = lastCol.dateString.split("-").map(Number)
-      defaultTitle = `${formatMD(new Date(y1, m1 - 1, d1))} – ${formatMD(new Date(y2, m2 - 1, d2))}`
+    if (viewType === "personal") {
+      startD = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+      endD = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
+    } else {
+      endD = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 29)
     }
-  } else if (columns.length === 1 && columns[0].dateString) {
-    const [y1, m1, d1] = columns[0].dateString.split("-").map(Number)
-    defaultTitle = formatMD(new Date(y1, m1 - 1, d1))
+  } else if (viewMode === "week") {
+    endD = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 6)
   }
+
+  const defaultTitle = startD.getTime() === endD.getTime() 
+    ? formatMD(startD) 
+    : `${formatMD(startD)} — ${formatMD(endD)}`
   const headerTitle = propHeaderTitle || defaultTitle
 
   // Mini calendar days
