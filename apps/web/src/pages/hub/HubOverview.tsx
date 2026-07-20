@@ -68,7 +68,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
           </span>{" "}
           на общую сумму{" "}
           <span className="text-hub-text font-semibold">
-            {formatCurrency(expectedRevenue)}
+            ≈ {formatCurrency(expectedRevenue)}
           </span>
           .
           {lastAppointmentEndTime && (
@@ -92,7 +92,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
       <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
         Сегодня {verbEarned}{" "}
         <span className="text-hub-text font-semibold">
-          {formatCurrency(todayRevenue)}
+          ≈ {formatCurrency(todayRevenue)}
         </span>
         . Из{" "}
         <span className="text-hub-text font-semibold inline-flex items-center gap-1.5">
@@ -191,8 +191,8 @@ export default function HubOverview({ data }: HubOverviewProps) {
         {canViewFinancials && (
           <>
             {" "}на общую сумму{" "}
-            <span className="text-white font-semibold">
-              {formatCurrency(totalWorkspaceRevenue)}
+            <span className="text-hub-text font-semibold">
+              ≈ {formatCurrency(totalWorkspaceRevenue)}
             </span>
           </>
         )}
