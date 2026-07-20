@@ -165,7 +165,7 @@ export default function HubOverview({ data }: HubOverviewProps) {
 
     return (
       <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-500 leading-relaxed">
-        По <span className="text-hub-text font-semibold inline-flex items-center gap-1"><Layers className="w-4 h-4" /> {pronounPossessive} {totalWorkspaces} {pluralize(totalWorkspaces, ["пространству", "пространствам", "пространствам"])}</span>
+        По {pronounPossessive} <span className="text-hub-text font-semibold inline-flex items-center gap-1"><Layers className="w-4 h-4" /> {totalWorkspaces} {pluralize(totalWorkspaces, ["пространству", "пространствам", "пространствам"])}</span>
         {canViewAnalytics ? (
           <>
             {" "}сегодня{" "}
