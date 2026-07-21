@@ -23,7 +23,7 @@ export function AppointmentStatusCard({
           )}
         </IconBox>
         <div className="flex flex-col min-w-0">
-          <span className="text-xs font-medium text-panel-text-muted">Статус записи</span>
+          <span className="text-xs font-medium text-panel-text-muted">Статус</span>
           <span
             className={`text-sm font-semibold truncate ${
               isConfirmed ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
