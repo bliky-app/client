@@ -89,7 +89,8 @@ function SearchableSelect({
   customOptionLabel = "Другое",
   autoOpen = false,
   searchValue,
-  onSearchChange
+  onSearchChange,
+  hideIcon = false
 }: {
   value: string | undefined
   onChange: (val: string) => void
@@ -102,6 +103,7 @@ function SearchableSelect({
   autoOpen?: boolean
   searchValue?: string
   onSearchChange?: (val: string) => void
+  hideIcon?: boolean
 }) {
   const [isOpen, setIsOpen] = useState(autoOpen)
   const [internalSearch, setInternalSearch] = useState("")
@@ -176,18 +178,20 @@ function SearchableSelect({
                     onClick={() => { onChange(opt.id); setIsOpen(false); setSearch("") }}
                     className={`w-full flex items-center justify-between p-3 rounded-lg hover:bg-panel-surface transition-colors text-left ${value === opt.id ? "bg-panel-surface" : ""}`}
                   >
-                    <div className="flex items-center gap-3">
-                      {opt.avatarUrl ? (
-                        <img src={opt.avatarUrl} alt={opt.name} className="w-8 h-8 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
-                      ) : (
-                        (opt.subtitle || opt.color) ? (
-                          <div 
-                            className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-xs shrink-0 text-white"
-                            style={{ backgroundColor: opt.color || 'var(--panel-text)' }}
-                          >
-                            {opt.name?.[0]?.toUpperCase()}
-                          </div>
-                        ) : null 
+                    <div className="flex items-center gap-3 pr-3 flex-1 min-w-0">
+                      {!hideIcon && (
+                        opt.avatarUrl ? (
+                          <img src={opt.avatarUrl} alt={opt.name} className="w-8 h-8 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
+                        ) : (
+                          (opt.subtitle || opt.color) ? (
+                            <div 
+                              className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-xs shrink-0 text-white"
+                              style={{ backgroundColor: opt.color || 'var(--panel-text)' }}
+                            >
+                              {opt.name?.[0]?.toUpperCase()}
+                            </div>
+                          ) : null 
+                        )
                       )}
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-panel-text">{opt.name}</span>
@@ -562,6 +566,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       options={MOCK_SERVICES.map(s => ({ id: s.id, name: s.name, subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽` }))}
                       placeholder={isFormal ? "Выберите услугу..." : "Выбери услугу..."}
                       showCustomOption={true}
+                      hideIcon={true}
                     />
                   ) : (
                     <div className="flex flex-col bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">

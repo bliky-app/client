@@ -21,7 +21,7 @@ interface QuickActionsRowProps {
   onOpenForm: (draft: QuickActionDraft) => void
 }
 
-function CustomSelect({ placeholder, options, onChange }: { placeholder: string, options: {value: string, label: string, subtitle?: string, color?: string, avatarUrl?: string}[], onChange: (val: string) => void }) {
+function CustomSelect({ placeholder, options, onChange, hideIcon = false }: { placeholder: string, options: {value: string, label: string, subtitle?: string, color?: string, avatarUrl?: string}[], onChange: (val: string) => void, hideIcon?: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const ref = useRef<HTMLButtonElement>(null)
   const [rect, setRect] = useState<DOMRect | null>(null)
@@ -56,17 +56,19 @@ function CustomSelect({ placeholder, options, onChange }: { placeholder: string,
                   className="w-full text-left px-4 py-2.5 hover:bg-panel-surface-hover transition-colors flex items-center gap-3"
                   onClick={() => { setIsOpen(false); onChange(opt.value) }}
                 >
-                  {opt.avatarUrl ? (
-                    <img src={opt.avatarUrl} alt={opt.label} className="w-8 h-8 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
-                  ) : (
-                    (opt.subtitle || opt.color) ? (
-                      <div 
-                        className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-xs shrink-0 text-white"
-                        style={{ backgroundColor: opt.color || 'var(--panel-text)' }}
-                      >
-                        {opt.label?.[0]?.toUpperCase()}
-                      </div>
-                    ) : null 
+                  {!hideIcon && (
+                    opt.avatarUrl ? (
+                      <img src={opt.avatarUrl} alt={opt.label} className="w-8 h-8 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
+                    ) : (
+                      (opt.subtitle || opt.color) ? (
+                        <div 
+                          className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-xs shrink-0 text-white"
+                          style={{ backgroundColor: opt.color || 'var(--panel-text)' }}
+                        >
+                          {opt.label?.[0]?.toUpperCase()}
+                        </div>
+                      ) : null 
+                    )
                   )}
                   <div className="flex flex-col min-w-0">
                     <span className="text-sm font-medium text-panel-text truncate">{opt.label}</span>
@@ -188,6 +190,7 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
                     placeholder="Выбрать" 
                     options={services.map(s => ({ value: s.id, label: s.name, subtitle: s.subtitle }))}
                     onChange={(val) => onOpenForm({ serviceId: val })}
+                    hideIcon={true}
                   />
                 </div>
               </div>
