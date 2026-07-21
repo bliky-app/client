@@ -35,8 +35,8 @@ const MOCK_SERVICES = [
 ]
 
 const MOCK_MASTERS = [
-  { id: "me", name: "Я (Александр)", subtitle: "Топ-мастер" },
-  { id: "other", name: "Елена", subtitle: "Мастер" },
+  { id: "me", name: "Я (Александр)", subtitle: "Топ-мастер", avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026024d" },
+  { id: "other", name: "Елена", subtitle: "Мастер", avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
 ]
 
 export type ServiceStage = {
@@ -81,7 +81,7 @@ function SearchableSelect({
 }: {
   value: string | undefined
   onChange: (val: string) => void
-  options: { id: string, name: string, subtitle?: string }[]
+  options: { id: string, name: string, subtitle?: string, avatarUrl?: string }[]
   placeholder: string
   searchPlaceholder?: string
   disabled?: boolean
@@ -158,9 +158,20 @@ function SearchableSelect({
                     onClick={() => { onChange(opt.id); setIsOpen(false); setSearch("") }}
                     className={`w-full flex items-center justify-between p-3 rounded-lg hover:bg-panel-surface transition-colors text-left ${value === opt.id ? "bg-panel-surface" : ""}`}
                   >
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-panel-text">{opt.name}</span>
-                      {opt.subtitle && <span className="text-xs text-panel-text-muted">{opt.subtitle}</span>}
+                    <div className="flex items-center gap-3">
+                      {opt.avatarUrl ? (
+                        <img src={opt.avatarUrl} alt={opt.name} className="w-8 h-8 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
+                      ) : (
+                        opt.subtitle ? (
+                          <div className="w-8 h-8 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-xs text-panel-text shrink-0">
+                            {opt.name?.[0]?.toUpperCase()}
+                          </div>
+                        ) : null // don't show avatar placeholder if it's just a simple option without subtitle (like Service, which doesn't have an avatar logic here)
+                      )}
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-panel-text">{opt.name}</span>
+                        {opt.subtitle && <span className="text-xs text-panel-text-muted">{opt.subtitle}</span>}
+                      </div>
                     </div>
                     {value === opt.id && <Check className="w-4 h-4 text-panel-text" />}
                   </button>
@@ -175,9 +186,13 @@ function SearchableSelect({
 }
 
 export default function CreateAppointmentSheet({ isOpen, onClose, initialData, workspaces }: CreateAppointmentSheetProps) {
-  const [draft, setDraft] = useState<AppointmentDraft>({})
+  const [draft, setDraft] = useState<AppointmentDraft>(initialData || {})
   
-  const [isClientSearchActive, setIsClientSearchActive] = useState(true)
+  const [isWorkspaceSearchActive, setIsWorkspaceSearchActive] = useState(!initialData?.workspaceId)
+  const [isClientSearchActive, setIsClientSearchActive] = useState(!initialData?.clientId)
+  const [isMasterSearchActive, setIsMasterSearchActive] = useState(!initialData?.masterId)
+  const [isServiceSearchActive, setIsServiceSearchActive] = useState(!initialData?.serviceId)
+
   const [clientSearch, setClientSearch] = useState("")
   const [newClientName, setNewClientName] = useState("")
   const [newClientPhone, setNewClientPhone] = useState("")
@@ -185,14 +200,17 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
 
   useEffect(() => {
     if (isOpen) {
-      setDraft(initialData || {})
-      setIsClientSearchActive(!initialData?.clientId)
+      const data = initialData || {}
+      setDraft(data)
+      setIsWorkspaceSearchActive(!data.workspaceId)
+      setIsClientSearchActive(!data.clientId)
+      setIsMasterSearchActive(!data.masterId)
+      setIsServiceSearchActive(!data.serviceId)
     } else {
       setClientSearch("")
       setNewClientName("")
       setNewClientPhone("")
       setPhoneError("")
-      setIsClientSearchActive(true)
     }
   }, [isOpen, initialData])
 
@@ -232,6 +250,12 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
     })
   }
 
+  const selectedWorkspace = workspaces?.find(w => w.id === draft.workspaceId)
+  const selectedMaster = MOCK_MASTERS.find(m => m.id === draft.masterId)
+  const selectedService = draft.serviceId === "custom" 
+    ? { name: draft.customService?.name || "Свободная услуга", price: undefined } 
+    : MOCK_SERVICES.find(s => s.id === draft.serviceId)
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
       <div 
@@ -260,12 +284,31 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
             
             <div className="flex flex-col gap-3">
               <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Пространство</h3>
-              <SearchableSelect
-                value={draft.workspaceId}
-                onChange={val => setDraft({ ...draft, workspaceId: val, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })}
-                options={workspaces?.map(w => ({ id: w.id, name: w.name })) || []}
-                placeholder="Выберите пространство..."
-              />
+              {isWorkspaceSearchActive ? (
+                <SearchableSelect
+                  value={draft.workspaceId}
+                  onChange={val => {
+                    setDraft({ ...draft, workspaceId: val, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
+                    setIsWorkspaceSearchActive(false)
+                  }}
+                  options={workspaces?.map(w => ({ id: w.id, name: w.name, avatarUrl: w.avatarUrl })) || []}
+                  placeholder="Выберите пространство..."
+                />
+              ) : (
+                <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
+                  <div className="flex items-center gap-3">
+                    {selectedWorkspace?.avatarUrl ? (
+                      <img src={selectedWorkspace.avatarUrl} alt={selectedWorkspace.name} className="w-12 h-12 rounded-2xl object-cover shrink-0 border border-panel-border-subtle" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-2xl bg-panel-border-subtle flex items-center justify-center font-medium text-lg text-panel-text shrink-0">
+                        {selectedWorkspace?.name?.[0]?.toUpperCase() || "П"}
+                      </div>
+                    )}
+                    <span className="font-medium text-panel-text">{selectedWorkspace?.name}</span>
+                  </div>
+                  <button onClick={() => setIsWorkspaceSearchActive(true)} className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0">Изменить</button>
+                </div>
+              )}
             </div>
 
             {draft.workspaceId && (
@@ -289,18 +332,10 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                           }}
                           className="w-full bg-panel-surface border border-panel-border rounded-xl pl-11 pr-4 py-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text transition-colors"
                         />
-                        {clientSearch && (
-                          <button 
-                            onClick={() => { setClientSearch(""); setNewClientName(""); setNewClientPhone(""); }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-panel-text-muted hover:text-panel-text"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        )}
                       </div>
                       
                       {clientSearch && draft.clientId !== "new_pending" && (
-                        <div className="flex flex-col gap-2 bg-panel-surface border border-panel-border-subtle rounded-xl p-2 mt-1 shadow-sm animate-in fade-in slide-in-from-top-2">
+                        <div className="flex flex-col gap-2 bg-panel-surface border border-panel-border-subtle rounded-xl p-2 mt-1 shadow-sm">
                           <button 
                             onClick={() => {
                               setDraft({ ...draft, clientId: "new_pending" })
@@ -312,7 +347,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             </div>
                             <div className="flex flex-col min-w-0">
                               <span className="text-sm font-medium text-panel-text truncate">Создать нового клиента</span>
-                              <span className="text-xs text-panel-text-muted truncate">Заполнить имя и телефон</span>
                             </div>
                           </button>
                           
@@ -320,7 +354,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             onClick={() => {
                               setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
                               setIsClientSearchActive(false)
-                              setClientSearch("")
                             }}
                             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-base transition-colors border border-transparent hover:border-panel-border-subtle text-left"
                           >
@@ -337,15 +370,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
 
                       {draft.clientId === "new_pending" && (
                         <div className="flex flex-col gap-4 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 mt-1">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-semibold text-panel-text">Новый клиент</h4>
-                            <button 
-                              onClick={() => setDraft({ ...draft, clientId: undefined })}
-                              className="text-xs font-medium text-panel-text-muted hover:text-panel-text transition-colors"
-                            >
-                              Отмена
-                            </button>
-                          </div>
                           <div className="flex flex-col gap-3">
                             <input 
                               type="text" 
@@ -354,29 +378,21 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                               onChange={e => setNewClientName(e.target.value)}
                               className="w-full bg-panel-base border border-panel-border rounded-xl px-4 py-3 text-sm text-panel-text outline-none focus:border-panel-text transition-colors"
                             />
-                            <div className="flex flex-col gap-1">
-                              <input 
-                                type="tel" 
-                                placeholder="Телефон (например, +7 999 000 00 00)"
-                                value={newClientPhone}
-                                onChange={e => {
-                                  setNewClientPhone(e.target.value)
-                                  setPhoneError("")
-                                }}
-                                className={`w-full bg-panel-base border rounded-xl px-4 py-3 text-sm text-panel-text outline-none transition-colors ${phoneError ? 'border-red-500/50 focus:border-red-500' : 'border-panel-border focus:border-panel-text'}`}
-                              />
-                              {phoneError && <span className="text-xs text-red-500 pl-1">{phoneError}</span>}
-                            </div>
+                            <input 
+                              type="tel" 
+                              placeholder="Телефон"
+                              value={newClientPhone}
+                              onChange={e => { setNewClientPhone(e.target.value); setPhoneError("") }}
+                              className={`w-full bg-panel-base border rounded-xl px-4 py-3 text-sm text-panel-text outline-none transition-colors ${phoneError ? 'border-red-500' : 'border-panel-border'}`}
+                            />
                             <button 
                               onClick={() => {
                                 if (newClientName && validatePhone(newClientPhone)) {
                                   setDraft({ ...draft, clientId: "new", clientName: newClientName, clientPhone: newClientPhone })
                                   setIsClientSearchActive(false)
-                                  setClientSearch("")
                                 }
                               }}
-                              disabled={!newClientName || !newClientPhone}
-                              className="mt-2 w-full py-3 rounded-xl bg-panel-text text-panel-base font-semibold text-sm transition-opacity disabled:opacity-50"
+                              className="mt-2 w-full py-3 rounded-xl bg-panel-text text-panel-base font-semibold text-sm"
                             >
                               Сохранить клиента
                             </button>
@@ -395,12 +411,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                           <span className="text-sm text-panel-text-muted truncate">{draft.clientPhone || "Телефон не указан"}</span>
                         </div>
                       </div>
-                      <button 
-                        onClick={() => setIsClientSearchActive(true)}
-                        className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
-                      >
-                        Изменить
-                      </button>
+                      <button onClick={() => setIsClientSearchActive(true)} className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text">Изменить</button>
                     </div>
                   )}
                 </div>
@@ -408,64 +419,95 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                 <div className="flex flex-col sm:flex-row gap-6">
                   <div className="flex-1 flex flex-col gap-3">
                     <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Мастер</h3>
-                    <SearchableSelect
-                      value={draft.masterId}
-                      onChange={val => setDraft({ ...draft, masterId: val })}
-                      options={MOCK_MASTERS}
-                      placeholder="Выберите мастера..."
-                      searchPlaceholder="Поиск мастера..."
-                    />
+                    {isMasterSearchActive ? (
+                      <SearchableSelect
+                        value={draft.masterId}
+                        onChange={val => { setDraft({ ...draft, masterId: val }); setIsMasterSearchActive(false) }}
+                        options={MOCK_MASTERS}
+                        placeholder="Выберите мастера..."
+                      />
+                    ) : (
+                      <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm h-full min-h-[82px]">
+                        <div className="flex items-center gap-3">
+                          {selectedMaster?.avatarUrl ? (
+                            <img src={selectedMaster.avatarUrl} alt={selectedMaster.name} className="w-12 h-12 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-lg text-panel-text shrink-0">
+                              {selectedMaster?.name?.[0] || "М"}
+                            </div>
+                          )}
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-base font-semibold text-panel-text truncate">{selectedMaster?.name}</span>
+                            <span className="text-sm text-panel-text-muted truncate">{selectedMaster?.subtitle || "Мастер"}</span>
+                          </div>
+                        </div>
+                        <button onClick={() => setIsMasterSearchActive(true)} className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text">Изменить</button>
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 flex flex-col gap-3">
                     <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Начало</h3>
-                    <input 
-                      type="datetime-local"
-                      value={draft.startDateTime || ""}
-                      onChange={e => setDraft({ ...draft, startDateTime: e.target.value })}
-                      className="w-full bg-panel-surface border border-panel-border rounded-xl px-4 py-3 text-sm text-panel-text outline-none focus:border-panel-text transition-colors"
-                    />
+                    <div className="h-full min-h-[82px]">
+                      <input 
+                        type="datetime-local"
+                        value={draft.startDateTime || ""}
+                        onChange={e => setDraft({ ...draft, startDateTime: e.target.value })}
+                        className="w-full h-full bg-panel-surface border border-panel-border rounded-xl px-4 py-3 text-sm text-panel-text outline-none focus:border-panel-text"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-3">
                   <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Услуга</h3>
-                  
-                  <SearchableSelect
-                    value={draft.serviceId}
-                    onChange={val => {
-                      if (val === "custom") {
-                        setDraft({ 
-                          ...draft, 
-                          serviceId: "custom", 
-                          customService: { name: "" },
-                          price: undefined,
-                          stages: [{ id: "custom-stage-1", name: "Общее время", durationMinutes: 60 }]
-                        })
-                      } else {
-                        const srv = MOCK_SERVICES.find(s => s.id === val)
-                        if (srv) {
-                          setDraft({ 
-                            ...draft, 
-                            serviceId: srv.id, 
-                            customService: undefined,
-                            price: srv.price,
-                            stages: srv.stages
-                          })
+                  {isServiceSearchActive ? (
+                    <SearchableSelect
+                      value={draft.serviceId}
+                      onChange={val => {
+                        if (val === "custom") {
+                          setDraft({ ...draft, serviceId: "custom", customService: { name: "" }, price: undefined, stages: [{ id: "custom-stage-1", name: "Общее время", durationMinutes: 60 }] })
+                        } else {
+                          const srv = MOCK_SERVICES.find(s => s.id === val)
+                          if (srv) setDraft({ ...draft, serviceId: srv.id, customService: undefined, price: srv.price, stages: srv.stages })
                         }
-                      }
-                    }}
-                    options={MOCK_SERVICES.map(s => ({
-                      id: s.id,
-                      name: s.name,
-                      subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽`
-                    }))}
-                    placeholder="Выберите услугу..."
-                    searchPlaceholder="Поиск услуги..."
-                    showCustomOption={true}
-                    customOptionLabel="Свободная услуга"
-                  />
+                        setIsServiceSearchActive(false)
+                      }}
+                      options={MOCK_SERVICES.map(s => ({ id: s.id, name: s.name, subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽` }))}
+                      placeholder="Выберите услугу..."
+                      showCustomOption={true}
+                    />
+                  ) : (
+                    <div className="flex flex-col gap-4 p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="w-12 h-12 rounded-2xl bg-panel-border-subtle flex items-center justify-center font-medium text-lg shrink-0 text-panel-text">
+                            {draft.serviceId === "custom" ? "У" : selectedService?.name?.[0]?.toUpperCase() || "У"}
+                          </div>
+                          <div className="flex flex-col min-w-0 flex-1">
+                            {draft.serviceId === "custom" ? (
+                              <input 
+                                autoFocus
+                                type="text"
+                                value={draft.customService?.name || ""}
+                                onChange={e => setDraft({ ...draft, customService: { name: e.target.value } })}
+                                placeholder="Название услуги..."
+                                className="bg-transparent text-base font-semibold text-panel-text outline-none placeholder:text-panel-text-muted w-full"
+                              />
+                            ) : (
+                              <span className="text-base font-semibold text-panel-text truncate">{selectedService?.name}</span>
+                            )}
+                            <span className="text-sm text-panel-text-muted truncate">
+                              {totalDuration > 0 ? formatDuration(totalDuration) : "Длительность не указана"}
+                              {draft.price ? ` • ${draft.price} ₽` : ""}
+                            </span>
+                          </div>
+                        </div>
+                        <button onClick={() => setIsServiceSearchActive(true)} className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text ml-4 shrink-0">Изменить</button>
+                      </div>
+                    </div>
+                  )}
 
-                  {draft.serviceId === "custom" && draft.customService && (
+                  {draft.serviceId === "custom" && draft.customService && !isServiceSearchActive && (
                     <div className="mt-2 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl flex flex-col gap-5 animate-in slide-in-from-top-2">
                       <div className="flex flex-col gap-2">
                         <label className="text-xs font-semibold text-panel-text-muted uppercase tracking-wider">Название услуги</label>
