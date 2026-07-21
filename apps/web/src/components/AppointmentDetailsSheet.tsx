@@ -12,6 +12,7 @@ import AppointmentDateCard from "@/components/appointment/AppointmentDateCard"
 import AppointmentClientCard from "@/components/appointment/AppointmentClientCard"
 import AppointmentStatusCard from "@/components/appointment/AppointmentStatusCard"
 import AppointmentNotesCard from "@/components/appointment/AppointmentNotesCard"
+import AppointmentStageTimeline from "@/components/appointment/AppointmentStageTimeline"
 
 interface AppointmentDetailsSheetProps {
   event: Appointment | null
@@ -195,42 +196,14 @@ export default function AppointmentDetailsSheet({
                 )}
               </div>
 
-              {/* Stage timeline */}
+              {/* Stage timeline with completion stage */}
               {event.stages && event.stages.length > 0 && (
-                <div className="flex flex-col gap-1 pt-1">
-                  {event.stages.map((stage, idx) => {
-                    let stageStartTimeStr: string | null = null
-                    const allPrecedingHaveDuration = event.stages.slice(0, idx).every(s => s.durationMinutes !== undefined)
-
-                    if (allPrecedingHaveDuration) {
-                      const accumulatedMinutes = event.stages
-                        .slice(0, idx)
-                        .reduce((acc, s) => acc + (s.durationMinutes || 0), 0)
-                      const stageStartTimeISO = addMinutes(currentStartISO, accumulatedMinutes)
-                      stageStartTimeStr = formatTime(stageStartTimeISO, workspaceTimezone)
-                    }
-
-                    return (
-                      <div key={stage.id} className="flex gap-4 min-h-10">
-                        <div className="flex flex-col items-center">
-                          <div className={`w-3 h-3 rounded-full mt-1.5 z-10 ${stage.isActive ? 'bg-panel-text' : 'bg-panel-border'}`} />
-                          <div className={`w-0.5 flex-1 -mt-1.5 mb-1 ${stage.isActive ? 'bg-panel-border-subtle' : 'border-l-2 border-dashed border-panel-border-subtle bg-transparent'}`} />
-                        </div>
-
-                        <div className="flex flex-col pb-3">
-                          <span className={`text-sm font-semibold leading-tight ${stage.isActive ? 'text-panel-text' : 'text-panel-text-muted'}`}>
-                            {stage.name}
-                          </span>
-                          <span className="text-xs text-panel-text-subtle mt-0.5 flex items-center gap-1.5">
-                            {stageStartTimeStr && <span className="font-medium text-panel-text-muted">≈ {stageStartTimeStr}</span>}
-                            {stageStartTimeStr && stage.durationMinutes !== undefined && <span>•</span>}
-                            {stage.durationMinutes !== undefined && <span>{formatDuration(stage.durationMinutes)}</span>}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
+                <AppointmentStageTimeline
+                  stages={event.stages}
+                  startDateTime={currentStartISO}
+                  totalDurationMinutes={totalDuration}
+                  workspaceTimezone={workspaceTimezone}
+                />
               )}
             </div>
 
