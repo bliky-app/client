@@ -126,11 +126,16 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
               onClick={() => onOpenForm({})}
               className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 active:scale-[0.97] transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle cursor-pointer group hover:border-panel-text-muted"
             >
-              <div className="flex justify-between items-start w-full gap-2">
+              <div className="flex justify-between items-start w-full gap-2 pointer-events-none">
                 <h3 className="font-semibold text-panel-text text-base tracking-tight leading-tight">
                   Новая запись
                 </h3>
-                <Plus className="h-5 w-5 text-panel-text-subtle shrink-0 translate-y-0.5 group-hover:text-panel-text transition-colors" />
+              </div>
+              <div className="mt-auto relative z-10 w-full">
+                <button className="w-full text-left bg-panel-base border border-panel-border-subtle rounded-xl px-3 py-2 text-xs font-medium text-panel-text-muted group-hover:text-panel-text group-hover:border-panel-text-muted transition-colors flex items-center justify-between pointer-events-none">
+                  <span>Создать</span>
+                  <Plus className="w-4 h-4 shrink-0" />
+                </button>
               </div>
             </div>
 
