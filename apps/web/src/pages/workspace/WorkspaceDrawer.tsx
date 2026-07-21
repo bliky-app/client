@@ -52,7 +52,7 @@ export default function WorkspaceDrawer({
   onClose,
   onSelectSection,
 }: WorkspaceDrawerProps) {
-  const { can, user } = usePermissions(workspace.id)
+  const { can } = usePermissions(workspace.id)
 
   const visibleSections = SECTIONS.filter((section) => {
     if ((section.id === "staff" || section.id === "schedule") && workspace.type === "individual") return false

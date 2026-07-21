@@ -1,167 +1,34 @@
-// 1. Права и Роли
-export type Permission =
-  | "view_analytics"
-  | "view_global_schedule"
-  | "manage_schedule"
-  | "view_global_clients"
-  | "manage_clients"
-  | "manage_services"
-  | "manage_staff"
-  | "view_financials"
-  | "manage_workspace"
-  | "is_administrator"
-  | "is_owner"
+/**
+ * Barrel-файл для обратной совместимости.
+ * Все новые импорты должны использовать доменные файлы напрямую:
+ *   import type { User } from "@/types/auth.models"
+ *   import type { Workspace } from "@/types/workspace.models"
+ *   и т.д.
+ */
+export type { Permission, Role, User } from "./auth.models"
 
-export interface Role {
-  id: string
-  nameRu: string
-  permissions: Permission[]
-  isSystem: boolean
-}
+export type {
+  StaffCategory,
+  Member,
+  WorkspaceType,
+  WorkspaceSchedule,
+  Workspace,
+  WorkspaceSectionId,
+} from "./workspace.models"
 
-// 2. Пользователь и Клиент
-export interface User {
-  id: string
-  phone: string
-  firstName?: string
-  lastName?: string
-  fullName?: string
-  shortName?: string
-  gender: "male" | "female"
-  isFormal: boolean
-  color: string
-  avatarUrl?: string
-  timezone?: string
-  globalRole: Role
-}
+export type {
+  Client,
+  AppointmentStage,
+  ServiceStage,
+  Service,
+  CustomService,
+  Appointment,
+} from "./appointment.models"
 
-export interface Client {
-  id: string
-  name: string
-  phone: string
-}
+export type {
+  TimetableSlot,
+  TimetableViewType,
+  TimetableColumn,
+} from "./timetable.models"
 
-// 3. Сотрудники и Пространства
-export interface StaffCategory {
-  id: string
-  name: string // например: "Колорист", "Массажист"
-}
-
-export interface Member {
-  id: string
-  user?: User
-  fullName?: string
-  shortName?: string
-  color?: string
-  workspaceRole: Role
-  mainCategory: StaffCategory
-  additionalCategories: StaffCategory[]
-}
-
-export type WorkspaceType = "individual" | "shared" | "coworking" | "hybrid"
-
-export interface WorkspaceSchedule {
-  [dayOfWeek: number]: { start: string; end: string }[]
-}
-
-export interface Workspace {
-  id: string
-  name: string
-  type: WorkspaceType
-  category: string // "Салон", "Частная практика" и т.д.
-  additionalCategories?: string[]
-  color: string
-  timezone: string // IANA timezone, например "Europe/Moscow"
-  address?: string
-  avatarUrl?: string
-  staff?: Member[] // undefined, если нет прав на просмотр стафа
-  schedule: WorkspaceSchedule
-}
-
-// 4. Услуги (Services)
-export interface Service {
-  id: string
-  name: string
-  categoryId: string
-  allowedStaffIds: string[]
-  price: number
-  totalDurationMinutes: number
-  stages: AppointmentStage[]
-}
-
-export interface CustomService {
-  id: string
-  name: string
-  price: number
-  totalDurationMinutes: number
-  stages: AppointmentStage[]
-}
-
-// 5. Дашборд
-export interface HubOverviewData {
-  user: User
-  requestAt: string // ISO 8601 (заменили requestTime: Date)
-  todayAppointments: number
-  completeAppointments: number
-  todayRevenue: number
-  expectedRevenue: number
-  lastAppointmentEndTime: string | null // Можно оставить ISO 8601 для единообразия
-  totalWorkspaceAppointments: number
-  totalWorkspaceRevenue: number
-  unconfirmedAppointments: number
-  totalWorkspaces: number
-}
-
-// 6. Расписание (Timetable)
-export interface AppointmentStage {
-  id: string
-  name: string
-  durationMinutes?: number
-  isActive: boolean
-}
-
-export interface Appointment {
-  id: string
-  startDateTime: string // ISO 8601
-  totalDurationMinutes: number 
-  color?: string
-  client: Client
-  service?: Service
-  customService?: CustomService
-  serviceName: string // Used for display, derived from service/customService
-  price: number
-  workspace: Workspace
-  staff: Member
-  stages: AppointmentStage[]
-  notes?: string
-  isConfirmed: boolean
-}
-
-export interface TimetableSlot {
-  startDateTime: string // ISO 8601
-  endDateTime: string   // ISO 8601
-}
-
-export type TimetableViewType = "personal" | "team"
-
-export interface TimetableColumn {
-  id: string
-  label: string
-  subLabel?: string
-  dateString?: string // YYYY-MM-DD для UI (идентификатор дня для personal view)
-  staff?: Member // Для team view
-  isToday?: boolean
-  schedule: TimetableSlot[] // Открытые рабочие часы в формате ISO
-}
-
-export type WorkspaceSectionId =
-  | "overview"
-  | "schedule"
-  | "appointments"
-  | "work_schedule"
-  | "services"
-  | "staff"
-  | "resources"
-  | "analytics"
-  | "clients"
-  | "settings"
+export type { HubOverviewData } from "./hub.models"

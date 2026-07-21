@@ -1,6 +1,14 @@
 import type { User, Workspace, Member } from "@/types/models"
 
-export type AvatarData = User | Workspace | Member
+/** Минимальный набор данных для отображения аватара */
+export interface AvatarDisplayData {
+  id: string
+  name?: string
+  avatarUrl?: string
+  color?: string
+}
+
+export type AvatarData = User | Workspace | Member | AvatarDisplayData
 
 interface AvatarProps {
   data?: AvatarData | null

@@ -259,11 +259,26 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
   if (!isOpen) return null
 
   const selectedWorkspace = workspaces?.find(w => w.id === draft.workspaceId) || workspaces?.[0]
-  const selectedMaster = selectedWorkspace?.staff?.find(s => s.id === draft.masterId) || 
-    MOCK_MASTERS.find(m => m.id === draft.masterId) || 
-    { id: currentUserMasterId, name: user?.shortName || user?.fullName || "Я (Александр)", subtitle: "Топ-мастер", avatarUrl: user?.avatarUrl }
-  
-  const selectedMasterUser = selectedMaster ? ("user" in selectedMaster ? selectedMaster.user : selectedMaster) : null
+
+  const selectedMasterAsMember = selectedWorkspace?.staff?.find(s => s.id === draft.masterId)
+  const selectedMasterAsOption =
+    selectedMasterAsMember
+      ? null
+      : MOCK_MASTERS.find(m => m.id === draft.masterId) ||
+        { id: currentUserMasterId, name: user?.shortName || user?.fullName || "Я (Александр)", subtitle: "Топ-мастер", avatarUrl: user?.avatarUrl }
+
+  const selectedMasterDisplayName = selectedMasterAsMember
+    ? (selectedMasterAsMember.shortName || selectedMasterAsMember.user?.shortName || selectedMasterAsMember.user?.fullName || selectedMasterAsMember.fullName || "—")
+    : (selectedMasterAsOption?.name || "—")
+
+  const selectedMasterDisplaySubtitle = selectedMasterAsMember
+    ? selectedMasterAsMember.mainCategory.name
+    : (selectedMasterAsOption?.subtitle || "")
+
+  const selectedMasterUser = selectedMasterAsMember
+    ? (selectedMasterAsMember.user ?? selectedMasterAsMember)
+    : selectedMasterAsOption
+
   const selectedService = MOCK_SERVICES.find(s => s.id === draft.serviceId)
 
   const handleStageDurationChange = (stageId: string, deltaMinutes: number) => {
@@ -488,9 +503,9 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                         className="w-12 h-12 rounded-full text-sm shrink-0"
                       />
                       <div className="flex flex-col min-w-0">
-                        <span className="text-base font-semibold text-panel-text truncate">{selectedMaster?.name}</span>
-                        {selectedMaster?.subtitle && (
-                          <span className="text-xs text-panel-text-subtle truncate">{selectedMaster.subtitle}</span>
+                        <span className="text-base font-semibold text-panel-text truncate">{selectedMasterDisplayName}</span>
+                        {selectedMasterDisplaySubtitle && (
+                          <span className="text-xs text-panel-text-subtle truncate">{selectedMasterDisplaySubtitle}</span>
                         )}
                       </div>
                     </div>
@@ -563,7 +578,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     {/* Interactive Stage Timeline with Completion Stage */}
                     {draft.stages && draft.stages.length > 0 && (
                       <AppointmentStageTimeline
-                        stages={draft.stages}
+                        stages={draft.stages.map(stage => ({ ...stage, isActive: stage.isActive ?? true }))}
                         startDateTime={draft.startDateTime || ""}
                         totalDurationMinutes={totalDuration}
                         isEditable={true}

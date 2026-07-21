@@ -1,7 +1,6 @@
 import { MOCK_HUB_OVERVIEW, MOCK_WORKSPACES, MOCK_APPOINTMENTS, MOCK_USER, syncMockUserWithSession } from "./mockData"
 import type { HubOverviewData, Workspace, TimetableColumn, Appointment } from "@/types/models"
 import { getTzDateString } from "../formatters"
-import { getSession } from "./authApi"
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 

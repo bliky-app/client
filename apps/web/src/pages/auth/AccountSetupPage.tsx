@@ -9,6 +9,7 @@ import Avatar from "@/components/Avatar"
 import ColorPicker from "@/components/ui/ColorPicker"
 import Select, { type SelectOption } from "@/components/ui/Select"
 import { getDefaultTimezone } from "@/lib/formatters"
+import type { User } from "@/types/auth.models"
 
 const TIMEZONE_OPTIONS: SelectOption[] = [
   { value: "Europe/Kaliningrad", label: "Калининград", subtitle: "UTC+2" },
