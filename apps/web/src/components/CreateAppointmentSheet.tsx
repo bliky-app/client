@@ -192,7 +192,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
   const [isClientSearchActive, setIsClientSearchActive] = useState(!initialData?.clientId)
   const [isMasterSearchActive, setIsMasterSearchActive] = useState(!initialData?.masterId)
   const [isServiceSearchActive, setIsServiceSearchActive] = useState(!initialData?.serviceId)
-  const [isStartTimeActive, setIsStartTimeActive] = useState(!initialData?.startDateTime)
 
   const [clientSearch, setClientSearch] = useState("")
   const [newClientName, setNewClientName] = useState("")
@@ -207,7 +206,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
       setIsClientSearchActive(!data.clientId)
       setIsMasterSearchActive(!data.masterId)
       setIsServiceSearchActive(!data.serviceId)
-      setIsStartTimeActive(!data.startDateTime)
     } else {
       setClientSearch("")
       setNewClientName("")
@@ -493,37 +491,13 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     )}
                   </div>
                   <div className="flex-1 flex flex-col gap-3">
-                    <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Начало</h3>
-                    {isStartTimeActive ? (
-                      <div className="h-full min-h-[82px] flex items-center bg-panel-surface border border-panel-border rounded-xl px-4 focus-within:border-panel-text transition-colors relative">
-                        <input 
-                          type="datetime-local"
-                          value={draft.startDateTime || ""}
-                          onChange={e => setDraft({ ...draft, startDateTime: e.target.value })}
-                          className="w-full bg-transparent text-sm font-medium text-panel-text outline-none"
-                        />
-                        {draft.startDateTime && (
-                          <button onClick={() => setIsStartTimeActive(false)} className="absolute right-3 px-4 py-2 bg-panel-text text-panel-base rounded-lg text-xs font-semibold shrink-0">ОК</button>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm h-full min-h-[82px]">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center shrink-0 text-panel-text">
-                            <Calendar className="w-5 h-5" />
-                          </div>
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-base font-semibold text-panel-text capitalize truncate">
-                              {draft.startDateTime ? new Date(draft.startDateTime).toLocaleDateString("ru-RU", { weekday: 'short', day: 'numeric', month: 'long' }) : ""}
-                            </span>
-                            <span className="text-sm text-panel-text-muted truncate">
-                              {draft.startDateTime ? new Date(draft.startDateTime).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' }) : ""}
-                            </span>
-                          </div>
-                        </div>
-                        <button onClick={() => setIsStartTimeActive(true)} className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0">Изменить</button>
-                      </div>
-                    )}
+                    <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Дата и время</h3>
+                    <input 
+                      type="datetime-local"
+                      value={draft.startDateTime || ""}
+                      onChange={e => setDraft({ ...draft, startDateTime: e.target.value })}
+                      className="w-full bg-panel-surface border border-panel-border rounded-xl px-4 py-3.5 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-colors"
+                    />
                   </div>
                 </div>
 
@@ -567,6 +541,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             )}
                             <span className="text-sm text-panel-text-muted truncate">
                               {totalDuration > 0 ? formatDuration(totalDuration) : "Длительность не указана"}
+                              {draft.price ? ` • ${draft.price} ₽` : ""}
                             </span>
                           </div>
                         </div>
@@ -590,7 +565,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                                       <div className="flex items-center gap-2 shrink-0">
                                         <button 
                                           onClick={() => handleStageDurationChange(stage.id, -15)}
-                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
                                         >
                                           -
                                         </button>
@@ -614,7 +589,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                                         </div>
                                         <button 
                                           onClick={() => handleStageDurationChange(stage.id, 15)}
-                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
                                         >
                                           +
                                         </button>
