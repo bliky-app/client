@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { X, Search, ChevronDown, Check, UserPlus, Plus, Calendar } from "lucide-react"
+import { X, Search, ChevronDown, Check, Plus, Calendar } from "lucide-react"
 import type { Workspace } from "@/types/models"
 import { MOCK_USER } from "@/lib/api/mockData"
 
@@ -63,6 +63,14 @@ export type AppointmentDraft = {
   notes?: string
 }
 
+export interface SearchableSelectOption {
+  id: string
+  name: string
+  subtitle?: string
+  avatarUrl?: string
+  color?: string
+}
+
 interface CreateAppointmentSheetProps {
   isOpen: boolean
   onClose: () => void
@@ -80,20 +88,27 @@ function SearchableSelect({
   showCustomOption = false,
   customOptionLabel = "Другое",
   autoOpen = false,
+  searchValue,
+  onSearchChange
 }: {
   value: string | undefined
   onChange: (val: string) => void
-  options: { id: string, name: string, subtitle?: string, avatarUrl?: string }[]
+  options: SearchableSelectOption[]
   placeholder: string
   searchPlaceholder?: string
   disabled?: boolean
   showCustomOption?: boolean
   customOptionLabel?: string
   autoOpen?: boolean
+  searchValue?: string
+  onSearchChange?: (val: string) => void
 }) {
   const [isOpen, setIsOpen] = useState(autoOpen)
-  const [search, setSearch] = useState("")
+  const [internalSearch, setInternalSearch] = useState("")
   const ref = useRef<HTMLDivElement>(null)
+
+  const search = searchValue ?? internalSearch
+  const setSearch = onSearchChange ?? setInternalSearch
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -165,11 +180,14 @@ function SearchableSelect({
                       {opt.avatarUrl ? (
                         <img src={opt.avatarUrl} alt={opt.name} className="w-8 h-8 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
                       ) : (
-                        opt.subtitle ? (
-                          <div className="w-8 h-8 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-xs text-panel-text shrink-0">
+                        (opt.subtitle || opt.color) ? (
+                          <div 
+                            className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-xs shrink-0 text-white"
+                            style={{ backgroundColor: opt.color || 'var(--panel-text)' }}
+                          >
                             {opt.name?.[0]?.toUpperCase()}
                           </div>
-                        ) : null // don't show avatar placeholder if it's just a simple option without subtitle (like Service, which doesn't have an avatar logic here)
+                        ) : null 
                       )}
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-panel-text">{opt.name}</span>
@@ -341,7 +359,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     setDraft({ ...draft, workspaceId: val, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
                     setIsWorkspaceSearchActive(false)
                   }}
-                  options={workspaces?.map(w => ({ id: w.id, name: w.name, avatarUrl: w.avatarUrl })) || []}
+                  options={workspaces?.map(w => ({ id: w.id, name: w.name, subtitle: w.address, color: w.color, avatarUrl: w.avatarUrl })) || []}
                   placeholder={isFormal ? "Выберите пространство..." : "Выбери пространство..."}
                   autoOpen={autoOpenField === "workspace"}
                 />
@@ -380,128 +398,87 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                   <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Клиент</h3>
                   
                   {isClientSearchActive ? (
-                    <div className="flex flex-col gap-2">
-                      <div className="relative flex items-center gap-2">
-                        <div className="relative flex-1">
-                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-panel-text-subtle" />
+                    draft.clientId === "new_pending" ? (
+                      <div className="flex flex-col gap-4 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 mt-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-semibold text-panel-text">Новый клиент</h4>
+                          <button 
+                            onClick={() => setDraft({ ...draft, clientId: undefined })}
+                            className="p-1.5 -mr-1.5 rounded-lg text-panel-text-muted hover:text-panel-text hover:bg-panel-base transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="flex flex-col gap-3">
                           <input 
                             type="text" 
-                            placeholder="Имя или телефон..."
-                            value={clientSearch}
-                            onChange={(e) => {
-                              setClientSearch(e.target.value)
-                              setNewClientName(e.target.value.replace(/[\d+()-]/g, "").trim())
-                              const phoneMatch = e.target.value.match(/[\d+()-]+/)
-                              if (phoneMatch) setNewClientPhone(phoneMatch[0])
-                            }}
-                            className="w-full bg-panel-surface border border-panel-border rounded-xl pl-11 pr-4 py-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text transition-colors"
+                            placeholder="Имя"
+                            value={newClientName}
+                            onChange={e => setNewClientName(e.target.value)}
+                            className="w-full bg-panel-base border border-panel-border rounded-xl px-4 py-3 text-sm text-panel-text outline-none focus:border-panel-text transition-colors"
                           />
-                        </div>
-                        {draft.clientId && draft.clientId !== "new_pending" && (
+                          <input 
+                            type="tel" 
+                            placeholder="Телефон"
+                            value={newClientPhone}
+                            onChange={e => { 
+                              let val = e.target.value
+                              const digits = val.replace(/\D/g, "")
+                              if (digits.length === 1 && val.length === 1) {
+                                if (val === "7" || val === "8") val = "+7 "
+                                else if (val !== "+") val = "+7 " + val
+                              } else if (val.startsWith("8") && val.length > 1) {
+                                val = "+7 " + val.slice(1)
+                              } else if (val.startsWith("7")) {
+                                val = "+7 " + val.slice(1)
+                              } else if (val.length > 0 && !val.startsWith("+7") && !val.startsWith("+") && val[0] !== "8" && val[0] !== "7") {
+                                val = "+7 " + val
+                              }
+                              setNewClientPhone(val)
+                              setPhoneError("") 
+                            }}
+                            className={`w-full bg-panel-base border rounded-xl px-4 py-3 text-sm text-panel-text outline-none transition-colors ${phoneError ? 'border-red-500' : 'border-panel-border focus:border-panel-text'}`}
+                          />
                           <button 
-                            onClick={() => setIsClientSearchActive(false)}
-                            className="p-3 text-panel-text-muted hover:text-panel-text transition-colors shrink-0"
+                            onClick={() => {
+                              if (newClientName && validatePhone(newClientPhone)) {
+                                setDraft({ ...draft, clientId: "new", clientName: newClientName, clientPhone: newClientPhone })
+                                setIsClientSearchActive(false)
+                              } else {
+                                setPhoneError("Некорректный номер")
+                              }
+                            }}
+                            className="mt-2 w-full py-3 rounded-xl bg-panel-text text-panel-base font-semibold text-sm hover:opacity-90 transition-opacity"
                           >
-                            <X className="w-5 h-5" />
+                            Сохранить клиента
                           </button>
-                        )}
+                        </div>
                       </div>
-                      
-                      {draft.clientId !== "new_pending" && (
-                        <div className="flex flex-col bg-panel-base border border-panel-border-subtle rounded-xl shadow-lg mt-1 overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-64">
-                          <div className="flex-1 overflow-y-auto p-1">
-                            <button 
-                              onClick={() => {
-                                setDraft({ ...draft, clientId: "new_pending" })
-                              }}
-                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-surface transition-colors text-left group mb-1"
-                            >
-                              <div className="w-10 h-10 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium group-hover:scale-105 transition-transform shrink-0">
-                                <UserPlus className="w-5 h-5" />
-                              </div>
-                              <div className="flex flex-col flex-1">
-                                <span className="text-sm font-medium text-panel-text">Создать нового клиента</span>
-                                <span className="text-xs text-panel-text-muted">Ввести вручную</span>
-                              </div>
-                            </button>
-                            
-                            {(clientSearch.trim().length === 0 || "алина смирнова".includes(clientSearch.toLowerCase())) && (
-                              <button 
-                                onClick={() => {
-                                  setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
-                                  setIsClientSearchActive(false)
-                                }}
-                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-surface transition-colors text-left"
-                              >
-                                <div className="w-10 h-10 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-panel-text shrink-0">
-                                  А
-                                </div>
-                                <div className="flex flex-col min-w-0">
-                                  <span className="text-sm font-medium text-panel-text truncate">Алина Смирнова</span>
-                                  <span className="text-xs text-panel-text-muted truncate">+7 (999) 123-45-67</span>
-                                </div>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {draft.clientId === "new_pending" && (
-                        <div className="flex flex-col gap-4 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 mt-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-semibold text-panel-text">Новый клиент</h4>
-                            <button 
-                              onClick={() => setDraft({ ...draft, clientId: undefined })}
-                              className="p-1.5 -mr-1.5 rounded-lg text-panel-text-muted hover:text-panel-text hover:bg-panel-base transition-colors"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <div className="flex flex-col gap-3">
-                            <input 
-                              type="text" 
-                              placeholder="Имя"
-                              value={newClientName}
-                              onChange={e => setNewClientName(e.target.value)}
-                              className="w-full bg-panel-base border border-panel-border rounded-xl px-4 py-3 text-sm text-panel-text outline-none focus:border-panel-text transition-colors"
-                            />
-                            <input 
-                              type="tel" 
-                              placeholder="Телефон"
-                              value={newClientPhone}
-                              onChange={e => { 
-                                let val = e.target.value
-                                const digits = val.replace(/\D/g, "")
-                                if (digits.length === 1 && val.length === 1) {
-                                  if (val === "7" || val === "8") val = "+7 "
-                                  else if (val !== "+") val = "+7 " + val
-                                } else if (val.startsWith("8") && val.length > 1) {
-                                  val = "+7 " + val.slice(1)
-                                } else if (val.startsWith("7")) {
-                                  val = "+7 " + val.slice(1)
-                                } else if (val.length > 0 && !val.startsWith("+7") && !val.startsWith("+") && val[0] !== "8" && val[0] !== "7") {
-                                  val = "+7 " + val
-                                }
-                                setNewClientPhone(val)
-                                setPhoneError("") 
-                              }}
-                              className={`w-full bg-panel-base border rounded-xl px-4 py-3 text-sm text-panel-text outline-none transition-colors ${phoneError ? 'border-red-500' : 'border-panel-border focus:border-panel-text'}`}
-                            />
-                            <button 
-                              onClick={() => {
-                                if (newClientName && validatePhone(newClientPhone)) {
-                                  setDraft({ ...draft, clientId: "new", clientName: newClientName, clientPhone: newClientPhone })
-                                  setIsClientSearchActive(false)
-                                }
-                              }}
-                              className="mt-2 w-full py-3 rounded-xl bg-panel-text text-panel-base font-semibold text-sm"
-                            >
-                              Сохранить клиента
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    ) : (
+                      <SearchableSelect
+                        value={draft.clientId}
+                        onChange={val => {
+                          if (val === "custom") {
+                            setDraft({ ...draft, clientId: "new_pending" })
+                          } else {
+                            setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
+                            setIsClientSearchActive(false)
+                          }
+                        }}
+                        options={[{ id: "client-1", name: "Алина Смирнова", subtitle: "+7 (999) 123-45-67", color: "#ec4899" }]}
+                        placeholder={isFormal ? "Выберите клиента..." : "Выбери клиента..."}
+                        autoOpen={autoOpenField === "client"}
+                        showCustomOption={true}
+                        customOptionLabel="Создать нового клиента"
+                        searchValue={clientSearch}
+                        onSearchChange={(val: string) => {
+                          setClientSearch(val)
+                          setNewClientName(val.replace(/[\d+()-]/g, "").trim())
+                          const phoneMatch = val.match(/[\d+()-]+/)
+                          if (phoneMatch) setNewClientPhone(phoneMatch[0])
+                        }}
+                      />
+                    )
                   ) : (
                     <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
                       <div className="flex items-center gap-3">
@@ -517,6 +494,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                         onClick={() => {
                           setDraft({ ...draft, clientId: undefined, clientName: undefined, clientPhone: undefined })
                           setIsClientSearchActive(true)
+                          setAutoOpenField("client")
                         }} 
                         className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text"
                       >
