@@ -116,14 +116,14 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
                     type="time"
                     value={slot.start}
                     onChange={e => updateTime(key, "start", e.target.value)}
-                    className="bg-panel-base border border-panel-border-subtle rounded-lg px-1.5 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-[5.5rem]"
+                    className="bg-panel-base border border-panel-border-subtle rounded-xl px-2 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-[5.5rem]"
                   />
                   <span className="text-panel-text-subtle text-sm">—</span>
                   <input
                     type="time"
                     value={slot.end}
                     onChange={e => updateTime(key, "end", e.target.value)}
-                    className="bg-panel-base border border-panel-border-subtle rounded-lg px-1.5 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-[5.5rem]"
+                    className="bg-panel-base border border-panel-border-subtle rounded-xl px-2 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-[5.5rem]"
                   />
                 </div>
               ) : (

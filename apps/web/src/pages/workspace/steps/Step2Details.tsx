@@ -1,5 +1,6 @@
-import { useRef, useMemo } from "react"
-import { Camera } from "lucide-react"
+import { useRef, useMemo, useState } from "react"
+import type { KeyboardEvent } from "react"
+import { Camera, X, Star } from "lucide-react"
 import type { CreateWorkspaceFormData } from "../CreateWorkspacePage"
 import Avatar from "@/components/Avatar"
 
@@ -9,48 +10,27 @@ interface Step2DetailsProps {
 }
 
 const ACCENT_COLORS = [
-  "#6366f1", // indigo
-  "#8b5cf6", // violet
-  "#d946ef", // fuchsia
-  "#ec4899", // pink
-  "#f43f5e", // rose
-  "#ef4444", // red
-  "#f97316", // orange
-  "#eab308", // yellow
-  "#84cc16", // lime
-  "#22c55e", // green
-  "#10b981", // emerald
-  "#14b8a6", // teal
-  "#06b6d4", // cyan
-  "#0ea5e9", // sky
-  "#3b82f6", // blue
-  "#64748b", // slate
+  "#6366f1", "#8b5cf6", "#d946ef", "#ec4899",
+  "#f43f5e", "#ef4444", "#f97316", "#eab308",
+  "#84cc16", "#22c55e", "#10b981", "#14b8a6",
+  "#06b6d4", "#0ea5e9", "#3b82f6", "#64748b",
 ]
 
 const CATEGORIES_INDIVIDUAL = [
-  "Колорист",
-  "Стилист по волосам",
-  "Массажист",
-  "Мастер маникюра",
-  "Косметолог",
-  "Бровист",
-  "Мастер по ресницам",
-  "Барбер",
-  "Другое",
+  "Колорист", "Стилист по волосам", "Массажист",
+  "Мастер маникюра", "Косметолог", "Бровист",
+  "Мастер по ресницам", "Барбер",
 ]
 
 const CATEGORIES_SHARED = [
-  "Салон красоты",
-  "Барбершоп",
-  "Ногтевая студия",
-  "Спа",
-  "Клиника эстетической медицины",
-  "Студия красоты",
-  "Другое",
+  "Салон красоты", "Барбершоп", "Ногтевая студия",
+  "Спа", "Клиника эстетической медицины", "Студия красоты",
 ]
 
 export default function Step2Details({ data, onChange }: Step2DetailsProps) {
   const fileRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [inputValue, setInputValue] = useState("")
 
   const availableCategories = data.type === "individual" ? CATEGORIES_INDIVIDUAL : CATEGORIES_SHARED
 
@@ -68,16 +48,7 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
     return list
   }, [data.category, data.additionalCategories])
 
-  const toggleCategory = (cat: string) => {
-    const isSelected = selectedCategories.includes(cat)
-    let newList = []
-    
-    if (isSelected) {
-      newList = selectedCategories.filter(c => c !== cat)
-    } else {
-      newList = [...selectedCategories, cat]
-    }
-
+  const updateCategories = (newList: string[]) => {
     if (newList.length === 0) {
       onChange({ category: "", additionalCategories: [] })
     } else {
@@ -85,7 +56,28 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
     }
   }
 
-  const hasOther = selectedCategories.includes("Другое")
+  const addCategory = (cat: string) => {
+    const trimmed = cat.trim()
+    if (!trimmed || selectedCategories.includes(trimmed)) return
+    updateCategories([...selectedCategories, trimmed])
+    setInputValue("")
+  }
+
+  const removeCategory = (cat: string) => {
+    updateCategories(selectedCategories.filter(c => c !== cat))
+  }
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault()
+      addCategory(inputValue)
+    } else if (e.key === "Backspace" && !inputValue && selectedCategories.length > 0) {
+      removeCategory(selectedCategories[selectedCategories.length - 1])
+    }
+  }
+
+  // Filter out already selected categories for the suggestions list
+  const suggestedCategories = availableCategories.filter(c => !selectedCategories.includes(c))
 
   return (
     <div className="flex flex-col gap-8 py-2">
@@ -157,44 +149,69 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
         </div>
       </div>
 
-      {/* Category */}
+      {/* Categories Tag Input */}
       <div className="flex flex-col gap-3">
         <label className="text-xs font-semibold text-panel-text-subtle uppercase tracking-wider">
-          Категория
+          Направления и услуги
         </label>
-        <div className="flex flex-wrap gap-2">
-          {availableCategories.map(cat => {
-            const isSelected = selectedCategories.includes(cat)
-            const isMain = isSelected && selectedCategories[0] === cat
-
+        
+        {/* Input container */}
+        <div 
+          className="w-full bg-panel-surface border border-panel-border rounded-2xl p-2 min-h-[52px] flex flex-wrap items-center gap-2 focus-within:border-panel-text-muted transition-colors cursor-text"
+          onClick={() => inputRef.current?.focus()}
+        >
+          {selectedCategories.map((cat, idx) => {
+            const isMain = idx === 0
             return (
-              <button
-                key={cat}
-                onClick={() => toggleCategory(cat)}
-                className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-150 active:scale-[0.97] flex items-center gap-1.5 ${
-                  isSelected
-                    ? "bg-panel-text text-panel-base"
-                    : "bg-panel-surface border border-panel-border text-panel-text-muted-dark hover:border-panel-text-muted hover:text-panel-text"
+              <div 
+                key={cat} 
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium animate-in zoom-in-95 duration-150 ${
+                  isMain 
+                    ? "bg-panel-text text-panel-base" 
+                    : "bg-panel-border-subtle text-panel-text-muted-dark"
                 }`}
               >
-                {cat}
-                {isMain && selectedCategories.length > 1 && (
-                  <span className="opacity-70 text-[10px] uppercase tracking-wider ml-1 -mr-1">(Основная)</span>
-                )}
-              </button>
+                {isMain && <Star className="w-3.5 h-3.5" fill="currentColor" />}
+                <span>{cat}</span>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    removeCategory(cat)
+                  }}
+                  className={`p-0.5 rounded-full hover:bg-black/10 transition-colors ${isMain ? "text-panel-base/80" : "text-panel-text-muted"}`}
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
             )
           })}
+          
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={() => {
+              if (inputValue) addCategory(inputValue)
+            }}
+            placeholder={selectedCategories.length === 0 ? "Например: Массаж, СПА..." : ""}
+            className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-panel-text placeholder:text-panel-text-subtle py-1 px-2"
+          />
         </div>
 
-        {hasOther && (
-          <div className="mt-2 animate-in slide-in-from-top-2 fade-in duration-200">
-            <input
-              type="text"
-              value={data.customCategory}
-              onChange={e => onChange({ customCategory: e.target.value })}
-              placeholder="Укажите вашу категорию..."
-              className="w-full bg-panel-surface border border-panel-border rounded-2xl px-4 py-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text-muted transition-colors"
-            />
+        {/* Suggestions */}
+        {suggestedCategories.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-1">
+            {suggestedCategories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => addCategory(cat)}
+                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-panel-surface border border-panel-border text-panel-text-muted-dark hover:border-panel-text-muted hover:text-panel-text transition-colors"
+              >
+                + {cat}
+              </button>
+            ))}
           </div>
         )}
       </div>

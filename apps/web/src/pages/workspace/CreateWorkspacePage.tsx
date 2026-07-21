@@ -83,7 +83,7 @@ export default function CreateWorkspacePage() {
     if (step === 0) return data.type !== null
     if (step === 1) {
       const nameValid = data.name.trim().length >= 4 && data.name.trim().length <= 32
-      const categoryValid = data.category.trim().length > 0 && (data.category !== "Другое" || data.customCategory.trim().length > 0)
+      const categoryValid = data.category.trim().length > 0
       return nameValid && categoryValid
     }
     return true
