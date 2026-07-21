@@ -183,23 +183,24 @@ export default function UserSettingsPage() {
 
   return (
     <div className="flex flex-col flex-1 bg-hub-base h-svh overflow-hidden">
+      {/* Functional Top Hub Toolbar */}
+      <div className="h-16 px-6 flex items-center justify-between shrink-0 z-30">
+        <span className="text-sm font-bold text-hub-text">
+          Профиль
+        </span>
+
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="w-9 h-9 rounded-xl bg-hub-surface border border-hub-border text-hub-text-muted hover:text-hub-text hover:bg-hub-surface-hover flex items-center justify-center transition-all active:scale-95 shadow-sm"
+          title="Закрыть"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
       {/* White wizard panel */}
-      <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] mt-16 shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle">
-          <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
-            Профиль
-          </h1>
-
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="p-2 -mr-2 rounded-full text-panel-text-muted hover:text-panel-text hover:bg-panel-surface-hover transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
+      <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
         {/* Content Body */}
         <div className="flex-1 overflow-y-auto px-6 pt-6 flex flex-col relative">
           {error && (
