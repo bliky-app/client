@@ -1,5 +1,6 @@
 import { Calendar as CalendarIcon } from "lucide-react"
 import { formatAppointmentDate, formatDuration, formatTime, addMinutes } from "@/lib/formatters"
+import IconBox from "@/components/ui/IconBox"
 
 interface AppointmentDateCardProps {
   startDateTime?: string
@@ -35,9 +36,9 @@ export function AppointmentDateCard({
         />
       )}
       <div className="flex items-center gap-3 min-w-0">
-        <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center shrink-0 text-panel-text">
+        <IconBox size="lg" shape="squircle">
           <CalendarIcon className="w-5 h-5" />
-        </div>
+        </IconBox>
         <div className="flex flex-col min-w-0">
           {startDateTime ? (
             <>

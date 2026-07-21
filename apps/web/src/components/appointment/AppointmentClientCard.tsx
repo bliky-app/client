@@ -1,4 +1,5 @@
 import { Phone } from "lucide-react"
+import IconBox from "@/components/ui/IconBox"
 
 interface AppointmentClientCardProps {
   name: string
@@ -16,9 +17,9 @@ export function AppointmentClientCard({
   return (
     <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center justify-between w-full">
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <div className="w-12 h-12 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-bold text-base shrink-0">
+        <IconBox size="lg" shape="circle" className="bg-panel-text text-panel-base border-none font-bold">
           {name?.[0]?.toUpperCase() || "К"}
-        </div>
+        </IconBox>
         <div className="flex flex-col min-w-0">
           <span className="text-base font-semibold text-panel-text truncate">{name}</span>
           {phone ? (

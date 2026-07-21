@@ -3,6 +3,7 @@ import { X, Phone, Trash2, AlertCircle } from "lucide-react"
 import Avatar from "@/components/Avatar"
 import Button from "@/components/ui/Button"
 import ColorPicker from "@/components/ui/ColorPicker"
+import IconBox from "@/components/ui/IconBox"
 import type { Appointment } from "@/types/models"
 import { formatCurrency, addMinutes, formatDuration, formatTime } from "@/lib/formatters"
 import { usePermissions } from "@/lib/permissions"
@@ -163,9 +164,9 @@ export default function AppointmentDetailsSheet({
             <div className="bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden p-5 flex flex-col gap-4">
               <div className="flex items-center justify-between border-b border-panel-border-subtle pb-4">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center font-medium text-lg shrink-0 text-panel-text">
+                  <IconBox size="lg" shape="squircle">
                     {event.serviceName?.[0]?.toUpperCase() || "У"}
-                  </div>
+                  </IconBox>
                   <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-base font-semibold text-panel-text truncate">
                       {event.serviceName}
