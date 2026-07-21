@@ -319,7 +319,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       </>
                     ) : (
                       <span className="text-base font-medium text-panel-text-subtle truncate">
-                        Установить время...
+                        Выберите время...
                       </span>
                     )}
                   </div>
