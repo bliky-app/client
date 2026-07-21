@@ -226,7 +226,14 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
 
   useEffect(() => {
     if (isOpen) {
-      const data = initialData || {}
+      const data = { ...(initialData || {}) }
+      if (data.serviceId && !data.stages && data.serviceId !== "custom") {
+        const srv = MOCK_SERVICES.find(s => s.id === data.serviceId)
+        if (srv) {
+          data.stages = srv.stages
+          data.price = srv.price
+        }
+      }
       setDraft(data)
       setIsWorkspaceSearchActive(!data.workspaceId)
       setIsClientSearchActive(!data.clientId)
