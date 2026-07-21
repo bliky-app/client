@@ -2,7 +2,6 @@ import { MapPin } from "lucide-react"
 import type { CreateWorkspaceFormData } from "../CreateWorkspacePage"
 import Input from "@/components/ui/Input"
 import Select, { type SelectOption } from "@/components/ui/Select"
-import { usePermissions } from "@/lib/permissions"
 
 interface Step3LocationProps {
   data: CreateWorkspaceFormData
@@ -41,9 +40,6 @@ const TZ_OPTIONS: SelectOption[] = TIMEZONES.map(tz => ({
 }))
 
 export default function Step3Location({ data, onChange }: Step3LocationProps) {
-  const { user } = usePermissions()
-  const isFormal = user?.isFormal ?? true
-
   return (
     <div className="flex flex-col pt-2 pb-6">
       <div className="bg-panel-surface border border-panel-border rounded-[32px] p-6 shadow-sm flex flex-col gap-5">
@@ -56,7 +52,6 @@ export default function Step3Location({ data, onChange }: Step3LocationProps) {
           onChange={e => onChange({ address: e.target.value })}
           placeholder="ул. Примерная, д. 1"
           icon={<MapPin className="w-4 h-4" />}
-          hint={isFormal ? "Необязательно, но поможет клиентам быстрее вас найти" : "Необязательно, но поможет клиентам быстрее тебя найти"}
           inputClassName="py-3 text-base font-medium"
         />
 
@@ -74,9 +69,6 @@ export default function Step3Location({ data, onChange }: Step3LocationProps) {
             placeholder="Выбрать часовой пояс"
             onChange={(val) => onChange({ timezone: val })}
           />
-          <p className="text-xs pt-1 text-panel-text-subtle font-medium">
-            Влияет на отображение расписания и уведомления клиентам
-          </p>
         </div>
       </div>
     </div>
