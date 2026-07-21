@@ -250,6 +250,14 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
     })
   }
 
+  const formatDuration = (minutes: number) => {
+    const h = Math.floor(minutes / 60)
+    const m = minutes % 60
+    return h > 0 ? `${h}ч ${m > 0 ? `${m}м` : ""}` : `${m}м`
+  }
+
+  const totalDuration = draft.stages?.reduce((acc, s) => acc + s.durationMinutes, 0) || 0
+
   const selectedWorkspace = workspaces?.find(w => w.id === draft.workspaceId)
   const selectedMaster = MOCK_MASTERS.find(m => m.id === draft.masterId)
   const selectedService = draft.serviceId === "custom" 
@@ -280,7 +288,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          <div className="flex flex-col gap-8 max-w-2xl mx-auto w-full pb-32">
+          <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full pb-32">
             
             <div className="flex flex-col gap-3">
               <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Пространство</h3>
@@ -300,11 +308,14 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     {selectedWorkspace?.avatarUrl ? (
                       <img src={selectedWorkspace.avatarUrl} alt={selectedWorkspace.name} className="w-12 h-12 rounded-2xl object-cover shrink-0 border border-panel-border-subtle" />
                     ) : (
-                      <div className="w-12 h-12 rounded-2xl bg-panel-border-subtle flex items-center justify-center font-medium text-lg text-panel-text shrink-0">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-medium text-lg text-panel-base shrink-0" style={{ backgroundColor: selectedWorkspace?.color || "#6366f1" }}>
                         {selectedWorkspace?.name?.[0]?.toUpperCase() || "П"}
                       </div>
                     )}
-                    <span className="font-medium text-panel-text">{selectedWorkspace?.name}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-base font-semibold text-panel-text truncate">{selectedWorkspace?.name}</span>
+                      <span className="text-sm text-panel-text-muted truncate">{selectedWorkspace?.address || "Пространство"}</span>
+                    </div>
                   </div>
                   <button onClick={() => setIsWorkspaceSearchActive(true)} className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0">Изменить</button>
                 </div>
@@ -318,20 +329,30 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                   
                   {isClientSearchActive ? (
                     <div className="flex flex-col gap-2">
-                      <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-panel-text-subtle" />
-                        <input 
-                          type="text" 
-                          placeholder="Имя или телефон..."
-                          value={clientSearch}
-                          onChange={(e) => {
-                            setClientSearch(e.target.value)
-                            setNewClientName(e.target.value.replace(/[\d+()-]/g, "").trim())
-                            const phoneMatch = e.target.value.match(/[\d+()-]+/)
-                            if (phoneMatch) setNewClientPhone(phoneMatch[0])
-                          }}
-                          className="w-full bg-panel-surface border border-panel-border rounded-xl pl-11 pr-4 py-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text transition-colors"
-                        />
+                      <div className="relative flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-panel-text-subtle" />
+                          <input 
+                            type="text" 
+                            placeholder="Имя или телефон..."
+                            value={clientSearch}
+                            onChange={(e) => {
+                              setClientSearch(e.target.value)
+                              setNewClientName(e.target.value.replace(/[\d+()-]/g, "").trim())
+                              const phoneMatch = e.target.value.match(/[\d+()-]+/)
+                              if (phoneMatch) setNewClientPhone(phoneMatch[0])
+                            }}
+                            className="w-full bg-panel-surface border border-panel-border rounded-xl pl-11 pr-4 py-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text transition-colors"
+                          />
+                        </div>
+                        {draft.clientId && (
+                          <button 
+                            onClick={() => setIsClientSearchActive(false)}
+                            className="px-3 py-3 text-sm font-medium text-panel-text-muted hover:text-panel-text shrink-0"
+                          >
+                            Отмена
+                          </button>
+                        )}
                       </div>
                       
                       {clientSearch && draft.clientId !== "new_pending" && (
@@ -382,8 +403,23 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                               type="tel" 
                               placeholder="Телефон"
                               value={newClientPhone}
-                              onChange={e => { setNewClientPhone(e.target.value); setPhoneError("") }}
-                              className={`w-full bg-panel-base border rounded-xl px-4 py-3 text-sm text-panel-text outline-none transition-colors ${phoneError ? 'border-red-500' : 'border-panel-border'}`}
+                              onChange={e => { 
+                                let val = e.target.value
+                                const digits = val.replace(/\D/g, "")
+                                if (digits.length === 1 && val.length === 1) {
+                                  if (val === "7" || val === "8") val = "+7 "
+                                  else if (val !== "+") val = "+7 " + val
+                                } else if (val.startsWith("8") && val.length > 1) {
+                                  val = "+7 " + val.slice(1)
+                                } else if (val.startsWith("7")) {
+                                  val = "+7 " + val.slice(1)
+                                } else if (val.length > 0 && !val.startsWith("+7") && !val.startsWith("+") && val[0] !== "8" && val[0] !== "7") {
+                                  val = "+7 " + val
+                                }
+                                setNewClientPhone(val)
+                                setPhoneError("") 
+                              }}
+                              className={`w-full bg-panel-base border rounded-xl px-4 py-3 text-sm text-panel-text outline-none transition-colors ${phoneError ? 'border-red-500' : 'border-panel-border focus:border-panel-text'}`}
                             />
                             <button 
                               onClick={() => {
@@ -403,7 +439,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                   ) : (
                     <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-hub-text/10 text-hub-text flex items-center justify-center font-medium text-lg shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium text-lg shrink-0">
                           {draft.clientName?.[0]?.toUpperCase() || "К"}
                         </div>
                         <div className="flex flex-col min-w-0">
@@ -432,7 +468,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                           {selectedMaster?.avatarUrl ? (
                             <img src={selectedMaster.avatarUrl} alt={selectedMaster.name} className="w-12 h-12 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
                           ) : (
-                            <div className="w-12 h-12 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-lg text-panel-text shrink-0">
+                            <div className="w-12 h-12 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium text-lg shrink-0">
                               {selectedMaster?.name?.[0] || "М"}
                             </div>
                           )}
