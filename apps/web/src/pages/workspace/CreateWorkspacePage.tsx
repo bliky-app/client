@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { X, ArrowLeft } from "lucide-react"
+import { X, ArrowLeft, Plus } from "lucide-react"
 import Step1Type from "./steps/Step1Type"
 import Step2Details from "./steps/Step2Details"
 import Step4Schedule from "./steps/Step4Schedule"
@@ -101,47 +101,56 @@ export default function CreateWorkspacePage() {
 
   return (
     <div className="flex flex-col flex-1 bg-hub-base h-svh overflow-hidden">
-      {/* White wizard panel */}
-      <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] mt-16 shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
-
-        {/* Header */}
-        <div className="flex items-center gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle">
+      {/* Functional Top Hub Header */}
+      <div className="h-16 px-6 flex items-center justify-between shrink-0 z-30">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={handleBack}
-            className="p-2 -ml-2 rounded-full text-panel-text-muted hover:text-panel-text hover:bg-panel-surface-hover transition-colors"
+            className="p-2.5 rounded-2xl bg-hub-surface border border-hub-border text-hub-text-muted hover:text-hub-text hover:bg-hub-surface-hover transition-all active:scale-95 shadow-sm"
+            title="Назад"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
 
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-bold text-panel-text-subtle uppercase tracking-wider mb-0.5">
-              Шаг {step + 1} из {totalSteps}
-            </p>
-            <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
-              {step === 0 && "Тип пространства"}
-              {step === 1 && "Детали пространства"}
-              {step === 2 && "График работы"}
-            </h1>
+          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-hub-surface border border-hub-border text-hub-text shadow-sm">
+            <Plus className="w-4 h-4 text-hub-text-muted" />
+            <span className="text-xs font-semibold">Новое пространство</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-hub-surface-hover border border-hub-border-light/50 text-hub-text-muted">
+              {step + 1}/{totalSteps}
+            </span>
           </div>
-
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="p-2 -mr-2 rounded-full text-panel-text-muted hover:text-panel-text hover:bg-panel-surface-hover transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
-        {/* Progress bar */}
-        <div className="px-6 pt-4 pb-2 shrink-0">
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="p-2.5 rounded-2xl bg-hub-surface border border-hub-border text-hub-text-muted hover:text-hub-text hover:bg-hub-surface-hover transition-all active:scale-95 shadow-sm"
+          title="Закрыть"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* White wizard panel */}
+      <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
+        {/* Step Progress Line */}
+        <div className="px-6 pt-5 pb-2 shrink-0">
           <div className="h-1 bg-panel-border-subtle rounded-full overflow-hidden">
             <div
               className="h-full bg-panel-text rounded-full transition-all duration-500 ease-out"
               style={{ width: `${((step + 1) / totalSteps) * 100}%` }}
             />
           </div>
+        </div>
+
+        {/* Step Title Header inside white panel */}
+        <div className="px-6 pt-2 pb-2 shrink-0">
+          <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
+            {step === 0 && "Тип пространства"}
+            {step === 1 && "Детали пространства"}
+            {step === 2 && "График работы"}
+          </h1>
         </div>
 
         {/* Step content scroll body */}

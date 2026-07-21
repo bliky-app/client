@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { X, Check, Sun, Moon, Monitor, LogOut, Camera, Trash2, ShieldCheck } from "lucide-react"
+import { X, Check, Sun, Moon, Monitor, LogOut, Camera, Trash2, ShieldCheck, User as UserIcon } from "lucide-react"
 import { useAuth } from "@/lib/AuthProvider"
 import { useTheme } from "@/lib/ThemeProvider"
 import { useToast } from "@/lib/ToastProvider"
@@ -14,26 +14,26 @@ import { getDefaultTimezone } from "@/lib/formatters"
 import type { User as UserType } from "@/types/models"
 
 const TIMEZONE_OPTIONS: SelectOption[] = [
-  { value: "Europe/Kaliningrad", label: "Калининград", subtitle: "UTC+2" },
-  { value: "Europe/Moscow", label: "Москва", subtitle: "UTC+3" },
-  { value: "Europe/Samara", label: "Самара", subtitle: "UTC+4" },
-  { value: "Asia/Yekaterinburg", label: "Екатеринбург", subtitle: "UTC+5" },
-  { value: "Asia/Omsk", label: "Омск", subtitle: "UTC+6" },
-  { value: "Asia/Krasnoyarsk", label: "Красноярск", subtitle: "UTC+7" },
-  { value: "Asia/Irkutsk", label: "Иркутск", subtitle: "UTC+8" },
-  { value: "Asia/Yakutsk", label: "Якутск", subtitle: "UTC+9" },
-  { value: "Asia/Vladivostok", label: "Владивосток", subtitle: "UTC+10" },
-  { value: "Asia/Magadan", label: "Магадан", subtitle: "UTC+11" },
-  { value: "Asia/Kamchatka", label: "Камчатка", subtitle: "UTC+12" },
-  { value: "Europe/Minsk", label: "Минск", subtitle: "UTC+3" },
-  { value: "Asia/Almaty", label: "Алматы", subtitle: "UTC+5" },
-  { value: "Asia/Tashkent", label: "Ташкент", subtitle: "UTC+5" },
-  { value: "Europe/London", label: "Лондон", subtitle: "UTC+0/+1" },
-  { value: "Europe/Paris", label: "Париж", subtitle: "UTC+1/+2" },
-  { value: "America/New_York", label: "Нью-Йорк", subtitle: "UTC-5/-4" },
-  { value: "America/Los_Angeles", label: "Лос-Анджелес", subtitle: "UTC-8/-7" },
-  { value: "Asia/Dubai", label: "Дубай", subtitle: "UTC+4" },
-  { value: "Asia/Istanbul", label: "Стамбул", subtitle: "UTC+3" },
+  { value: "Europe/Kaliningrad",  label: "Калининград",   subtitle: "UTC+2" },
+  { value: "Europe/Moscow",       label: "Москва",        subtitle: "UTC+3" },
+  { value: "Europe/Samara",       label: "Самара",        subtitle: "UTC+4" },
+  { value: "Asia/Yekaterinburg",  label: "Екатеринбург",  subtitle: "UTC+5" },
+  { value: "Asia/Omsk",           label: "Омск",          offset: "UTC+6" },
+  { value: "Asia/Krasnoyarsk",    label: "Красноярск",    subtitle: "UTC+7" },
+  { value: "Asia/Irkutsk",        label: "Иркутск",       subtitle: "UTC+8" },
+  { value: "Asia/Yakutsk",        label: "Якутск",        subtitle: "UTC+9" },
+  { value: "Asia/Vladivostok",    label: "Владивосток",   subtitle: "UTC+10" },
+  { value: "Asia/Magadan",        label: "Магадан",       subtitle: "UTC+11" },
+  { value: "Asia/Kamchatka",      label: "Камчатка",      subtitle: "UTC+12" },
+  { value: "Europe/Minsk",        label: "Минск",         subtitle: "UTC+3" },
+  { value: "Asia/Almaty",         label: "Алматы",        subtitle: "UTC+5" },
+  { value: "Asia/Tashkent",       label: "Ташкент",       subtitle: "UTC+5" },
+  { value: "Europe/London",       label: "Лондон",        subtitle: "UTC+0/+1" },
+  { value: "Europe/Paris",        label: "Париж",         subtitle: "UTC+1/+2" },
+  { value: "America/New_York",    label: "Нью-Йорк",      subtitle: "UTC-5/-4" },
+  { value: "America/Los_Angeles", label: "Лос-Анджелес",  subtitle: "UTC-8/-7" },
+  { value: "Asia/Dubai",          label: "Дубай",         subtitle: "UTC+4" },
+  { value: "Asia/Istanbul",       label: "Стамбул",       subtitle: "UTC+3" },
 ]
 
 export default function UserSettingsPage() {
@@ -183,23 +183,27 @@ export default function UserSettingsPage() {
 
   return (
     <div className="flex flex-col flex-1 bg-hub-base h-svh overflow-hidden">
-      {/* White wizard panel */}
-      <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] mt-16 shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle">
-          <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
-            Профиль
-          </h1>
-
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="p-2 -mr-2 rounded-full text-panel-text-muted hover:text-panel-text hover:bg-panel-surface-hover transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+      {/* Functional Top Hub Header */}
+      <div className="h-16 px-6 flex items-center justify-between shrink-0 z-30">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-hub-surface border border-hub-border text-hub-text shadow-sm">
+            <UserIcon className="w-4 h-4 text-hub-text-muted" />
+            <span className="text-xs font-semibold">Профиль</span>
+          </div>
         </div>
 
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="p-2.5 rounded-2xl bg-hub-surface border border-hub-border text-hub-text-muted hover:text-hub-text hover:bg-hub-surface-hover transition-all active:scale-95 shadow-sm"
+          title="Закрыть"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* White wizard panel */}
+      <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
         {/* Content Body */}
         <div className="flex-1 overflow-y-auto px-6 pt-6 flex flex-col relative">
           {error && (
