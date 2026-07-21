@@ -204,9 +204,12 @@ export default function HubOverview({ data }: HubOverviewProps) {
   const renderFallbackBlock = () => {
     if (todayAppointments > 0 || isAdmin || isOwner) return null
     
+    const verbCreate = isFormal ? "Создайте" : "Создай"
+    const verbTell = isFormal ? "расскажите" : "расскажи"
+
     return (
       <span className="block mt-3 pt-3 border-t border-zinc-800/50 first:border-0 first:pt-0 first:mt-0 text-zinc-400">
-        У {pronounGenitive} пока нет активных ролей. Создайте своё пространство или расскажите работодателю о нашей платформе.
+        У {pronounGenitive} пока нет активных ролей. {verbCreate} своё пространство или {verbTell} работодателю о нашей платформе.
       </span>
     )
   }

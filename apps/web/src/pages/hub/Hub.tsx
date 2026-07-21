@@ -7,15 +7,14 @@ import WorkspaceList from "./WorkspaceList"
 import QuickActionsRow from "@/components/QuickActionsRow"
 import Timetable, { type TimetableViewMode } from "@/components/Timetable"
 import EventPopup from "@/components/EventPopup"
+import SectionCard from "@/components/ui/SectionCard"
 import { hubApi } from "@/lib/api/hubApi"
 import { MOCK_USER } from "@/lib/api/mockData"
-import type { User, Appointment } from "@/types/models"
+import type { Appointment } from "@/types/models"
 import type { QuickActionDraft } from "@/components/QuickActionsRow"
 import CreateAppointmentSheet, { type AppointmentDraft } from "@/components/CreateAppointmentSheet"
 
 export default function Hub() {
-  useQuery<User>({ queryKey: ["user"], queryFn: async () => MOCK_USER })
-
   const { data: workspaces = [] } = useQuery({
     queryKey: ["workspaces"],
     queryFn: hubApi.getWorkspaces,
@@ -27,7 +26,6 @@ export default function Hub() {
   })
 
   const [calendarDate, setCalendarDate] = useState(new Date())
-  const [isWorkspacesExpanded, setIsWorkspacesExpanded] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
   const [viewMode, setViewMode] = useState<TimetableViewMode>("week")
   
@@ -122,31 +120,14 @@ export default function Hub() {
             <div className="w-12 h-1.5 bg-panel-border rounded-full mx-auto shrink-0 -mb-2" />
 
             {/* Workspaces */}
-            <div className="flex flex-col bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden shrink-0">
-              <div
-                className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-panel-surface-hover transition-colors"
-                onClick={() => setIsWorkspacesExpanded(!isWorkspacesExpanded)}
-              >
-                <h2 className="text-lg font-semibold text-panel-text">Пространства</h2>
-                <button className="p-2 -mr-2 text-panel-text-muted hover:text-panel-text transition-colors rounded-full">
-                  <div className={`transition-transform duration-300 ${isWorkspacesExpanded ? "rotate-180" : ""}`}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </div>
-                </button>
-              </div>
-              <div className={`grid transition-all duration-300 ease-in-out ${isWorkspacesExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                <div className="overflow-hidden">
-                  <WorkspaceList workspaces={workspaces} />
-                </div>
-              </div>
-            </div>
+            <SectionCard title="Пространства">
+              <WorkspaceList workspaces={workspaces} />
+            </SectionCard>
 
             <QuickActionsRow context="hub" workspaces={workspaces} onOpenForm={handleOpenForm} />
 
             {/* Timetable */}
-            <div className="flex flex-col flex-1 bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden min-h-0 shrink-0">
+            <div className="flex flex-col bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden mb-6">
               <Timetable
                 timezone={MOCK_USER.timezone || "Europe/Moscow"}
                 viewType="personal"

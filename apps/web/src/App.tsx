@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider, useParams, Navigate } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { Loader2 } from "lucide-react"
 import MasterLayout from "@/layouts/MasterLayout"
 import Hub from "@/pages/hub/Hub"
 import WorkspacePage from "@/pages/workspace/WorkspacePage"
@@ -9,13 +10,22 @@ import AccountSetupPage from "@/pages/auth/AccountSetupPage"
 import { AuthProvider, useAuth } from "@/lib/AuthProvider"
 import { ThemeProvider } from "@/lib/ThemeProvider"
 
-function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth()
+import UserSettingsPage from "@/pages/settings/UserSettingsPage"
+
+function RequireAuth({ children, requireName = true }: { children: React.ReactNode; requireName?: boolean }) {
+  const { user, isLoading } = useAuth()
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full bg-hub-base flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-hub-text-muted" />
+      </div>
+    )
+  }
   if (!user) {
     return <Navigate to="/auth" replace />
   }
   // If user is logged in but hasn't set their name, force setup
-  if (!user.firstName || !user.lastName) {
+  if (requireName && (!user.firstName || !user.lastName)) {
     return <Navigate to="/setup" replace />
   }
   return <>{children}</>
@@ -34,7 +44,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/setup",
-    element: <AccountSetupPage />
+    element: (
+      <RequireAuth requireName={false}>
+        <AccountSetupPage />
+      </RequireAuth>
+    )
   },
   {
     path: "/",
@@ -53,6 +67,10 @@ const router = createBrowserRouter([
         element: <CreateWorkspacePage />
       },
       {
+        path: "settings",
+        element: <UserSettingsPage />
+      },
+      {
         path: "workspace/:id",
         element: <WorkspaceRoute />
       },
@@ -69,13 +87,17 @@ const queryClient = new QueryClient({
   },
 })
 
+import { ToastProvider } from "@/lib/ToastProvider"
+
 export function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="bliky-ui-theme">
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <RouterProvider router={router} />
-        </AuthProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <RouterProvider router={router} />
+          </AuthProvider>
+        </ToastProvider>
       </QueryClientProvider>
     </ThemeProvider>
   )

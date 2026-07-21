@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from "react"
 import { X, Search, ChevronDown, Check, Plus, Calendar } from "lucide-react"
 import type { Workspace } from "@/types/models"
-import { MOCK_USER } from "@/lib/api/mockData"
+import { useAuth } from "@/lib/AuthProvider"
+import Avatar from "@/components/Avatar"
+import Button from "@/components/ui/Button"
+import Input from "@/components/ui/Input"
+import PhoneInput from "@/components/ui/PhoneInput"
+import ColorPicker from "@/components/ui/ColorPicker"
 
 const ACCENT_COLORS = [
   "#6366f1", "#8b5cf6", "#d946ef", "#ec4899",
@@ -211,12 +216,15 @@ function SearchableSelect({
 }
 
 export default function CreateAppointmentSheet({ isOpen, onClose, initialData, workspaces }: CreateAppointmentSheetProps) {
-  const isFormal = MOCK_USER?.isFormal ?? true
+  const { user } = useAuth()
+  const isFormal = user?.isFormal ?? true
+  const currentUserMasterId = user?.id || "me"
+
   const [draft, setDraft] = useState<AppointmentDraft>(initialData || {})
   
   const [isWorkspaceSearchActive, setIsWorkspaceSearchActive] = useState(!initialData?.workspaceId)
   const [isClientSearchActive, setIsClientSearchActive] = useState(!initialData?.clientId)
-  const [isMasterSearchActive, setIsMasterSearchActive] = useState(!initialData?.masterId)
+  const [isMasterSearchActive, setIsMasterSearchActive] = useState(false)
   const [isServiceSearchActive, setIsServiceSearchActive] = useState(!initialData?.serviceId)
 
   const [clientSearch, setClientSearch] = useState("")
@@ -227,6 +235,9 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
   useEffect(() => {
     if (isOpen) {
       const data = { ...(initialData || {}) }
+      if (!data.masterId) {
+        data.masterId = currentUserMasterId
+      }
       if (data.serviceId && !data.stages && data.serviceId !== "custom") {
         const srv = MOCK_SERVICES.find(s => s.id === data.serviceId)
         if (srv) {
@@ -237,7 +248,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
       setDraft(data)
       setIsWorkspaceSearchActive(!data.workspaceId)
       setIsClientSearchActive(!data.clientId)
-      setIsMasterSearchActive(!data.masterId)
+      setIsMasterSearchActive(false)
       setIsServiceSearchActive(!data.serviceId)
     } else {
       setClientSearch("")
@@ -245,7 +256,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
       setNewClientPhone("")
       setPhoneError("")
     }
-  }, [isOpen, initialData])
+  }, [isOpen, initialData, currentUserMasterId])
 
   if (!isOpen) return null
 
@@ -292,15 +303,29 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
   const totalDuration = draft.stages?.reduce((acc, s) => acc + s.durationMinutes, 0) || 0
 
   const selectedWorkspace = workspaces?.find(w => w.id === draft.workspaceId)
-  const selectedMasterFromWorkspace = workspaces?.flatMap(w => w.staff || []).find(s => s.id === draft.masterId)
-  const selectedMaster = MOCK_MASTERS.find(m => m.id === draft.masterId) || 
-    (selectedMasterFromWorkspace ? { 
-      id: selectedMasterFromWorkspace.id, 
-      name: selectedMasterFromWorkspace.user?.shortName || selectedMasterFromWorkspace.user?.fullName || "Мастер",
-      subtitle: selectedMasterFromWorkspace.mainCategory?.name,
-      avatarUrl: selectedMasterFromWorkspace.user?.avatarUrl,
-      color: selectedMasterFromWorkspace.user?.color
-    } : undefined)
+  const selectedMasterFromWorkspace = workspaces?.flatMap(w => w.staff || []).find(s => s.id === draft.masterId || s.user?.id === draft.masterId)
+  
+  const currentUserMasterOption = {
+    id: currentUserMasterId,
+    name: user ? `${user.shortName || user.fullName} (Я)` : "Я",
+    subtitle: "Мои записи",
+    avatarUrl: user?.avatarUrl,
+    color: user?.color,
+    user: user || undefined,
+  }
+
+  const selectedMasterUser = selectedMasterFromWorkspace?.user || user
+
+  const selectedMaster = (draft.masterId === currentUserMasterId || draft.masterId === "me" || draft.masterId === user?.id)
+    ? currentUserMasterOption
+    : (selectedMasterFromWorkspace ? { 
+        id: selectedMasterFromWorkspace.id, 
+        name: selectedMasterFromWorkspace.user?.shortName || selectedMasterFromWorkspace.user?.fullName || "Мастер",
+        subtitle: selectedMasterFromWorkspace.mainCategory?.name,
+        avatarUrl: selectedMasterFromWorkspace.user?.avatarUrl,
+        color: selectedMasterFromWorkspace.user?.color,
+        user: selectedMasterFromWorkspace.user
+      } : currentUserMasterOption)
   const selectedService = draft.serviceId === "custom" 
     ? { name: draft.customService?.name || "Свободная услуга", price: undefined } 
     : MOCK_SERVICES.find(s => s.id === draft.serviceId)
@@ -426,37 +451,28 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             <X className="w-4 h-4" />
                           </button>
                         </div>
-                        <div className="flex flex-col gap-3">
-                          <input 
-                            type="text" 
+                         <div className="flex flex-col gap-3">
+                          <Input
+                            theme="panel"
+                            type="text"
                             placeholder="Имя"
                             value={newClientName}
                             onChange={e => setNewClientName(e.target.value)}
-                            className="w-full bg-panel-base border border-panel-border rounded-xl px-4 py-3 text-sm text-panel-text outline-none focus:border-panel-text transition-colors"
                           />
-                          <input 
-                            type="tel" 
+                          <PhoneInput
+                            theme="panel"
                             placeholder="Телефон"
                             value={newClientPhone}
-                            onChange={e => { 
-                              let val = e.target.value
-                              const digits = val.replace(/\D/g, "")
-                              if (digits.length === 1 && val.length === 1) {
-                                if (val === "7" || val === "8") val = "+7 "
-                                else if (val !== "+") val = "+7 " + val
-                              } else if (val.startsWith("8") && val.length > 1) {
-                                val = "+7 " + val.slice(1)
-                              } else if (val.startsWith("7")) {
-                                val = "+7 " + val.slice(1)
-                              } else if (val.length > 0 && !val.startsWith("+7") && !val.startsWith("+") && val[0] !== "8" && val[0] !== "7") {
-                                val = "+7 " + val
-                              }
+                            error={phoneError || undefined}
+                            onChange={(val) => {
                               setNewClientPhone(val)
-                              setPhoneError("") 
+                              setPhoneError("")
                             }}
-                            className={`w-full bg-panel-base border rounded-xl px-4 py-3 text-sm text-panel-text outline-none transition-colors ${phoneError ? 'border-red-500' : 'border-panel-border focus:border-panel-text'}`}
                           />
-                          <button 
+                          <Button
+                            variant="primary"
+                            theme="panel"
+                            fullWidth
                             onClick={() => {
                               if (newClientName && validatePhone(newClientPhone)) {
                                 setDraft({ ...draft, clientId: "new", clientName: newClientName, clientPhone: newClientPhone })
@@ -465,10 +481,9 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                                 setPhoneError("Некорректный номер")
                               }
                             }}
-                            className="mt-2 w-full py-3 rounded-xl bg-panel-text text-panel-base font-semibold text-sm hover:opacity-90 transition-opacity"
                           >
                             Сохранить клиента
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
@@ -525,19 +540,24 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       <SearchableSelect
                         value={draft.masterId}
                         onChange={val => { setDraft({ ...draft, masterId: val }); setIsMasterSearchActive(false) }}
-                        options={selectedWorkspace?.staff?.map(s => ({ id: s.id, name: s.user?.shortName || s.user?.fullName || "Мастер", subtitle: s.mainCategory?.name, avatarUrl: s.user?.avatarUrl })) || []}
+                        options={
+                          selectedWorkspace?.staff?.map(s => ({
+                            id: s.id,
+                            name: s.user?.shortName || s.user?.fullName || "Мастер",
+                            subtitle: s.mainCategory?.name,
+                            avatarUrl: s.user?.avatarUrl,
+                            color: s.user?.color
+                          })) || [currentUserMasterOption]
+                        }
                         placeholder={isFormal ? "Выберите мастера..." : "Выбери мастера..."}
                       />
                     ) : (
                       <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm h-full min-h-[82px]">
                         <div className="flex items-center gap-3">
-                          {selectedMaster?.avatarUrl ? (
-                            <img src={selectedMaster.avatarUrl} alt={selectedMaster.name} className="w-12 h-12 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
-                          ) : (
-                            <div className="w-12 h-12 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium text-lg shrink-0">
-                              {selectedMaster?.name?.[0] || "М"}
-                            </div>
-                          )}
+                          <Avatar
+                            data={selectedMasterUser}
+                            className="w-12 h-12 rounded-full text-lg shadow-sm border border-panel-border-subtle shrink-0"
+                          />
                           <div className="flex flex-col min-w-0">
                             <span className="text-base font-semibold text-panel-text truncate">{selectedMaster?.name}</span>
                             <span className="text-sm text-panel-text-muted truncate">{selectedMaster?.subtitle || "Мастер"}</span>
@@ -619,12 +639,12 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                           {draft.serviceId === "custom" && (
                             <div className="flex flex-col gap-3">
                               <h3 className="text-[11px] font-bold text-panel-text-subtle uppercase tracking-widest">Название услуги</h3>
-                              <input 
-                                type="text" 
+                              <Input
+                                theme="panel"
+                                type="text"
                                 value={draft.customService?.name || ""}
                                 onChange={e => setDraft({ ...draft, customService: { name: e.target.value }})}
                                 placeholder="Свободная услуга"
-                                className="w-full bg-panel-base border border-panel-border rounded-xl px-4 py-3 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-colors"
                               />
                             </div>
                           )}
@@ -698,33 +718,11 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                   )}
                 </div>
 
-                <div className="flex flex-col gap-3">
-                  <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Цвет записи</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {ACCENT_COLORS.map(color => (
-                      <button
-                        key={color}
-                        onClick={() => setDraft({ ...draft, color })}
-                        className={`w-10 h-10 rounded-full transition-all duration-150 active:scale-90 ${
-                          draft.color === color
-                            ? "ring-2 ring-offset-2 ring-panel-text scale-110 shadow-md"
-                            : "hover:scale-110 shadow-sm border border-black/5"
-                        }`}
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-
-                    <label className="w-10 h-10 rounded-full border border-dashed border-panel-border cursor-pointer flex items-center justify-center hover:border-panel-text-muted transition-colors overflow-hidden relative active:scale-95 shadow-sm bg-panel-surface">
-                      <span className="text-sm font-medium text-panel-text-subtle select-none">+</span>
-                      <input
-                        type="color"
-                        value={draft.color || "#000000"}
-                        onChange={e => setDraft({ ...draft, color: e.target.value })}
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                      />
-                    </label>
-                  </div>
-                </div>
+                <ColorPicker
+                  label="Цвет записи"
+                  value={draft.color}
+                  onChange={(c) => setDraft({ ...draft, color: c })}
+                />
 
                 <div className="flex flex-col gap-3">
                   <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Примечания</h3>
@@ -744,15 +742,15 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
 
         <div className="px-6 py-5 shrink-0 border-t border-panel-border-subtle bg-panel-base">
           <div className="max-w-2xl mx-auto w-full">
-            <button 
-              onClick={() => {
-                onClose()
-              }}
+            <Button
+              variant="primary"
+              theme="panel"
+              fullWidth
               disabled={!draft.workspaceId || !draft.clientId || !draft.masterId || !draft.serviceId}
-              className="w-full py-4 rounded-2xl font-semibold text-base transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-panel-text text-panel-base hover:opacity-90 active:scale-[0.98]"
+              onClick={onClose}
             >
               Создать запись
-            </button>
+            </Button>
           </div>
         </div>
 

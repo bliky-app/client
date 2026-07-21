@@ -10,11 +10,12 @@ import {
   X,
   List,
   LayoutDashboard,
+  ChevronRight,
   type LucideIcon,
 } from "lucide-react"
 import type { Workspace, WorkspaceSectionId, Permission } from "@/types/models"
 import { usePermissions } from "@/lib/permissions"
-import Avatar from "@/components/Avatar"
+import UserProfileCard from "@/components/UserProfileCard"
 
 interface SectionConfig {
   id: WorkspaceSectionId
@@ -28,7 +29,7 @@ const SECTIONS: SectionConfig[] = [
   { id: "schedule", label: "Расписание", icon: Calendar, permission: "view_global_schedule" },
   { id: "appointments", label: "Записи", icon: ClipboardList, permission: null },
   { id: "work_schedule", label: "График", icon: Clock, permission: null },
-  { id: "services", label: "Услуги", icon: List, permission: null }, // services doesn't require permission to view own services
+  { id: "services", label: "Услуги", icon: List, permission: null },
   { id: "staff", label: "Сотрудники", icon: Users, permission: "manage_staff" },
   { id: "resources", label: "Ресурсы", icon: Package, permission: "manage_services" },
   { id: "analytics", label: "Аналитика", icon: BarChart2, permission: "view_analytics" },
@@ -53,17 +54,10 @@ export default function WorkspaceDrawer({
 }: WorkspaceDrawerProps) {
   const { can, user } = usePermissions(workspace.id)
 
-  const visibleSections = SECTIONS.filter(section => {
-    // Hide 'staff' and 'schedule' for individual workspaces entirely
+  const visibleSections = SECTIONS.filter((section) => {
     if ((section.id === "staff" || section.id === "schedule") && workspace.type === "individual") return false
-    
-    // Fallback to permission check
     return section.permission === null || can(section.permission)
   })
-
-  // Determine user role in this workspace
-  const staffMember = workspace.staff?.find(s => s.user?.id === user?.id)
-  const roleName = staffMember?.workspaceRole.nameRu || "Сотрудник"
 
   return (
     <>
@@ -81,8 +75,8 @@ export default function WorkspaceDrawer({
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between px-6 py-5">
-          <span className="text-xl font-semibold text-hub-text tracking-tight">Пространство</span>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-hub-border/50">
+          <span className="text-lg font-semibold text-hub-text tracking-tight">Пространство</span>
           <button
             onClick={onClose}
             className="p-2 -mr-2 text-hub-text-muted hover:text-hub-text transition-colors rounded-full hover:bg-hub-surface-hover"
@@ -91,10 +85,11 @@ export default function WorkspaceDrawer({
           </button>
         </div>
 
-        <nav className="flex-1 px-3 overflow-y-auto">
+        <nav className="flex-1 px-3 py-3 overflow-y-auto">
           <div className="flex flex-col gap-1">
-            {visibleSections.map(section => {
+            {visibleSections.map((section) => {
               const Icon = section.icon
+              const isActive = activeSection === section.id
               return (
                 <button
                   key={section.id}
@@ -103,14 +98,31 @@ export default function WorkspaceDrawer({
                     onSelectSection(section.id)
                     onClose()
                   }}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
-                    activeSection === section.id
-                      ? "bg-hub-surface text-hub-text"
+                  className={`flex items-center justify-between gap-3 px-3 py-2 rounded-xl cursor-pointer transition-colors group ${
+                    isActive
+                      ? "bg-hub-surface text-hub-text font-semibold shadow-xs"
                       : "text-hub-text-muted hover:bg-hub-surface-hover hover:text-hub-text"
                   }`}
                 >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  <span className="font-medium text-[15px]">{section.label}</span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${
+                        isActive
+                          ? "bg-hub-surface border-hub-border text-hub-text"
+                          : "bg-hub-surface-hover/60 border-hub-border-light/50 text-hub-text-muted group-hover:text-hub-text group-hover:bg-hub-surface-hover"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm font-medium truncate">{section.label}</span>
+                  </div>
+                  <ChevronRight
+                    className={`w-4 h-4 transition-transform shrink-0 ${
+                      isActive
+                        ? "text-hub-text"
+                        : "text-hub-text-subtle group-hover:text-hub-text-muted group-hover:translate-x-0.5"
+                    }`}
+                  />
                 </button>
               )
             })}
@@ -118,21 +130,8 @@ export default function WorkspaceDrawer({
         </nav>
 
         {/* User profile at bottom */}
-        <div className="px-3 pb-6 flex flex-col mt-auto pt-4 border-t border-hub-border">
-          <div className="flex items-center justify-between px-3 py-2">
-            <div className="flex items-center gap-3 min-w-0">
-              <Avatar
-                type="user"
-                name={user?.shortName || "?"}
-                avatarUrl={user?.avatarUrl}
-                className="w-10 h-10 rounded-full border border-hub-border-light shrink-0"
-              />
-              <div className="flex flex-col min-w-0">
-                <span className="text-sm font-medium text-hub-text truncate">{user?.shortName}</span>
-                <span className="text-[11px] text-hub-text-subtle truncate">{roleName}</span>
-              </div>
-            </div>
-          </div>
+        <div className="p-3 pb-6 flex flex-col mt-auto pt-3 border-t border-hub-border">
+          <UserProfileCard onClose={onClose} />
         </div>
       </div>
     </>

@@ -1,5 +1,6 @@
 import type { CreateWorkspaceFormData } from "../CreateWorkspacePage"
 import type { WorkspaceSchedule } from "@/types/models"
+import Toggle from "@/components/ui/Toggle"
 
 interface Step4ScheduleProps {
   data: CreateWorkspaceFormData
@@ -90,17 +91,11 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
               } ${!enabled ? "opacity-50" : ""}`}
             >
               {/* Toggle */}
-              <button
-                type="button"
-                onClick={() => toggleDay(key)}
-                className={`relative w-10 h-5.5 h-[22px] rounded-full shrink-0 transition-colors duration-200 ${
-                  enabled ? "bg-panel-text" : "bg-panel-border"
-                }`}
-              >
-                <div className={`absolute top-[2px] w-[18px] h-[18px] rounded-full bg-panel-base shadow-sm transition-transform duration-200 ${
-                  enabled ? "translate-x-[20px]" : "translate-x-[2px]"
-                }`} />
-              </button>
+              <Toggle
+                checked={enabled}
+                onChange={() => toggleDay(key)}
+                theme="panel"
+              />
 
               {/* Day — short name */}
               <span className={`text-base flex-1 min-w-0 font-semibold ${
@@ -116,14 +111,14 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
                     type="time"
                     value={slot.start}
                     onChange={e => updateTime(key, "start", e.target.value)}
-                    className="bg-panel-base border border-panel-border-subtle rounded-xl px-2 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-[5.5rem]"
+                    className="bg-panel-base border border-panel-border-subtle rounded-xl px-2 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-22"
                   />
                   <span className="text-panel-text-subtle text-sm">—</span>
                   <input
                     type="time"
                     value={slot.end}
                     onChange={e => updateTime(key, "end", e.target.value)}
-                    className="bg-panel-base border border-panel-border-subtle rounded-xl px-2 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-[5.5rem]"
+                    className="bg-panel-base border border-panel-border-subtle rounded-xl px-2 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-22"
                   />
                 </div>
               ) : (

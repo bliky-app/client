@@ -1,4 +1,4 @@
-import { MOCK_WORKSPACES, MOCK_APPOINTMENTS, MOCK_USER, STAFF_SCHEDULE_HOURS } from "./mockData"
+import { MOCK_WORKSPACES, MOCK_APPOINTMENTS, MOCK_USER, STAFF_SCHEDULE_HOURS, syncMockUserWithSession } from "./mockData"
 import type { Workspace, TimetableColumn, Appointment, TimetableViewType } from "@/types/models"
 import { getTzDateString } from "../formatters"
 
@@ -7,11 +7,13 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 export const workspaceApi = {
   getWorkspace: async (id: string): Promise<Workspace | null> => {
     await delay(300)
+    syncMockUserWithSession()
     return MOCK_WORKSPACES.find(w => w.id === id) ?? null
   },
 
   getTimetableColumns: async (workspaceId: string, startDate: Date): Promise<TimetableColumn[]> => {
     await delay(300)
+    syncMockUserWithSession()
     const cols: TimetableColumn[] = []
     const tz = "+03:00" // Use valid ISO 8601 offset
 
@@ -49,6 +51,7 @@ export const workspaceApi = {
 
   getTeamDayColumns: async (workspaceId: string, date: Date): Promise<TimetableColumn[]> => {
     await delay(300)
+    syncMockUserWithSession()
     const ws = MOCK_WORKSPACES.find(w => w.id === workspaceId)
     if (!ws || !ws.staff) return []
 

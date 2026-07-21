@@ -46,14 +46,14 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
   const isLoading = columnsLoading || eventsLoading
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
-      <div className="flex flex-col flex-1 min-h-0">
+    <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1">
         {isLoading ? (
           <div className="flex items-center justify-center flex-1 min-h-50">
             <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
           </div>
         ) : (
-          <div className="flex-1 flex flex-col min-h-0 gap-6 p-4 sm:p-6 pb-0">
+          <div className="flex flex-col gap-6 p-4 sm:p-6 pb-6">
             <QuickActionsRow 
               context="workspace_schedule" 
               masters={workspace.staff?.map(s => ({ 
@@ -74,7 +74,7 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
               }} 
             />
             
-            <div className="flex-1 flex flex-col min-h-0 bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden shrink-0 mb-6">
+            <div className="flex flex-col bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden mb-6">
               <Timetable
                 timezone={workspace.timezone || "Europe/Moscow"}
                 viewType={viewType}

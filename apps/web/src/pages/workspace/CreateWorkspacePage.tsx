@@ -5,7 +5,10 @@ import Step1Type from "./steps/Step1Type"
 import Step2Details from "./steps/Step2Details"
 import Step3Location from "./steps/Step3Location"
 import Step4Schedule from "./steps/Step4Schedule"
+import Button from "@/components/ui/Button"
+import { useAuth } from "@/lib/AuthProvider"
 import type { WorkspaceType, WorkspaceSchedule } from "@/types/models"
+import { getDefaultTimezone } from "@/lib/formatters"
 
 export interface CreateWorkspaceFormData {
   // Step 1
@@ -32,7 +35,7 @@ const INITIAL_DATA: CreateWorkspaceFormData = {
   customCategory: "",
   color: "#6366f1",
   address: "",
-  timezone: "Europe/Moscow",
+  timezone: getDefaultTimezone(),
   schedule: {
     1: [{ start: "09:00", end: "19:00" }],
     2: [{ start: "09:00", end: "19:00" }],
@@ -51,6 +54,8 @@ const STEP_LABELS = [
 
 export default function CreateWorkspacePage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isFormal = user?.isFormal ?? true
   const [step, setStep] = useState(0)
   const [data, setData] = useState<CreateWorkspaceFormData>(INITIAL_DATA)
 
@@ -150,13 +155,17 @@ export default function CreateWorkspacePage() {
 
         {/* Footer navigation */}
         <div className="px-6 py-5 shrink-0 border-t border-panel-border-subtle">
-          <button
-            onClick={handleNext}
+          <Button
+            variant="primary"
+            theme="panel"
+            fullWidth
             disabled={!canProceed()}
-            className="w-full py-4 rounded-2xl font-semibold text-base transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-panel-text text-panel-base hover:opacity-90 active:scale-[0.98]"
+            onClick={handleNext}
           >
-            {isLast ? "Создать пространство" : "Далее"}
-          </button>
+            {isLast
+              ? (isFormal ? "Создайте пространство" : "Создай пространство")
+              : (isFormal ? "Продолжить" : "Далее")}
+          </Button>
         </div>
       </div>
     </div>

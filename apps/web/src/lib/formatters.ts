@@ -66,3 +66,13 @@ export const getGreeting = (date: Date, timezone: string = "Europe/Moscow"): str
   if (hours >= 18 && hours < 23) return "Добрый вечер!"
   return "Доброй ночи!"
 }
+
+export const getDefaultTimezone = (): string => {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    if (tz) return tz
+  } catch (e) {
+    // ignore
+  }
+  return "Europe/Moscow"
+}

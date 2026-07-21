@@ -27,10 +27,7 @@ export default function WorkspaceHeader({ workspace, onMenuOpen }: WorkspaceHead
           className="flex items-center gap-3 w-full text-left group"
         >
           <Avatar
-            type="workspace"
-            name={workspace.name}
-            avatarUrl={workspace.avatarUrl}
-            color={workspace.color}
+            data={workspace}
             className="h-11 w-11 rounded-2xl text-sm shadow-lg group-hover:opacity-90 transition-opacity"
           />
           <div className="flex flex-col min-w-0 pr-2">

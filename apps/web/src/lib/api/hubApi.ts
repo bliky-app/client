@@ -1,6 +1,7 @@
-import { MOCK_HUB_OVERVIEW, MOCK_WORKSPACES, MOCK_APPOINTMENTS, MOCK_USER } from "./mockData"
+import { MOCK_HUB_OVERVIEW, MOCK_WORKSPACES, MOCK_APPOINTMENTS, MOCK_USER, syncMockUserWithSession } from "./mockData"
 import type { HubOverviewData, Workspace, TimetableColumn, Appointment } from "@/types/models"
 import { getTzDateString } from "../formatters"
+import { getSession } from "./authApi"
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -30,11 +31,16 @@ function mergeIntervals(intervals: { start: string, end: string }[]): { start: s
 export const hubApi = {
   getOverview: async (): Promise<HubOverviewData> => {
     await delay(500)
-    return MOCK_HUB_OVERVIEW
+    const currentUser = syncMockUserWithSession()
+    return {
+      ...MOCK_HUB_OVERVIEW,
+      user: currentUser,
+    }
   },
 
   getWorkspaces: async (): Promise<Workspace[]> => {
     await delay(300)
+    syncMockUserWithSession()
     return MOCK_WORKSPACES
   },
 

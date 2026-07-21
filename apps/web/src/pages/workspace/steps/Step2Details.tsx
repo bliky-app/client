@@ -2,19 +2,16 @@ import { useRef, useMemo, useState } from "react"
 import type { KeyboardEvent } from "react"
 import { Camera, X, Star } from "lucide-react"
 import type { CreateWorkspaceFormData } from "../CreateWorkspacePage"
+import type { Workspace } from "@/types/models"
 import Avatar from "@/components/Avatar"
+import Input from "@/components/ui/Input"
+import ColorPicker from "@/components/ui/ColorPicker"
 
 interface Step2DetailsProps {
   data: CreateWorkspaceFormData
   onChange: (patch: Partial<CreateWorkspaceFormData>) => void
 }
 
-const ACCENT_COLORS = [
-  "#6366f1", "#8b5cf6", "#d946ef", "#ec4899",
-  "#f43f5e", "#ef4444", "#f97316", "#eab308",
-  "#84cc16", "#22c55e", "#10b981", "#14b8a6",
-  "#06b6d4", "#0ea5e9", "#3b82f6", "#64748b",
-]
 
 const CATEGORIES_INDIVIDUAL = [
   "Колорист", "Стилист по волосам", "Массажист",
@@ -87,13 +84,26 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
           onClick={() => fileRef.current?.click()}
           className="relative w-20 h-20 rounded-full shrink-0 overflow-hidden group border-2 border-dashed border-panel-border hover:border-panel-text-muted transition-colors"
         >
-          <Avatar
-            type="workspace"
-            name={data.name || "?"}
-            avatarUrl={data.avatarUrl}
-            color={data.color}
-            className="w-full h-full rounded-full text-2xl font-bold"
-          />
+          {(() => {
+            const draftWorkspace: Workspace = {
+              id: "temp",
+              name: data.name,
+              type: data.type || "individual",
+              category: data.category,
+              color: data.color,
+              avatarUrl: data.avatarUrl,
+              timezone: data.timezone,
+              address: data.address,
+              schedule: data.schedule,
+              staff: [],
+            }
+            return (
+              <Avatar
+                data={draftWorkspace}
+                className="w-full h-full rounded-full text-2xl font-bold"
+              />
+            )
+          })()}
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             <Camera className="w-6 h-6 text-white" />
           </div>
@@ -101,65 +111,30 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
 
         <div className="flex-1 flex flex-col gap-1 relative">
-          <label className="text-xs font-semibold text-panel-text-subtle uppercase tracking-wider">
-            Название
-          </label>
-          <input
+          <Input
+            label="Название"
+            theme="panel"
             type="text"
             value={data.name}
             onChange={e => onChange({ name: e.target.value })}
             placeholder="Моё пространство"
             maxLength={32}
-            className="w-full bg-panel-surface border border-panel-border rounded-2xl px-4 py-3 text-base text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text-muted transition-colors"
+            inputClassName="pr-16"
           />
-          <span className={`absolute right-4 bottom-3 text-xs font-medium ${data.name.length < 4 ? 'text-red-500' : 'text-panel-text-subtle'}`}>
+          <span className={`absolute right-4 bottom-3 text-xs font-medium pointer-events-none ${
+            data.name.length < 4 ? 'text-red-500' : 'text-panel-text-subtle'
+          }`}>
             {data.name.length}/32
           </span>
         </div>
       </div>
 
       {/* Color accent */}
-      <div className="flex flex-col gap-3">
-        <label className="text-xs font-semibold text-panel-text-subtle uppercase tracking-wider">
-          Фирменный цвет
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {ACCENT_COLORS.map(color => (
-            <button
-              key={color}
-              onClick={() => onChange({ color })}
-              className={`w-9 h-9 rounded-full transition-all duration-150 active:scale-90 ${
-                data.color === color
-                  ? "ring-2 ring-offset-1 ring-panel-text scale-105"
-                  : "hover:scale-105"
-              }`}
-              style={{ backgroundColor: color }}
-            />
-          ))}
-
-          {/* Render custom color if selected */}
-          {!ACCENT_COLORS.includes(data.color) && (
-            <button
-              className="w-9 h-9 rounded-full transition-all duration-150 active:scale-90 ring-2 ring-offset-1 ring-panel-text scale-105 relative flex items-center justify-center"
-              style={{ backgroundColor: data.color }}
-            >
-              <span className="absolute inset-0 rounded-full border border-black/10 mix-blend-overlay"></span>
-              <div className="w-2 h-2 rounded-full bg-white/80 shadow-sm mix-blend-overlay"></div>
-            </button>
-          )}
-
-          {/* Custom color picker (+) */}
-          <label className="w-9 h-9 rounded-full border-2 border-dashed border-panel-border cursor-pointer flex items-center justify-center hover:border-panel-text-muted transition-colors overflow-hidden relative active:scale-95">
-            <span className="text-xs text-panel-text-subtle select-none">+</span>
-            <input
-              type="color"
-              value={data.color}
-              onChange={e => onChange({ color: e.target.value })}
-              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-            />
-          </label>
-        </div>
-      </div>
+      <ColorPicker
+        label="Фирменный цвет"
+        value={data.color}
+        onChange={(color) => onChange({ color })}
+      />
 
       {/* Categories Tag Input */}
       <div className="flex flex-col gap-3">
@@ -169,7 +144,7 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
 
         {/* Input container */}
         <div
-          className="w-full bg-panel-surface border border-panel-border rounded-2xl p-2 min-h-[52px] flex flex-wrap items-center gap-2 focus-within:border-panel-text-muted transition-colors cursor-text"
+          className="w-full bg-panel-surface border border-panel-border rounded-2xl p-2 min-h-13 flex flex-wrap items-center gap-2 focus-within:border-panel-text-muted transition-colors cursor-text"
           onClick={() => inputRef.current?.focus()}
         >
           {selectedCategories.map((cat, idx) => {
@@ -208,7 +183,7 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
               if (inputValue) addCategory(inputValue)
             }}
             placeholder={selectedCategories.length === 0 ? "Например: Массаж, СПА..." : ""}
-            className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-panel-text placeholder:text-panel-text-subtle py-1 px-2"
+            className="flex-1 min-w-30 bg-transparent outline-none text-sm text-panel-text placeholder:text-panel-text-subtle py-1 px-2"
           />
         </div>
 

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Bell, Settings, ChevronDown, Calendar as CalendarIcon } from "lucide-react"
+import { Bell, SlidersHorizontal, ChevronDown, Calendar as CalendarIcon } from "lucide-react"
 import Avatar from "@/components/Avatar"
 import WorkspaceDropdown from "@/components/WorkspaceDropdown"
 import SettingsDropdown from "@/components/SettingsDropdown"
@@ -45,9 +45,7 @@ export default function HubHeader({ user, date }: HubHeaderProps) {
           className="flex items-center gap-3 text-left group"
         >
           <Avatar
-            type="user"
-            name={user.shortName || user.fullName || ""}
-            avatarUrl={user.avatarUrl}
+            data={user}
             className="h-11 w-11 rounded-full border border-hub-border text-lg group-hover:border-hub-border-light transition-colors"
           />
           <div className="flex flex-col min-w-0 pr-2">
@@ -79,9 +77,11 @@ export default function HubHeader({ user, date }: HubHeaderProps) {
         <div className="relative">
           <button 
             onClick={handleSettingsToggle} 
+            title="Центр управления"
+            aria-label="Центр управления"
             className="h-11 w-11 rounded-full bg-hub-surface border border-hub-border flex items-center justify-center active:scale-95 transition-transform"
           >
-            <Settings className="h-5 w-5 text-hub-text-muted" />
+            <SlidersHorizontal className="h-5 w-5 text-hub-text-muted" />
           </button>
           
           <SettingsDropdown 

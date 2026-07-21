@@ -6,14 +6,28 @@ interface PreciseTimePickerProps {
   y: number
   initialHour: number
   initialMinute: number
+  dateString?: string
   onConfirm: (hour: number, minute: number) => void
   onCancel: () => void
 }
 
-export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm, onCancel }: PreciseTimePickerProps) {
+export function PreciseTimePicker({ x, y, initialHour, initialMinute, dateString, onConfirm, onCancel }: PreciseTimePickerProps) {
   const [hour, setHour] = useState(initialHour)
   const [minute, setMinute] = useState(initialMinute)
   const popoverRef = useRef<HTMLDivElement>(null)
+
+  const formattedDate = dateString ? (() => {
+    try {
+      const d = new Date(dateString)
+      if (isNaN(d.getTime())) return dateString
+      const day = d.getDate()
+      const monthNames = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
+      const dayNames = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"]
+      return `${dayNames[d.getDay()]}, ${day} ${monthNames[d.getMonth()]}`
+    } catch (e) {
+      return dateString
+    }
+  })() : null
 
   useEffect(() => {
     const handleDown = (e: MouseEvent | TouchEvent) => {
@@ -67,7 +81,7 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
       <div 
         ref={popoverRef}
         style={style}
-        className="absolute bg-panel-surface border border-panel-border shadow-xl rounded-2xl p-3.5 flex flex-col gap-3 w-52 pointer-events-auto relative"
+        className="absolute bg-panel-surface border border-panel-border shadow-xl rounded-2xl p-3.5 flex flex-col gap-2.5 w-52 pointer-events-auto relative"
       >
         <button 
           onClick={onCancel} 
@@ -76,7 +90,13 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
           <X className="w-4 h-4" />
         </button>
 
-        <div className="flex items-center justify-center gap-2 pt-2">
+        {formattedDate && (
+          <div className="text-[11px] font-medium text-panel-text-muted text-center pt-0.5 px-4 select-none truncate">
+            {formattedDate}
+          </div>
+        )}
+
+        <div className="flex items-center justify-center gap-2 pt-0.5">
           <div className="flex flex-col items-center">
             <button 
               onClick={() => setHour(h => (h + 1) % 24)} 

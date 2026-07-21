@@ -103,7 +103,7 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
 
             {event.workspace.name && (
               <div className="flex items-center gap-3">
-                <Avatar type="workspace" name={event.workspace.name} avatarUrl={event.workspace.avatarUrl} color={event.workspace.color} className="w-8 h-8 rounded-full text-[10px] shrink-0" />
+                <Avatar data={event.workspace} className="w-8 h-8 rounded-full text-[10px] shrink-0" />
                 <div className="flex flex-col min-w-0 leading-tight">
                   <span className="font-medium text-panel-text truncate">{event.workspace.name}</span>
                   {event.workspace.address && (
@@ -115,7 +115,7 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
 
             {event.staff && (
               <div className="flex items-center gap-3">
-                <Avatar type="user" name={event.staff.shortName || event.staff.user?.shortName || "?"} avatarUrl={event.staff.user?.avatarUrl} color={event.staff.color || event.staff.user?.color} className="w-8 h-8 rounded-full text-[10px] shrink-0" />
+                <Avatar data={event.staff} className="w-8 h-8 rounded-full text-[10px] shrink-0" />
                 <div className="flex flex-col min-w-0 leading-tight">
                   <span className="font-medium text-panel-text truncate">{event.staff.shortName || event.staff.user?.shortName}</span>
                   <span className="text-xs text-panel-text-muted-dark">{event.staff.mainCategory.name}</span>

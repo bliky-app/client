@@ -51,6 +51,32 @@ export const MOCK_USER: User = {
   globalRole: ROLE_USER
 }
 
+export function syncMockUserWithSession(): User {
+  try {
+    const raw = localStorage.getItem("bliky_auth_session")
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      const user = parsed?.user
+      if (user) {
+        if (user.firstName) MOCK_USER.firstName = user.firstName
+        if (user.lastName) MOCK_USER.lastName = user.lastName
+        if (user.fullName) MOCK_USER.fullName = user.fullName
+        if (user.shortName || user.firstName) MOCK_USER.shortName = user.shortName || user.firstName
+        MOCK_USER.avatarUrl = user.avatarUrl
+        if (user.color) MOCK_USER.color = user.color
+        if (user.gender) MOCK_USER.gender = user.gender
+        if (user.isFormal !== undefined) MOCK_USER.isFormal = user.isFormal
+        if (user.timezone) MOCK_USER.timezone = user.timezone
+        if (user.id) MOCK_USER.id = user.id
+        return user
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return MOCK_USER
+}
+
 const u2: User = { id: "u-masha", phone: "+79991112233", fullName: "Мария Смирнова", shortName: "Маша", gender: "female", isFormal: false, color: "#ec4899", globalRole: ROLE_MASTER }
 const u3: User = { id: "u-pasha", phone: "+79992223344", fullName: "Павел Иванов", shortName: "Павел", gender: "male", isFormal: true, color: "#14b8a6", globalRole: ROLE_MASTER }
 const u4: User = { id: "u-anya", phone: "+79993334455", fullName: "Анна Петрова", shortName: "Аня", gender: "female", isFormal: false, color: "#f59e0b", globalRole: ROLE_ADMIN }

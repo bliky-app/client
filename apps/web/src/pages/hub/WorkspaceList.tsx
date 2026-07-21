@@ -59,10 +59,7 @@ export default function WorkspaceList({ workspaces }: WorkspaceListProps) {
 
             <div className="flex items-center gap-3 mt-auto">
               <Avatar
-                type="workspace"
-                name={workspace.name}
-                avatarUrl={workspace.avatarUrl}
-                color={workspace.color}
+                data={workspace}
                 className="h-9 w-9 rounded-xl text-[10px] shrink-0 border border-panel-border/50"
               />
 

@@ -16,7 +16,8 @@ interface WorkspacePageProps {
 export default function WorkspacePage({ id }: WorkspacePageProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>("overview")
-  const { can } = usePermissions(id)
+  const { can, user } = usePermissions(id)
+  const isFormal = user?.isFormal ?? true
 
   useEffect(() => {
     setActiveSection("overview")
@@ -61,7 +62,7 @@ export default function WorkspacePage({ id }: WorkspacePageProps) {
             title="Услуги" 
             description={hasFullAccess 
               ? "Управление прайс-листом и категориями услуг всего пространства."
-              : "Здесь отображаются ваши доступные услуги и цены."} 
+              : (isFormal ? "Здесь отображаются ваши доступные услуги и цены." : "Здесь отображаются твои доступные услуги и цены.")} 
           />
         )
       }
@@ -92,7 +93,7 @@ export default function WorkspacePage({ id }: WorkspacePageProps) {
         <WorkspaceHeader workspace={workspace} onMenuOpen={() => setDrawerOpen(true)} />
       </div>
 
-      <div className="flex-1 bg-panel-base rounded-t-[32px] overflow-hidden flex flex-col">
+      <div className="flex-1 bg-panel-base rounded-t-[32px] overflow-y-auto flex flex-col">
         {renderSection()}
       </div>
     </div>

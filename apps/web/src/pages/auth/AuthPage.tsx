@@ -1,22 +1,37 @@
 import { useState } from "react"
 import { Navigate } from "react-router-dom"
-import { ArrowRight, Loader2, Sparkles, ChevronLeft } from "lucide-react"
+import { ChevronLeft, Loader2, Sun, Moon } from "lucide-react"
+import { useTheme } from "@/lib/ThemeProvider"
 import { useAuth } from "@/lib/AuthProvider"
+import Button from "@/components/ui/Button"
+import PhoneInput from "@/components/ui/PhoneInput"
+import PasswordInput, { validatePassword } from "@/components/ui/PasswordInput"
+import { getGreeting } from "@/lib/formatters"
 
 export default function AuthPage() {
   const { user, login, register, checkPhone, isLoading: isAuthLoading } = useAuth()
-  
+  const { theme, setTheme } = useTheme()
+
   const [step, setStep] = useState<"phone" | "password">("phone")
   const [isLoginFlow, setIsLoginFlow] = useState(true)
-  
+
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen w-full bg-hub-base flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-hub-text-muted" />
+      </div>
+    )
+  }
+
   // If already authenticated and setup complete, go to Hub
-  if (!isAuthLoading && user) {
-    if (user.firstName) {
+  if (user) {
+    if (user.firstName && user.lastName) {
       return <Navigate to="/" replace />
     } else {
       return <Navigate to="/setup" replace />
@@ -25,7 +40,8 @@ export default function AuthPage() {
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!phone || phone.length < 10) {
+    const rawDigits = phone.replace(/\D/g, "")
+    if (!phone || rawDigits.length < 10) {
       setError("Введите корректный номер телефона")
       return
     }
@@ -35,7 +51,7 @@ export default function AuthPage() {
       const exists = await checkPhone(phone)
       setIsLoginFlow(exists)
       setStep("password")
-    } catch (err) {
+    } catch {
       setError("Произошла ошибка при проверке номера")
     } finally {
       setIsLoading(false)
@@ -48,6 +64,19 @@ export default function AuthPage() {
       setError("Введите пароль")
       return
     }
+
+    if (!isLoginFlow) {
+      if (password !== confirmPassword) {
+        setError("Пароли не совпадают")
+        return
+      }
+      const valRes = validatePassword(password)
+      if (!valRes.isValid) {
+        setError(`Пароль не соответствует требованиям: ${valRes.errors.join(", ")}`)
+        return
+      }
+    }
+
     setError("")
     setIsLoading(true)
     try {
@@ -56,7 +85,6 @@ export default function AuthPage() {
       } else {
         await register(phone, password)
       }
-      // AuthProvider will update context and RequireAuth will handle redirect
     } catch (err: any) {
       setError(err.message || "Неверный пароль")
     } finally {
@@ -65,24 +93,30 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-hub-base flex items-center justify-center p-6 font-sans">
+    <div className="min-h-screen w-full bg-hub-base flex justify-center items-start pt-16 sm:pt-24 p-6 font-sans relative">
+      {/* Theme Toggle Button */}
+      <button
+        type="button"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        className="fixed top-6 right-6 p-3 rounded-full bg-panel-surface border border-panel-border text-panel-text hover:bg-panel-surface-hover shadow-lg transition-all active:scale-95 z-50"
+        title="Сменить тему"
+      >
+        {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      </button>
+
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="flex flex-col items-center justify-center mb-10 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="w-16 h-16 bg-gradient-to-br from-panel-border to-panel-border-subtle rounded-[24px] flex items-center justify-center shadow-sm mb-6 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-tr from-panel-text/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Sparkles className="w-8 h-8 text-panel-text" />
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-hub-text mb-3">
-            Добро пожаловать
+        <div className="flex flex-col mb-8 text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <h1 className="text-2xl font-medium tracking-tight text-hub-text mb-2 flex items-center gap-2.5">
+            <span>—</span> {getGreeting(new Date())}
           </h1>
-          <p className="text-hub-text-muted font-medium">
+          <p className="text-hub-text-muted font-medium text-sm">
             Войдите или зарегистрируйтесь, чтобы продолжить
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-panel-surface border border-panel-border rounded-[32px] p-8 shadow-xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-500 delay-150 fill-mode-both">
+        <div className="bg-panel-surface border border-panel-border rounded-[32px] p-8 shadow-xl animate-in fade-in zoom-in-95 duration-500 delay-150 fill-mode-both">
           {error && (
             <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium animate-in fade-in slide-in-from-top-2">
               {error}
@@ -91,72 +125,77 @@ export default function AuthPage() {
 
           {step === "phone" ? (
             <form onSubmit={handlePhoneSubmit} className="flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-panel-text-subtle uppercase tracking-widest pl-1">
-                  Номер телефона
-                </label>
-                <input
-                  type="tel"
-                  autoFocus
-                  placeholder="+7 (999) 000-00-00"
-                  value={phone}
-                  onChange={(e) => { setPhone(e.target.value); setError("") }}
-                  className="w-full bg-panel-base border border-panel-border focus:border-panel-text outline-none rounded-2xl px-5 py-4 text-panel-text font-medium text-lg transition-colors placeholder:text-panel-text-muted"
-                />
-              </div>
-              
-              <button 
+              <PhoneInput
+                theme="panel"
+                label="Номер телефона"
+                autoFocus
+                value={phone}
+                onChange={(val) => { setPhone(val); setError("") }}
+                inputClassName="py-3.5 text-base font-medium"
+              />
+              <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full bg-panel-text text-panel-base rounded-2xl px-5 py-4 font-semibold text-base flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-70"
+                variant="primary"
+                theme="panel"
+                loading={isLoading}
+                disabled={!phone || phone.replace(/\D/g, "").length < 10}
+                fullWidth
               >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
-                  <>
-                    Продолжить
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
+                Продолжить
+              </Button>
             </form>
           ) : (
             <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-6 animate-in slide-in-from-right-4 duration-300">
-              <button 
-                type="button" 
-                onClick={() => { setStep("phone"); setError(""); setPassword("") }}
-                className="flex items-center gap-2 text-sm font-semibold text-panel-text-muted hover:text-panel-text transition-colors w-fit -ml-2 p-2 rounded-xl"
+              <button
+                type="button"
+                onClick={() => { setStep("phone"); setError(""); setPassword(""); setConfirmPassword("") }}
+                className="flex items-center gap-1.5 text-sm font-medium text-panel-text-muted hover:text-panel-text transition-colors w-fit -ml-1 p-1 rounded-xl"
               >
                 <ChevronLeft className="w-4 h-4" />
                 {phone}
               </button>
 
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-panel-text-subtle uppercase tracking-widest pl-1">
-                  {isLoginFlow ? "Введите пароль" : "Придумайте пароль"}
-                </label>
-                <input
-                  type="password"
-                  autoFocus
+              <PasswordInput
+                theme="panel"
+                label={isLoginFlow ? "Введите пароль" : "Придумайте пароль"}
+                autoFocus
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setError("") }}
+                showRules={!isLoginFlow}
+                inputClassName="py-3.5 text-base font-medium"
+              />
+
+              {!isLoginFlow && (
+                <PasswordInput
+                  theme="panel"
+                  label="Повторите пароль"
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError("") }}
-                  className="w-full bg-panel-base border border-panel-border focus:border-panel-text outline-none rounded-2xl px-5 py-4 text-panel-text font-medium text-lg transition-colors placeholder:text-panel-text-muted"
+                  value={confirmPassword}
+                  onChange={(e) => { setConfirmPassword(e.target.value); setError("") }}
+                  error={
+                    confirmPassword.length > 0 && confirmPassword !== password
+                      ? "Пароли не совпадают"
+                      : undefined
+                  }
+                  inputClassName="py-3.5 text-base font-medium"
                 />
-                {!isLoginFlow && (
-                  <p className="text-xs font-medium text-panel-text-subtle pl-1 mt-1">
-                    Пароль должен быть не менее 6 символов
-                  </p>
-                )}
-              </div>
-              
-              <button 
+              )}
+
+              <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full bg-panel-text text-panel-base rounded-2xl px-5 py-4 font-semibold text-base flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-70"
+                variant="primary"
+                theme="panel"
+                loading={isLoading}
+                disabled={
+                  isLoginFlow
+                    ? !password
+                    : !password || !validatePassword(password).isValid || password !== confirmPassword
+                }
+                fullWidth
               >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
-                  isLoginFlow ? "Войти" : "Зарегистрироваться"
-                )}
-              </button>
+                {isLoginFlow ? "Войти" : "Зарегистрироваться"}
+              </Button>
             </form>
           )}
         </div>

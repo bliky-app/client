@@ -6,6 +6,8 @@ import type { Appointment, TimetableColumn, TimetableViewType } from "@/types/mo
 import Avatar from "@/components/Avatar"
 import { formatTime } from "@/lib/formatters"
 import { PreciseTimePicker } from "./PreciseTimePicker"
+import { useToast } from "@/lib/ToastProvider"
+import { useAuth } from "@/lib/AuthProvider"
 
 export type TimetableViewMode = "1day" | "week" | "month"
 
@@ -63,14 +65,19 @@ export default function Timetable({
   currentUserId,
 }: TimetableProps) {
 
-  const [showCal, setShowCal] = useState(false)
+  const { user } = useAuth()
+  const { showToast } = useToast()
+  const isFormal = user?.isFormal ?? true
+  const yearMonth = `${currentDate.getFullYear()}-${currentDate.getMonth()}`
+  const [prevYearMonth, setPrevYearMonth] = useState(yearMonth)
   const [calMonth, setCalMonth] = useState(() => new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
+  const [showCal, setShowCal] = useState(false)
   const [now, setNow] = useState(new Date())
 
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pointerStart = useRef({ x: 0, y: 0 })
   const isLongPressTriggered = useRef(false)
-  
+
   const [longPressPopover, setLongPressPopover] = useState<{
     show: boolean
     x: number
@@ -81,9 +88,10 @@ export default function Timetable({
     initialMinute: number
   } | null>(null)
 
-  useEffect(() => {
+  if (prevYearMonth !== yearMonth) {
+    setPrevYearMonth(yearMonth)
     setCalMonth(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
-  }, [currentDate.getFullYear(), currentDate.getMonth()])
+  }
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 60000)
@@ -137,10 +145,9 @@ export default function Timetable({
     endD = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 6)
   }
 
-  const defaultTitle = startD.getTime() === endD.getTime() 
-    ? formatMD(startD) 
-    : `${formatMD(startD)} — ${formatMD(endD)}`
-  const headerTitle = propHeaderTitle || defaultTitle
+  const isRange = startD.getTime() !== endD.getTime()
+  const startDateStr = formatMD(startD)
+  const endDateStr = isRange ? formatMD(endD) : ""
 
   // Mini calendar days
   const calY = calMonth.getFullYear(), calM = calMonth.getMonth()
@@ -178,10 +185,21 @@ export default function Timetable({
   const allowedModes = viewType === "personal" ? ["week", "month"] : ["1day", "month"]
 
   return (
-    <div className="flex flex-col bg-panel-surface overflow-hidden flex-1 w-full shrink-0 min-h-0">
+    <div className="flex flex-col bg-panel-surface w-full">
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-panel-border-subtle bg-panel-surface z-20 flex-wrap">
-        <h2 className="text-base font-semibold text-panel-text whitespace-nowrap pl-1">{headerTitle}</h2>
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-panel-border-subtle bg-panel-surface z-20 flex-nowrap overflow-hidden">
+        <h2 className="text-base font-semibold text-panel-text whitespace-nowrap pl-1 shrink min-w-0">
+          {propHeaderTitle ? (
+            propHeaderTitle
+          ) : isRange ? (
+            <>
+              <span>{startDateStr}</span>
+              <span className="hidden min-[380px]:inline">&nbsp;— {endDateStr}</span>
+            </>
+          ) : (
+            startDateStr
+          )}
+        </h2>
 
         <div className="flex items-center gap-2">
           {/* View mode */}
@@ -248,7 +266,7 @@ export default function Timetable({
       ) : (
         // Body (month or grid)
         viewMode === "month" ? (
-          <div className="flex-1 overflow-auto">
+          <div className="overflow-x-auto pb-4">
             {viewType === "team" && uniqueStaff.length > 0 ? (
               // Team: rows=dates, cols=staff
               <table className="w-full text-sm border-collapse">
@@ -258,7 +276,7 @@ export default function Timetable({
                     {uniqueStaff.map(s => (
                       <th key={s.id} className="px-2 py-2 border-b border-panel-border-subtle text-center min-w-16 bg-panel-surface">
                         <div className="flex flex-row items-center justify-center gap-1.5">
-                          <Avatar type="user" name={s.shortName || s.user?.shortName || "?"} avatarUrl={s.user?.avatarUrl} color={s.color || s.user?.color} className="w-6 h-6 rounded-full text-[9px] shrink-0" />
+                          <Avatar data={s} className="w-6 h-6 rounded-full text-[9px] shrink-0" />
                           <span className={`text-[10px] truncate max-w-20 ${currentUserId && s.user?.id === currentUserId ? "bg-panel-text text-panel-base px-1.5 py-0.5 rounded-full font-semibold" : "text-panel-text-muted font-medium"}`}>
                             {s.shortName || s.user?.shortName}
                           </span>
@@ -313,14 +331,14 @@ export default function Timetable({
                       </div>
                       <div className="grid grid-cols-7 gap-2">
                         {days.map((day, i) => {
-                          if (!day) return <div key={i} className="aspect-[4/5]" />
+                          if (!day) return <div key={i} className="aspect-4/5" />
                           const ds = getTzDateString(day, timezone)
                           const count = byDate[ds] || 0
                           const isToday = ds === todayStr
                           return (
                             <button key={ds}
                               onClick={() => { onDateSelect?.(day); onViewModeChange?.("week") }}
-                              className={`relative aspect-[4/5] rounded-xl flex flex-col items-center justify-start pt-2 transition-all hover:opacity-80 ${heatBg(count)}`}>
+                              className={`relative aspect-4/5 rounded-xl flex flex-col items-center justify-start pt-2 transition-all hover:opacity-80 ${heatBg(count)}`}>
                               <span className={`text-sm font-semibold z-10 flex items-center justify-center ${isToday ? "bg-panel-text text-panel-base rounded-full w-7 h-7" : count > 0 ? "text-panel-text" : "text-panel-text-subtle"}`}>
                                 {new Intl.DateTimeFormat("ru-RU", { day: "numeric", timeZone: timezone }).format(day)}
                               </span>
@@ -339,7 +357,7 @@ export default function Timetable({
           </div>
         ) : (
           // Normal timetable
-          <div className="flex-1 overflow-y-auto overflow-x-auto relative scrollbar-thin">
+          <div className="overflow-x-auto relative scrollbar-thin pb-4">
             <div className="flex min-w-full w-max">
               <div className="w-16 shrink-0 border-r border-panel-border-subtle bg-panel-surface sticky left-0 z-20">
                 <div className={`border-b border-panel-border-subtle bg-panel-surface sticky top-0 z-30 ${headerHeightClass}`} />
@@ -362,14 +380,14 @@ export default function Timetable({
                     <div key={col.id} className="flex-1 border-r border-panel-border-subtle relative min-w-50">
                       <div
                         className={`${headerHeightClass} border-b border-panel-border-subtle sticky top-0 z-10 flex flex-row items-center justify-center gap-2.5 cursor-pointer hover:bg-panel-surface-hover transition-colors bg-panel-surface px-2`}
-                        onClick={() => { 
-                          if (!col.dateString) return; 
-                          const [y,m,d] = col.dateString.split("-").map(Number); 
-                          onDateSelect?.(new Date(y, m-1, d, 12, 0, 0)) 
+                        onClick={() => {
+                          if (!col.dateString) return;
+                          const [y,m,d] = col.dateString.split("-").map(Number);
+                          onDateSelect?.(new Date(y, m-1, d, 12, 0, 0))
                         }}
                       >
                         {viewType === "team" && col.staff && (
-                          <Avatar type="user" name={col.staff.shortName || col.staff.user?.shortName || "?"} avatarUrl={col.staff.user?.avatarUrl} color={col.staff.color || col.staff.user?.color} className="w-9 h-9 rounded-full text-xs shrink-0" />
+                          <Avatar data={col.staff} className="w-9 h-9 rounded-full text-xs shrink-0" />
                         )}
                         <div className="flex flex-col items-start justify-center min-w-0">
                           <span className={`text-sm truncate max-w-full ${col.isToday && viewType !== "team" ? "font-bold text-panel-text" : (viewType === "team" && currentUserId && col.staff?.user?.id === currentUserId) ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-semibold" : "font-semibold text-panel-text-muted"}`}>
@@ -383,8 +401,8 @@ export default function Timetable({
                         </div>
                       </div>
 
-                      <div 
-                        className="relative cursor-pointer select-none" 
+                      <div
+                        className="relative cursor-pointer select-none"
                         style={{ height: gH }}
                         onContextMenu={(e) => e.preventDefault()}
                         onPointerDown={(e) => {
@@ -400,7 +418,7 @@ export default function Timetable({
                             const snappedMinutes = Math.round(minutes / 15) * 15
                             const h = Math.floor(snappedMinutes / 60)
                             const m = snappedMinutes % 60
-                            
+
                             setLongPressPopover({
                               show: true,
                               x: e.clientX,
@@ -434,18 +452,13 @@ export default function Timetable({
                             longPressRef.current = null
                           }
                         }}
-                        onClick={(e) => {
+                        onClick={() => {
                           if (isLongPressTriggered.current) return
                           if (!col.dateString) return
-                          const rect = e.currentTarget.getBoundingClientRect()
-                          const y = e.clientY - rect.top
-                          const minutes = Math.floor(y / PPM) + (gStart * 60)
-                          // Snap to 15 minute intervals
-                          const snappedMinutes = Math.round(minutes / 15) * 15
-                          const h = Math.floor(snappedMinutes / 60)
-                          const m = snappedMinutes % 60
-                          const timeStr = `${pad(h)}:${pad(m)}`
-                          onSlotClick?.(col.dateString, timeStr, col.id !== col.dateString ? col.id : undefined)
+                          const msg = isFormal
+                            ? "Нажмите и удерживайте свободное время, чтобы создать запись"
+                            : "Нажми и удерживай свободное время, чтобы создать запись"
+                          showToast(msg, "info")
                         }}
                       >
                         <div className="absolute inset-0 bg-timetable-busy pointer-events-none" />
@@ -460,8 +473,8 @@ export default function Timetable({
                         {colEvents.map(event => {
                           const top = t2px(formatTime(event.startDateTime, workspaceTimezone), gStart)
                           const height = event.totalDurationMinutes * PPM
-                          const eventColor = event.color || (viewType === "personal" 
-                            ? event.workspace.color 
+                          const eventColor = event.color || (viewType === "personal"
+                            ? event.workspace.color
                             : (event.staff?.color || event.staff?.user?.color))
 
                           const knownDuration = event.stages.reduce((acc, s) => acc + (s.durationMinutes || 0), 0)
@@ -480,8 +493,8 @@ export default function Timetable({
                                 {event.stages.map(s => {
                                   const duration = s.durationMinutes !== undefined ? s.durationMinutes : durationPerUnknown
                                   return (
-                                    <div key={s.id} 
-                                      style={{ 
+                                    <div key={s.id}
+                                      style={{
                                         height: `${(duration / Math.max(1, event.totalDurationMinutes)) * 100}%`,
                                         ...(s.isActive ? { backgroundColor: eventColor } : { borderColor: eventColor })
                                       }}
@@ -519,13 +532,14 @@ export default function Timetable({
           </div>
         )
       )}
-      
+
       {longPressPopover?.show && typeof document !== "undefined" && createPortal(
         <PreciseTimePicker
           x={longPressPopover.x}
           y={longPressPopover.y}
           initialHour={longPressPopover.initialHour}
           initialMinute={longPressPopover.initialMinute}
+          dateString={longPressPopover.dateString}
           onCancel={() => setLongPressPopover(null)}
           onConfirm={(h, m) => {
             const timeStr = `${pad(h)}:${pad(m)}`
