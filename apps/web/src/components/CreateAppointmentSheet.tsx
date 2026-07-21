@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { X, Search, ChevronDown, Check, UserPlus, Plus, Calendar } from "lucide-react"
 import type { Workspace } from "@/types/models"
+import { MOCK_USER } from "@/lib/api/mockData"
 
 const ACCENT_COLORS = [
   "#6366f1", "#8b5cf6", "#d946ef", "#ec4899",
@@ -188,6 +189,7 @@ function SearchableSelect({
 }
 
 export default function CreateAppointmentSheet({ isOpen, onClose, initialData, workspaces }: CreateAppointmentSheetProps) {
+  const isFormal = MOCK_USER?.isFormal ?? true
   const [draft, setDraft] = useState<AppointmentDraft>(initialData || {})
   
   const [isWorkspaceSearchActive, setIsWorkspaceSearchActive] = useState(!initialData?.workspaceId)
@@ -319,7 +321,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       </>
                     ) : (
                       <span className="text-base font-medium text-panel-text-subtle truncate">
-                        Выберите время...
+                        {isFormal ? "Выберите время..." : "Выбери время..."}
                       </span>
                     )}
                   </div>
@@ -340,7 +342,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     setIsWorkspaceSearchActive(false)
                   }}
                   options={workspaces?.map(w => ({ id: w.id, name: w.name, avatarUrl: w.avatarUrl })) || []}
-                  placeholder="Выберите пространство..."
+                  placeholder={isFormal ? "Выберите пространство..." : "Выбери пространство..."}
                   autoOpen={autoOpenField === "workspace"}
                 />
               ) : (
@@ -406,38 +408,41 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       </div>
                       
                       {draft.clientId !== "new_pending" && (
-                        <div className="flex flex-col gap-2 bg-panel-surface border border-panel-border-subtle rounded-xl p-2 mt-1 shadow-sm">
-                          <button 
-                            onClick={() => {
-                              setDraft({ ...draft, clientId: "new_pending" })
-                            }}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-base transition-colors border border-transparent hover:border-panel-border-subtle text-left group"
-                          >
-                            <div className="w-10 h-10 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium group-hover:scale-105 transition-transform shrink-0">
-                              <UserPlus className="w-5 h-5" />
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                              <span className="text-sm font-medium text-panel-text truncate">Создать нового клиента</span>
-                            </div>
-                          </button>
-                          
-                          {clientSearch.trim().length > 0 && (
+                        <div className="flex flex-col bg-panel-base border border-panel-border-subtle rounded-xl shadow-lg mt-1 overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-64">
+                          <div className="flex-1 overflow-y-auto p-1">
                             <button 
                               onClick={() => {
-                                setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
-                                setIsClientSearchActive(false)
+                                setDraft({ ...draft, clientId: "new_pending" })
                               }}
-                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-base transition-colors border border-transparent hover:border-panel-border-subtle text-left"
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-surface transition-colors text-left group mb-1"
                             >
-                              <div className="w-10 h-10 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-panel-text shrink-0">
-                                А
+                              <div className="w-10 h-10 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium group-hover:scale-105 transition-transform shrink-0">
+                                <UserPlus className="w-5 h-5" />
                               </div>
-                              <div className="flex flex-col min-w-0">
-                                <span className="text-sm font-medium text-panel-text truncate">Алина Смирнова</span>
-                                <span className="text-xs text-panel-text-muted truncate">+7 (999) 123-45-67</span>
+                              <div className="flex flex-col flex-1">
+                                <span className="text-sm font-medium text-panel-text">Создать нового клиента</span>
+                                <span className="text-xs text-panel-text-muted">Ввести вручную</span>
                               </div>
                             </button>
-                          )}
+                            
+                            {(clientSearch.trim().length === 0 || "алина смирнова".includes(clientSearch.toLowerCase())) && (
+                              <button 
+                                onClick={() => {
+                                  setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
+                                  setIsClientSearchActive(false)
+                                }}
+                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-surface transition-colors text-left"
+                              >
+                                <div className="w-10 h-10 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-panel-text shrink-0">
+                                  А
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-sm font-medium text-panel-text truncate">Алина Смирнова</span>
+                                  <span className="text-xs text-panel-text-muted truncate">+7 (999) 123-45-67</span>
+                                </div>
+                              </button>
+                            )}
+                          </div>
                         </div>
                       )}
 
@@ -528,7 +533,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                         value={draft.masterId}
                         onChange={val => { setDraft({ ...draft, masterId: val }); setIsMasterSearchActive(false) }}
                         options={MOCK_MASTERS}
-                        placeholder="Выберите мастера..."
+                        placeholder={isFormal ? "Выберите мастера..." : "Выбери мастера..."}
                         autoOpen={autoOpenField === "master"}
                       />
                     ) : (
@@ -575,7 +580,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                         setIsServiceSearchActive(false)
                       }}
                       options={MOCK_SERVICES.map(s => ({ id: s.id, name: s.name, subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽` }))}
-                      placeholder="Выберите услугу..."
+                      placeholder={isFormal ? "Выберите услугу..." : "Выбери услугу..."}
                       showCustomOption={true}
                       autoOpen={autoOpenField === "service"}
                     />
