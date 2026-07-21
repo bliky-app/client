@@ -84,7 +84,7 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
             >
               <ChevronUp className="w-4 h-4" />
             </button>
-            <div className="text-3xl font-extrabold text-panel-text w-14 text-center tabular-nums py-0.5">
+            <div className="text-3xl font-extrabold text-panel-text w-14 text-center py-0.5">
               {pad(hour)}
             </div>
             <button 
@@ -104,7 +104,7 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
             >
               <ChevronUp className="w-4 h-4" />
             </button>
-            <div className="text-3xl font-extrabold text-panel-text w-14 text-center tabular-nums py-0.5">
+            <div className="text-3xl font-extrabold text-panel-text w-14 text-center py-0.5">
               {pad(minute)}
             </div>
             <button 
