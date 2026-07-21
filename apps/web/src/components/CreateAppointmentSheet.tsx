@@ -350,9 +350,9 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                         {draft.clientId && draft.clientId !== "new_pending" && (
                           <button 
                             onClick={() => setIsClientSearchActive(false)}
-                            className="px-3 py-3 text-sm font-medium text-panel-text-muted hover:text-panel-text shrink-0"
+                            className="p-3 text-panel-text-muted hover:text-panel-text transition-colors shrink-0"
                           >
-                            Отмена
+                            <X className="w-5 h-5" />
                           </button>
                         )}
                       </div>
@@ -397,9 +397,9 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             <h4 className="text-sm font-semibold text-panel-text">Новый клиент</h4>
                             <button 
                               onClick={() => setDraft({ ...draft, clientId: undefined })}
-                              className="text-xs font-medium text-panel-text-muted hover:text-panel-text transition-colors"
+                              className="p-1.5 -mr-1.5 rounded-lg text-panel-text-muted hover:text-panel-text hover:bg-panel-base transition-colors"
                             >
-                              Отмена
+                              <X className="w-4 h-4" />
                             </button>
                           </div>
                           <div className="flex flex-col gap-3">
