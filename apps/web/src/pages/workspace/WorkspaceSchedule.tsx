@@ -1,14 +1,11 @@
-import { useState } from "react"
-import { useQuery, keepPreviousData } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
-import Timetable, { type TimetableViewMode } from "@/components/Timetable"
+import Timetable from "@/components/Timetable"
 import EventPopup from "@/components/EventPopup"
-import { workspaceApi } from "@/lib/api/workspaceApi"
 import { MOCK_USER } from "@/lib/api/mockData"
-import type { Workspace, Appointment } from "@/types/models"
-import { usePermissions } from "@/lib/permissions"
+import type { Workspace } from "@/types/models"
 import QuickActionsRow from "@/components/QuickActionsRow"
-import CreateAppointmentSheet, { type AppointmentDraft } from "@/components/CreateAppointmentSheet"
+import CreateAppointmentSheet from "@/components/CreateAppointmentSheet"
+import { useWorkspaceSchedule } from "@/hooks/useWorkspaceSchedule"
 
 interface WorkspaceScheduleProps {
   workspace: Workspace
@@ -16,34 +13,26 @@ interface WorkspaceScheduleProps {
 }
 
 export default function WorkspaceSchedule({ workspace, forcedViewType }: WorkspaceScheduleProps) {
-  const [calendarDate, setCalendarDate] = useState<Date>(new Date())
-  const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
-  const [viewMode, setViewMode] = useState<TimetableViewMode>("week")
-
-  // Appointment Sheet State
-  const [isAppointmentSheetOpen, setIsAppointmentSheetOpen] = useState(false)
-  const [appointmentDraft, setAppointmentDraft] = useState<AppointmentDraft | undefined>(undefined)
-
-  const { can } = usePermissions(workspace.id)
-  const canViewGlobalSchedule = workspace.type === "individual" ? false : can("view_global_schedule")
-  const viewType = forcedViewType || (canViewGlobalSchedule ? "team" : "personal")
-  const step = viewMode === "month" ? 30 : viewMode === "week" ? 7 : 1
-
-  const { data: columns = [], isLoading: columnsLoading } = useQuery({
-    queryKey: ["workspaceColumns", workspace.id, calendarDate.toISOString(), viewType, viewMode],
-    queryFn: () => viewType === "team" 
-      ? workspaceApi.getTeamDayColumns(workspace.id, calendarDate)
-      : workspaceApi.getTimetableColumns(workspace.id, calendarDate),
-    placeholderData: keepPreviousData,
-  })
-
-  const { data: events = [], isLoading: eventsLoading } = useQuery({
-    queryKey: ["workspaceEvents", workspace.id, calendarDate.toISOString(), viewType],
-    queryFn: () => workspaceApi.getTimetableEvents(workspace.id, viewType),
-    placeholderData: keepPreviousData,
-  })
-
-  const isLoading = columnsLoading || eventsLoading
+  const {
+    calendarDate,
+    setCalendarDate,
+    selectedEvent,
+    setSelectedEvent,
+    viewMode,
+    setViewMode,
+    isAppointmentSheetOpen,
+    setIsAppointmentSheetOpen,
+    appointmentDraft,
+    canViewGlobalSchedule,
+    viewType,
+    columns,
+    events,
+    isLoading,
+    handlePrevDate,
+    handleNextDate,
+    handleSlotClick,
+    handleOpenForm,
+  } = useWorkspaceSchedule(workspace, forcedViewType)
 
   return (
     <div className="flex flex-col flex-1">
@@ -54,26 +43,25 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
           </div>
         ) : (
           <div className="flex flex-col gap-6 p-4 sm:p-6 pb-6">
-            <QuickActionsRow 
-              context="workspace_schedule" 
-              masters={workspace.staff?.map(s => ({ 
-                id: s.id, 
-                name: s.user?.shortName || s.user?.fullName || s.id,
-                subtitle: s.mainCategory?.name,
-                color: s.user?.color,
-                avatarUrl: s.user?.avatarUrl
-              })) || []}
+            <QuickActionsRow
+              context="workspace_schedule"
+              masters={
+                workspace.staff?.map((staffMember) => ({
+                  id: staffMember.id,
+                  name: staffMember.user?.shortName || staffMember.user?.fullName || staffMember.id,
+                  subtitle: staffMember.mainCategory?.name,
+                  color: staffMember.user?.color,
+                  avatarUrl: staffMember.user?.avatarUrl,
+                })) || []
+              }
               services={[
                 { id: "srv-1", name: "Стрижка", subtitle: "60 мин • 1500 ₽" },
-                { id: "srv-2", name: "Окрашивание", subtitle: "120 мин • 4000 ₽" }
+                { id: "srv-2", name: "Окрашивание", subtitle: "120 мин • 4000 ₽" },
               ]}
               showMasterCard={workspace.type !== "individual" && canViewGlobalSchedule}
-              onOpenForm={(draft) => {
-                setAppointmentDraft({ ...draft, workspaceId: workspace.id })
-                setIsAppointmentSheetOpen(true)
-              }} 
+              onOpenForm={handleOpenForm}
             />
-            
+
             <div className="flex flex-col bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden mb-6">
               <Timetable
                 timezone={workspace.timezone || "Europe/Moscow"}
@@ -86,16 +74,9 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
                 workspaceTimezone={workspace.timezone}
                 onViewModeChange={setViewMode}
                 onDateSelect={(date) => setCalendarDate(date)}
-                onSlotClick={(dateString, time, staffId) => {
-                  setAppointmentDraft({
-                    workspaceId: workspace.id,
-                    masterId: staffId,
-                    startDateTime: `${dateString}T${time}`
-                  })
-                  setIsAppointmentSheetOpen(true)
-                }}
-                onPrev={() => { const d = new Date(calendarDate); d.setDate(d.getDate() - step); setCalendarDate(d) }}
-                onNext={() => { const d = new Date(calendarDate); d.setDate(d.getDate() + step); setCalendarDate(d) }}
+                onSlotClick={handleSlotClick}
+                onPrev={handlePrevDate}
+                onNext={handleNextDate}
                 onEventClick={setSelectedEvent}
                 currentUserId={MOCK_USER.id}
               />
@@ -104,10 +85,14 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
         )}
       </div>
 
-      <EventPopup event={selectedEvent} onClose={() => setSelectedEvent(null)} workspaceTimezone={workspace.timezone} />
-      
-      <CreateAppointmentSheet 
-        isOpen={isAppointmentSheetOpen} 
+      <EventPopup
+        event={selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+        workspaceTimezone={workspace.timezone}
+      />
+
+      <CreateAppointmentSheet
+        isOpen={isAppointmentSheetOpen}
         onClose={() => setIsAppointmentSheetOpen(false)}
         initialData={appointmentDraft}
         workspaces={[workspace]}
