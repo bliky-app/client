@@ -178,26 +178,26 @@ export default function AppointmentDetailsSheet({
         <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="flex flex-col gap-4 max-w-2xl mx-auto w-full pb-32">
 
-            {/* 1. Status Card (Top prominent position) */}
+            {/* 1. Client Info Card */}
+            <AppointmentClientCard
+              name={event.client.name}
+              phone={event.client.phone}
+            />
+
+            {/* 2. Status Card */}
             <AppointmentStatusCard
               isConfirmed={isConfirmed}
               canEdit={canEdit}
               onToggleConfirm={handleToggleConfirm}
             />
 
-            {/* 2. Date & Time Card */}
+            {/* 3. Date & Time Card */}
             <AppointmentDateCard
               startDateTime={currentStartISO}
               totalDurationMinutes={totalDuration}
               workspaceTimezone={workspaceTimezone}
               isEditable={canEdit}
               onChange={setStartDateTime}
-            />
-
-            {/* 2. Client Info Card */}
-            <AppointmentClientCard
-              name={event.client.name}
-              phone={event.client.phone}
             />
 
             {/* 3. Service Details & Price Input Card */}
