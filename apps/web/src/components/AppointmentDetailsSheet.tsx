@@ -164,36 +164,18 @@ export default function AppointmentDetailsSheet({
 
             {/* 3. Service Details & Price Input Card */}
             <div className="bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden p-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between border-b border-panel-border-subtle pb-4">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <IconBox size="lg" shape="squircle">
-                    {event.serviceName?.[0]?.toUpperCase() || "У"}
-                  </IconBox>
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-base font-semibold text-panel-text truncate">
-                      {event.serviceName}
-                    </span>
-                    <span className="text-sm text-panel-text-muted truncate">
-                      {formatDuration(totalDuration)}
-                    </span>
-                  </div>
-                </div>
-
-                {canEdit ? (
-                  <div className="flex items-center gap-2 shrink-0">
-                    <input
-                      type="number"
-                      value={price}
-                      onChange={(e) => setPrice(Number(e.target.value))}
-                      className="w-28 bg-panel-base border border-panel-border-subtle rounded-xl px-3 py-1.5 text-sm font-bold text-panel-text outline-none focus:border-panel-text"
-                    />
-                    <span className="text-sm font-medium text-panel-text-muted">₽</span>
-                  </div>
-                ) : (
-                  <span className="text-lg font-bold text-panel-text shrink-0">
-                    {formatCurrency(price)}
+              <div className="flex items-center gap-3">
+                <IconBox size="lg" shape="squircle">
+                  {event.serviceName?.[0]?.toUpperCase() || "У"}
+                </IconBox>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-base font-semibold text-panel-text truncate leading-tight">
+                    {event.serviceName}
                   </span>
-                )}
+                  <span className="text-sm text-panel-text-muted truncate mt-0.5">
+                    {formatDuration(totalDuration)}
+                  </span>
+                </div>
               </div>
 
               {/* Stage timeline with completion stage */}
@@ -205,6 +187,27 @@ export default function AppointmentDetailsSheet({
                   workspaceTimezone={workspaceTimezone}
                 />
               )}
+
+              {/* Dedicated Prominent Price Section */}
+              <div className="pt-3 border-t border-panel-border-subtle flex items-center justify-between">
+                <span className="text-xs font-semibold text-panel-text-muted">Стоимость услуги</span>
+
+                {canEdit ? (
+                  <div className="flex items-center gap-2 shrink-0">
+                    <input
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(Number(e.target.value))}
+                      className="w-32 bg-panel-base border border-panel-border-subtle rounded-xl px-3 py-2 text-base font-bold text-panel-text text-right outline-none focus:border-panel-text transition-colors"
+                    />
+                    <span className="text-base font-bold text-panel-text">₽</span>
+                  </div>
+                ) : (
+                  <span className="text-base font-bold text-panel-text shrink-0">
+                    {formatCurrency(price)}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* 4. Status Card */}
