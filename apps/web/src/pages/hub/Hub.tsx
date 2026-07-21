@@ -179,6 +179,7 @@ export default function Hub() {
         isOpen={isAppointmentSheetOpen} 
         onClose={() => setIsAppointmentSheetOpen(false)}
         initialData={appointmentDraft}
+        workspaces={workspaces}
       />
     </div>
   )

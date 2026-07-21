@@ -64,7 +64,7 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
               ]}
               showMasterCard={workspace.type !== "individual" && canViewGlobalSchedule}
               onOpenForm={(draft) => {
-                setAppointmentDraft(draft)
+                setAppointmentDraft({ ...draft, workspaceId: workspace.id })
                 setIsAppointmentSheetOpen(true)
               }} 
             />
@@ -83,6 +83,7 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
                 onDateSelect={(date) => setCalendarDate(date)}
                 onSlotClick={(dateString, time, staffId) => {
                   setAppointmentDraft({
+                    workspaceId: workspace.id,
                     masterId: staffId,
                     startDateTime: `${dateString}T${time}`
                   })
