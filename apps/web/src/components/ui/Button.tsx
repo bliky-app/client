@@ -29,7 +29,7 @@ function getVariantClasses(variant: ButtonVariant, theme: ButtonTheme): string {
   if (variant === "secondary") {
     return theme === "hub"
       ? "bg-hub-surface border border-hub-border text-hub-text hover:bg-hub-surface-hover disabled:opacity-60"
-      : "bg-panel-surface border border-panel-border text-panel-text hover:bg-panel-surface-hover disabled:opacity-40"
+      : "bg-panel-surface border border-panel-border-subtle text-panel-text hover:bg-panel-surface-hover disabled:opacity-40"
   }
   if (variant === "ghost") {
     return theme === "hub"

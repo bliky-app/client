@@ -81,7 +81,7 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, dateString
       <div 
         ref={popoverRef}
         style={style}
-        className="absolute bg-panel-surface border border-panel-border shadow-xl rounded-2xl p-3.5 flex flex-col gap-2.5 w-52 pointer-events-auto relative"
+        className="absolute bg-panel-surface border border-panel-border-subtle shadow-xl rounded-2xl p-3.5 flex flex-col gap-2.5 w-52 pointer-events-auto relative"
       >
         <button 
           onClick={onCancel} 

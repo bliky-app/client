@@ -24,7 +24,7 @@ const THEME_CLASSES: Record<InputTheme, { wrapper: string; input: string; label:
   },
   panel: {
     wrapper: "",
-    input: "bg-panel-surface border border-panel-border text-panel-text placeholder:text-panel-text-subtle focus:border-panel-text-muted focus:ring-2 focus:ring-panel-text/20",
+    input: "bg-panel-surface border border-panel-border-subtle text-panel-text placeholder:text-panel-text-subtle focus:border-panel-text-muted focus:ring-2 focus:ring-panel-text/20",
     label: "text-panel-text-muted",
     hint: "text-panel-text-subtle",
     icon: "text-panel-text-subtle hover:text-panel-text",

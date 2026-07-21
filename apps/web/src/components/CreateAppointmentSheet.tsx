@@ -138,7 +138,7 @@ function SearchableSelect({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-panel-surface border border-panel-border rounded-xl px-4 py-3 flex items-center justify-between hover:border-panel-text-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed outline-none focus:border-panel-text"
+        className="w-full bg-panel-surface border border-panel-border-subtle rounded-xl px-4 py-3 flex items-center justify-between hover:border-panel-text-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed outline-none focus:border-panel-text"
       >
         <span className={`text-sm ${selected ? "text-panel-text font-medium" : "text-panel-text-subtle"}`}>
           {selected ? selected.name : placeholder}
@@ -622,13 +622,13 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                                   const h = Math.floor(stage.durationMinutes / 60)
                                   const m = stage.durationMinutes % 60
                                   return (
-                                    <div key={stage.id} className="p-3 bg-panel-base border border-panel-border rounded-xl flex items-center justify-between gap-4 group">
+                                    <div key={stage.id} className="p-3 bg-panel-base border border-panel-border-subtle rounded-xl flex items-center justify-between gap-4 group">
                                       <span className="text-sm font-medium text-panel-text flex-1 truncate" title={stage.name}>{stage.name}</span>
                                       
                                       <div className="flex items-center gap-2 shrink-0">
                                         <button 
                                           onClick={() => handleStageDurationChange(stage.id, -15)}
-                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
+                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border-subtle flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
                                         >
                                           -
                                         </button>
@@ -652,7 +652,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                                         </div>
                                         <button 
                                           onClick={() => handleStageDurationChange(stage.id, 15)}
-                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
+                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border-subtle flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
                                         >
                                           +
                                         </button>
@@ -671,7 +671,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                                   value={draft.price || ""}
                                   onChange={e => setDraft({ ...draft, price: Number(e.target.value) })}
                                   placeholder="0"
-                                  className="w-full bg-panel-base border border-panel-border rounded-xl pl-4 pr-8 py-3 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-colors"
+                                  className="w-full bg-panel-base border border-panel-border-subtle rounded-xl pl-4 pr-8 py-3 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-colors"
                                 />
                                 <span className="absolute right-4 text-panel-text-muted font-medium text-sm">₽</span>
                               </div>
@@ -696,7 +696,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     onChange={e => setDraft({ ...draft, notes: e.target.value })}
                     placeholder="Дополнительная информация для мастера..."
                     rows={3}
-                    className="w-full bg-panel-surface border border-panel-border rounded-xl px-4 py-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text transition-colors resize-none"
+                    className="w-full bg-panel-surface border border-panel-border-subtle rounded-xl px-4 py-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text transition-colors resize-none"
                   />
                 </div>
               </>
