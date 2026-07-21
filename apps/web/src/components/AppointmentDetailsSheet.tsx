@@ -9,7 +9,7 @@ import AppointmentClientCard from "@/components/appointment/AppointmentClientCar
 import AppointmentStatusCard from "@/components/appointment/AppointmentStatusCard"
 import AppointmentNotesCard from "@/components/appointment/AppointmentNotesCard"
 import AppointmentStageTimeline from "@/components/appointment/AppointmentStageTimeline"
-import { useAppointmentDetailsSheet } from "@/hooks/useAppointmentDetailsSheet"
+import { useAppointmentDetailsSheet } from "@/hooks/components/useAppointmentDetailsSheet"
 
 interface AppointmentDetailsSheetProps {
   event: Appointment | null

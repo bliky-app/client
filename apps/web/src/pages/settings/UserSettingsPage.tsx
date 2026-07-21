@@ -3,7 +3,7 @@ import { useTheme } from "@/lib/ThemeProvider"
 import ModalSheetLayout from "@/layouts/ModalSheetLayout"
 import Button from "@/components/ui/Button"
 
-import { useUserSettings } from "@/hooks/useUserSettings"
+import { useUserSettings } from "@/hooks/settings/useUserSettings"
 import ProfileAvatarCard from "./ProfileAvatarCard"
 import ProfileFormCard from "./ProfileFormCard"
 import ThemePreferenceCard from "./ThemePreferenceCard"

@@ -1,7 +1,7 @@
 
 import type { HubOverviewData } from "@/types/models"
 import { ClipboardList, Clock, CheckCircle2, Inbox, Layers } from "lucide-react"
-import { useHubOverviewLogic } from "@/hooks/useHubOverviewLogic"
+import { useHubOverviewLogic } from "@/hooks/hub/useHubOverviewLogic"
 
 interface HubOverviewProps {
   data: HubOverviewData

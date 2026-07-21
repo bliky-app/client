@@ -2,7 +2,7 @@ import { Loader2, Users, Package, UserCheck, BarChart2, Clock, ClipboardList, Li
 import WorkspaceSchedule from "./WorkspaceSchedule"
 import WorkspaceStub from "./WorkspaceStub"
 import WorkspaceLayout from "@/layouts/WorkspaceLayout"
-import { useWorkspacePage } from "@/hooks/useWorkspacePage"
+import { useWorkspacePage } from "@/hooks/workspace/useWorkspacePage"
 
 interface WorkspacePageProps {
   id: string

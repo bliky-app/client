@@ -12,7 +12,7 @@ import {
   t2px,
   heatBg,
   pad
-} from "@/hooks/useTimetableLogic"
+} from "@/hooks/components/useTimetableLogic"
 
 export type TimetableViewMode = "1day" | "week" | "month"
 

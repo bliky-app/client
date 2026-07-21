@@ -6,7 +6,7 @@ import Button from "@/components/ui/Button"
 import PhoneInput from "@/components/ui/PhoneInput"
 import PasswordInput, { validatePassword } from "@/components/ui/PasswordInput"
 import { getGreeting } from "@/lib/formatters"
-import { useAuthForm } from "@/hooks/useAuthForm"
+import { useAuthForm } from "@/hooks/auth/useAuthForm"
 
 export default function AuthPage() {
   const { user, isLoading: isAuthLoading } = useAuth()

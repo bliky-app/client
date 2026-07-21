@@ -4,7 +4,7 @@ import Avatar from "@/components/Avatar"
 import Input from "@/components/ui/Input"
 import ColorPicker from "@/components/ui/ColorPicker"
 import Select from "@/components/ui/Select"
-import { useStep2Details, TZ_OPTIONS } from "@/hooks/useStep2Details"
+import { useStep2Details, TZ_OPTIONS } from "@/hooks/workspace/useStep2Details"
 
 interface Step2DetailsProps {
   data: CreateWorkspaceFormData

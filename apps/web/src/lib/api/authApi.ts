@@ -47,7 +47,7 @@ export const authApi = {
     return authenticatedUser
   },
 
-  register: async (phone: string, ): Promise<User> => {
+  register: async (phone: string): Promise<User> => {
     await delay(500)
     const newUser: User = {
       id: "u-" + Date.now(),

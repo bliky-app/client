@@ -5,7 +5,7 @@ import { MOCK_USER } from "@/lib/api/mockData"
 import type { Workspace } from "@/types/models"
 import QuickActionsRow from "@/components/QuickActionsRow"
 import CreateAppointmentSheet from "@/components/CreateAppointmentSheet"
-import { useWorkspaceSchedule } from "@/hooks/useWorkspaceSchedule"
+import { useWorkspaceSchedule } from "@/hooks/workspace/useWorkspaceSchedule"
 
 interface WorkspaceScheduleProps {
   workspace: Workspace

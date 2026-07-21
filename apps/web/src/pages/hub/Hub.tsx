@@ -8,9 +8,9 @@ import Timetable from "@/components/Timetable"
 import EventPopup from "@/components/EventPopup"
 import SectionCard from "@/components/ui/SectionCard"
 import CreateAppointmentSheet from "@/components/CreateAppointmentSheet"
-import { useHubOverview } from "@/hooks/useHubOverview"
-import { useHubTimetable } from "@/hooks/useHubTimetable"
-import { useAppointmentSheet } from "@/hooks/useAppointmentSheet"
+import { useHubOverview } from "@/hooks/hub/useHubOverview"
+import { useHubTimetable } from "@/hooks/hub/useHubTimetable"
+import { useAppointmentSheet } from "@/hooks/components/useAppointmentSheet"
 import type { Appointment } from "@/types/models"
 
 export default function Hub() {

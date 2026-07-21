@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState } from "react"
 import type { KeyboardEvent } from "react"
-import type { CreateWorkspaceFormData } from "@/hooks/useCreateWorkspace"
+import type { CreateWorkspaceFormData } from "@/hooks/workspace/useCreateWorkspace"
 import type { Workspace } from "@/types/models"
 import type { SelectOption } from "@/components/ui/Select"
 

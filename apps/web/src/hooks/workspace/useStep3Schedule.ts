@@ -1,4 +1,4 @@
-import type { CreateWorkspaceFormData } from "@/hooks/useCreateWorkspace"
+import type { CreateWorkspaceFormData } from "@/hooks/workspace/useCreateWorkspace"
 import type { WorkspaceSchedule } from "@/types/models"
 
 export const DAYS: { key: number; label: string; short: string }[] = [
@@ -11,7 +11,7 @@ export const DAYS: { key: number; label: string; short: string }[] = [
   { key: 0, label: "Воскресенье", short: "Вс" },
 ]
 
-export function useStep4Schedule(
+export function useStep3Schedule(
   data: CreateWorkspaceFormData,
   onChange: (patch: Partial<CreateWorkspaceFormData>) => void
 ) {

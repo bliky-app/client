@@ -1,20 +1,20 @@
-import type { CreateWorkspaceFormData } from "@/hooks/useCreateWorkspace"
+import type { CreateWorkspaceFormData } from "@/hooks/workspace/useCreateWorkspace"
 import Toggle from "@/components/ui/Toggle"
-import { useStep4Schedule, DAYS } from "@/hooks/useStep4Schedule"
+import { useStep3Schedule, DAYS } from "@/hooks/workspace/useStep3Schedule"
 
-interface Step4ScheduleProps {
+interface Step3ScheduleProps {
   data: CreateWorkspaceFormData
   onChange: (patch: Partial<CreateWorkspaceFormData>) => void
 }
 
-export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
+export default function Step3Schedule({ data, onChange }: Step3ScheduleProps) {
   const {
     schedule,
     isEnabled,
     toggleDay,
     updateTime,
     enabledCount,
-  } = useStep4Schedule(data, onChange)
+  } = useStep3Schedule(data, onChange)
 
   return (
     <div className="flex flex-col gap-6 py-2">

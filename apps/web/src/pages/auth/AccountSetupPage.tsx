@@ -6,7 +6,7 @@ import Input from "@/components/ui/Input"
 import Avatar from "@/components/Avatar"
 import ColorPicker from "@/components/ui/ColorPicker"
 import Select, { type SelectOption } from "@/components/ui/Select"
-import { useAccountSetup } from "@/hooks/useAccountSetup"
+import { useAccountSetup } from "@/hooks/auth/useAccountSetup"
 
 const TIMEZONE_OPTIONS: SelectOption[] = [
   { value: "Europe/Kaliningrad", label: "Калининград", subtitle: "UTC+2" },

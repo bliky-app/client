@@ -13,8 +13,8 @@ import AppointmentClientCard from "@/components/appointment/AppointmentClientCar
 import AppointmentNotesCard from "@/components/appointment/AppointmentNotesCard"
 import AppointmentStageTimeline from "@/components/appointment/AppointmentStageTimeline"
 
-import { useAppointmentSheetLogic, MOCK_SERVICES } from "@/hooks/useAppointmentSheetLogic"
-import type { SearchableSelectOption } from "@/hooks/useAppointmentSheetLogic"
+import { useAppointmentSheetLogic, MOCK_SERVICES } from "@/hooks/components/useAppointmentSheetLogic"
+import type { SearchableSelectOption } from "@/hooks/components/useAppointmentSheetLogic"
 
 export type ServiceStage = {
   id: string

@@ -1,5 +1,5 @@
 import type { WorkspaceType } from "@/types/models"
-import { useStep1Type } from "@/hooks/useStep1Type"
+import { useStep1Type } from "@/hooks/workspace/useStep1Type"
 
 interface Step1TypeProps {
   value: WorkspaceType | null
