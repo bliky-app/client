@@ -4,11 +4,14 @@ import { Loader2 } from "lucide-react"
 import HubOverview from "./HubOverview"
 import HubHeader from "./HubHeader"
 import WorkspaceList from "./WorkspaceList"
+import QuickActionsRow from "@/components/QuickActionsRow"
 import Timetable, { type TimetableViewMode } from "@/components/Timetable"
 import EventPopup from "@/components/EventPopup"
 import { hubApi } from "@/lib/api/hubApi"
 import { MOCK_USER } from "@/lib/api/mockData"
 import type { User, Appointment } from "@/types/models"
+import type { QuickActionType } from "@/components/QuickActionsRow"
+import CreateAppointmentSheet, { type AppointmentDraft } from "@/components/CreateAppointmentSheet"
 
 export default function Hub() {
   useQuery<User>({ queryKey: ["user"], queryFn: async () => MOCK_USER })
@@ -27,6 +30,24 @@ export default function Hub() {
   const [isWorkspacesExpanded, setIsWorkspacesExpanded] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
   const [viewMode, setViewMode] = useState<TimetableViewMode>("week")
+  
+  // Appointment Sheet State
+  const [isAppointmentSheetOpen, setIsAppointmentSheetOpen] = useState(false)
+  const [appointmentDraft, setAppointmentDraft] = useState<AppointmentDraft | undefined>(undefined)
+
+  const handleQuickAction = (action: QuickActionType) => {
+    // Determine draft context based on action
+    const draft: AppointmentDraft = {}
+    if (action === "master") {
+      // Just open to pick master if allowed
+    } else if (action === "time") {
+      // Open to pick time (would pre-fill current date/time ideally)
+    } else if (action === "service") {
+      // Open to pick service
+    }
+    setAppointmentDraft(draft)
+    setIsAppointmentSheetOpen(true)
+  }
 
   const step = viewMode === "month" ? 30 : viewMode === "week" ? 7 : 3
 
@@ -108,6 +129,8 @@ export default function Hub() {
 
             <div className="w-12 h-1.5 bg-panel-border rounded-full mx-auto shrink-0 -mb-2" />
 
+            <QuickActionsRow onAction={handleQuickAction} />
+
             {/* Workspaces */}
             <div className="flex flex-col bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden shrink-0">
               <div
@@ -153,6 +176,11 @@ export default function Hub() {
       </div>
 
       <EventPopup event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      <CreateAppointmentSheet 
+        isOpen={isAppointmentSheetOpen} 
+        onClose={() => setIsAppointmentSheetOpen(false)}
+        initialData={appointmentDraft}
+      />
     </div>
   )
 }

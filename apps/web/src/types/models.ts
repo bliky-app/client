@@ -75,7 +75,26 @@ export interface Workspace {
   schedule: WorkspaceSchedule
 }
 
-// 4. Дашборд
+// 4. Услуги (Services)
+export interface Service {
+  id: string
+  name: string
+  categoryId: string
+  allowedStaffIds: string[]
+  price: number
+  totalDurationMinutes: number
+  stages: AppointmentStage[]
+}
+
+export interface CustomService {
+  id: string
+  name: string
+  price: number
+  totalDurationMinutes: number
+  stages: AppointmentStage[]
+}
+
+// 5. Дашборд
 export interface HubOverviewData {
   user: User
   requestAt: string // ISO 8601 (заменили requestTime: Date)
@@ -90,7 +109,7 @@ export interface HubOverviewData {
   totalWorkspaces: number
 }
 
-// 5. Расписание (Timetable)
+// 6. Расписание (Timetable)
 export interface AppointmentStage {
   id: string
   name: string
@@ -100,15 +119,18 @@ export interface AppointmentStage {
 
 export interface Appointment {
   id: string
-  startDateTime: string // ISO 8601 (заменили date и startTime)
-  totalDurationMinutes: number // Total duration is now explicitly defined
+  startDateTime: string // ISO 8601
+  totalDurationMinutes: number 
   color?: string
   client: Client
-  serviceName: string
+  service?: Service
+  customService?: CustomService
+  serviceName: string // Used for display, derived from service/customService
   price: number
   workspace: Workspace
   staff: Member
   stages: AppointmentStage[]
+  notes?: string
   isConfirmed: boolean
 }
 
