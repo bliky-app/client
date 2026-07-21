@@ -1,6 +1,6 @@
 import { Calendar as CalendarIcon } from "lucide-react"
 import { formatAppointmentDate, formatDuration, formatTime, addMinutes } from "@/lib/formatters"
-import IconBox from "@/components/ui/IconBox"
+import IconBox from "@workspace/ui/components/IconBox"
 
 interface AppointmentDateCardProps {
   startDateTime?: string

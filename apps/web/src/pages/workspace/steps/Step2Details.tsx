@@ -3,7 +3,7 @@ import type { CreateWorkspaceFormData } from "../CreateWorkspacePage"
 import Avatar from "@/components/Avatar"
 import Input from "@/components/ui/Input"
 import ColorPicker from "@/components/ui/ColorPicker"
-import Select from "@/components/ui/Select"
+import SearchableSelect from "@/components/ui/SearchableSelect"
 import { useStep2Details, TZ_OPTIONS } from "@/hooks/workspace/useStep2Details"
 
 interface Step2DetailsProps {
@@ -185,9 +185,8 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
           <label className="text-xs font-semibold text-panel-text-muted">
             Часовой пояс
           </label>
-          <Select
+          <SearchableSelect
             theme="panel"
-            searchable
             hideIcon
             value={data.timezone}
             options={TZ_OPTIONS}

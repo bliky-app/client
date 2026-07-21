@@ -1,7 +1,7 @@
 import { Plus, Calendar as CalendarIcon } from "lucide-react"
 import type { Workspace } from "@/types/models"
 import Select from "@/components/ui/Select"
-import SectionCard from "@/components/ui/SectionCard"
+import SectionCard from "@workspace/ui/components/SectionCard"
 
 export type QuickActionContext = "hub" | "workspace_schedule"
 

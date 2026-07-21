@@ -1,7 +1,7 @@
 import { Check, LogOut } from "lucide-react"
 import { useTheme } from "@/lib/ThemeProvider"
 import ModalSheetLayout from "@/layouts/ModalSheetLayout"
-import Button from "@/components/ui/Button"
+import Button from "@workspace/ui/components/AppButton"
 
 import { useUserSettings } from "@/hooks/settings/useUserSettings"
 import ProfileAvatarCard from "./ProfileAvatarCard"

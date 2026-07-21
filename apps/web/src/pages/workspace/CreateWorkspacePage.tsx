@@ -1,7 +1,7 @@
 import Step1Type from "./steps/Step1Type"
 import Step2Details from "./steps/Step2Details"
 import Step3Schedule from "./steps/Step3Schedule"
-import Button from "@/components/ui/Button"
+import Button from "@workspace/ui/components/AppButton"
 import ModalSheetLayout from "@/layouts/ModalSheetLayout"
 import { useCreateWorkspace, STEP_LABELS } from "@/hooks/workspace/useCreateWorkspace"
 export type { CreateWorkspaceFormData } from "@/hooks/workspace/useCreateWorkspace"

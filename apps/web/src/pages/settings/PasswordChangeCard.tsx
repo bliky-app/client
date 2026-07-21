@@ -1,6 +1,6 @@
 import { ShieldCheck } from "lucide-react"
 import PasswordInput from "@/components/ui/PasswordInput"
-import Button from "@/components/ui/Button"
+import Button from "@workspace/ui/components/AppButton"
 
 interface PasswordChangeCardProps {
   isFormal: boolean

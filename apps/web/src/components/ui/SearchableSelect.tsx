@@ -1,6 +1,6 @@
 import { useState, useRef } from "react"
 import { createPortal } from "react-dom"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, Search } from "lucide-react"
 
 export interface SelectOption {
   value: string
@@ -12,7 +12,7 @@ export interface SelectOption {
 
 export type SelectTheme = "hub" | "panel"
 
-interface SelectProps {
+interface SearchableSelectProps {
   options: SelectOption[]
   value?: string
   placeholder?: string
@@ -32,6 +32,8 @@ const THEME = {
     itemText: "text-hub-text",
     itemSub: "text-hub-text-muted",
     empty: "text-hub-text-muted",
+    searchInput: "bg-hub-base border-hub-border text-hub-text placeholder:text-hub-text-subtle focus:border-hub-border-light",
+    searchBorder: "border-hub-border",
   },
   panel: {
     trigger: "bg-panel-base border-panel-border-subtle text-panel-text-muted hover:border-panel-text-muted hover:text-panel-text",
@@ -40,10 +42,12 @@ const THEME = {
     itemText: "text-panel-text",
     itemSub: "text-panel-text-muted",
     empty: "text-panel-text-muted",
+    searchInput: "bg-panel-base border-panel-border-subtle text-panel-text placeholder:text-panel-text-subtle focus:border-panel-text-muted",
+    searchBorder: "border-panel-border-subtle",
   },
 }
 
-export default function Select({
+export default function SearchableSelect({
   options,
   value,
   placeholder = "Выбрать",
@@ -52,13 +56,21 @@ export default function Select({
   theme = "panel",
   compact = false,
   className = "",
-}: SelectProps) {
+}: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState("")
   const ref = useRef<HTMLButtonElement>(null)
   const [rect, setRect] = useState<DOMRect | null>(null)
 
   const t = THEME[theme]
   const selected = options.find(o => o.value === value)
+
+  const filtered = search
+    ? options.filter(o =>
+        o.label.toLowerCase().includes(search.toLowerCase()) ||
+        o.subtitle?.toLowerCase().includes(search.toLowerCase())
+      )
+    : options
 
   const open = () => {
     if (ref.current) setRect(ref.current.getBoundingClientRect())
@@ -67,6 +79,7 @@ export default function Select({
 
   const close = () => {
     setIsOpen(false)
+    setSearch("")
   }
 
   const triggerLabel = selected?.label ?? placeholder
@@ -109,10 +122,23 @@ export default function Select({
             ].join(" ")}
             onClick={e => e.stopPropagation()}
           >
+              <div className={`p-2 border-b ${t.searchBorder}`}>
+                <div className="relative">
+                  <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ${t.empty}`} />
+                  <input
+                    autoFocus
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Поиск..."
+                    className={`w-full border rounded-xl pl-8 pr-3 py-2 text-xs outline-none transition-colors ${t.searchInput}`}
+                  />
+                </div>
+              </div>
             <div className="max-h-72 overflow-y-auto py-1">
-              {options.length === 0 ? (
+              {filtered.length === 0 ? (
                 <div className={`px-4 py-3 text-xs ${t.empty}`}>Нет вариантов</div>
-              ) : options.map(opt => (
+              ) : filtered.map(opt => (
                 <button
                   key={opt.value}
                   type="button"

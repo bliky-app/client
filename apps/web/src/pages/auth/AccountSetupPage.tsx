@@ -1,11 +1,12 @@
 import { Navigate } from "react-router-dom"
 import { Camera, Trash2, Loader2, Sun, Moon, LogOut } from "lucide-react"
 import { useTheme } from "@/lib/ThemeProvider"
-import Button from "@/components/ui/Button"
+import Button from "@workspace/ui/components/AppButton"
 import Input from "@/components/ui/Input"
 import Avatar from "@/components/Avatar"
 import ColorPicker from "@/components/ui/ColorPicker"
-import Select, { type SelectOption } from "@/components/ui/Select"
+import { type SelectOption } from "@/components/ui/Select"
+import SearchableSelect from "@/components/ui/SearchableSelect"
 import { useAccountSetup } from "@/hooks/auth/useAccountSetup"
 
 const TIMEZONE_OPTIONS: SelectOption[] = [
@@ -234,9 +235,8 @@ export default function AccountSetupPage() {
               <label className="text-xs font-semibold text-panel-text-muted">
                 Часовой пояс
               </label>
-              <Select
+              <SearchableSelect
                 theme="panel"
-                searchable
                 hideIcon
                 value={timezone}
                 options={TIMEZONE_OPTIONS}

@@ -1,5 +1,5 @@
 import type { CreateWorkspaceFormData } from "@/hooks/workspace/useCreateWorkspace"
-import Toggle from "@/components/ui/Toggle"
+import Toggle from "@workspace/ui/components/Toggle"
 import { useStep3Schedule, DAYS } from "@/hooks/workspace/useStep3Schedule"
 
 interface Step3ScheduleProps {

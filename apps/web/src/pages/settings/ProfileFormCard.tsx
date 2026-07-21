@@ -1,5 +1,6 @@
 import Input from "@/components/ui/Input"
-import Select, { type SelectOption } from "@/components/ui/Select"
+import { type SelectOption } from "@/components/ui/Select"
+import SearchableSelect from "@/components/ui/SearchableSelect"
 
 const TIMEZONE_OPTIONS: SelectOption[] = [
   { value: "Europe/Kaliningrad",  label: "Калининград",   subtitle: "UTC+2" },
@@ -156,9 +157,8 @@ export default function ProfileFormCard({
 
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-semibold text-panel-text-muted">Часовой пояс</label>
-        <Select
+        <SearchableSelect
           theme="panel"
-          searchable
           hideIcon
           value={timezone}
           options={TIMEZONE_OPTIONS}

@@ -1,5 +1,5 @@
 import { CheckCircle2, Clock } from "lucide-react"
-import IconBox from "@/components/ui/IconBox"
+import IconBox from "@workspace/ui/components/IconBox"
 
 interface AppointmentStatusCardProps {
   isConfirmed: boolean
