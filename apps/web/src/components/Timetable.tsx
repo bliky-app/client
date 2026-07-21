@@ -16,6 +16,7 @@ interface TimetableProps {
   onNext?: () => void
   onEventClick?: (event: Appointment) => void
   onDateSelect?: (date: Date) => void
+  onSlotClick?: (dateString: string, time: string, staffId?: string) => void
   onViewModeChange?: (mode: TimetableViewMode) => void
   timezone: string
   viewMode?: TimetableViewMode
@@ -53,7 +54,7 @@ function pad(n: number) {
 
 export default function Timetable({
   viewType, currentDate, events, columns,
-  onPrev, onNext, onEventClick, onDateSelect, onViewModeChange,
+  onPrev, onNext, onEventClick, onDateSelect, onSlotClick, onViewModeChange,
   timezone,
   viewMode = "week", hideWorkspaceTags = false,
   workspaceTimezone = "Europe/Moscow", headerTitle: propHeaderTitle,
@@ -366,8 +367,23 @@ export default function Timetable({
                         </div>
                       </div>
 
-                      <div className="relative" style={{ height: gH }}>
-                        <div className="absolute inset-0 bg-timetable-busy" />
+                      <div 
+                        className="relative cursor-pointer" 
+                        style={{ height: gH }}
+                        onClick={(e) => {
+                          if (!col.dateString) return
+                          const rect = e.currentTarget.getBoundingClientRect()
+                          const y = e.clientY - rect.top
+                          const minutes = Math.floor(y / PPM) + (startHour * 60)
+                          // Snap to 15 minute intervals
+                          const snappedMinutes = Math.round(minutes / 15) * 15
+                          const h = Math.floor(snappedMinutes / 60)
+                          const m = snappedMinutes % 60
+                          const timeStr = `${pad(h)}:${pad(m)}`
+                          onSlotClick?.(col.dateString, timeStr, col.id !== col.dateString ? col.id : undefined)
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-timetable-busy pointer-events-none" />
                         {col.schedule.map((slot, i) => {
                           const top = t2px(formatTime(slot.startDateTime, workspaceTimezone), gStart)
                           const height = t2px(formatTime(slot.endDateTime, workspaceTimezone), gStart) - top
@@ -389,7 +405,7 @@ export default function Timetable({
                           const durationPerUnknown = unknownCount > 0 ? remainingDuration / unknownCount : 0
 
                           return (
-                            <div key={event.id} onClick={() => onEventClick?.(event)}
+                            <div key={event.id} onClick={(e) => { e.stopPropagation(); onEventClick?.(event); }}
                               className={`absolute left-1.5 right-1.5 flex rounded-xl shadow-sm transition-transform hover:scale-[1.01] cursor-pointer overflow-hidden bg-panel-surface border border-panel-border ${!event.isConfirmed ? "opacity-60" : ""}`}
                               style={{ top, height }}>
                               {!event.isConfirmed && (

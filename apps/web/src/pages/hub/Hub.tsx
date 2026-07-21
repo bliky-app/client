@@ -165,6 +165,13 @@ export default function Hub() {
                 onEventClick={setSelectedEvent}
                 onViewModeChange={setViewMode}
                 onDateSelect={(date) => setCalendarDate(date)}
+                onSlotClick={(dateString, time, staffId) => {
+                  setAppointmentDraft({
+                    masterId: staffId,
+                    startDateTime: `${dateString}T${time}`
+                  })
+                  setIsAppointmentSheetOpen(true)
+                }}
                 onPrev={() => { const d = new Date(calendarDate); d.setDate(d.getDate() - step); setCalendarDate(d) }}
                 onNext={() => { const d = new Date(calendarDate); d.setDate(d.getDate() + step); setCalendarDate(d) }}
               />
