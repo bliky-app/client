@@ -138,8 +138,8 @@
     --theme-panel-base: #111113; /* Very dark gray, slightly lighter than hub */
     --theme-panel-surface: #18181b; /* zinc-900 */
     --theme-panel-surface-hover: #27272a; /* zinc-800 */
-    --theme-panel-border: #27272a; /* zinc-800 */
-    --theme-panel-border-subtle: #18181b; /* zinc-900 */
+    --theme-panel-border: #3f3f46; /* zinc-700 */
+    --theme-panel-border-subtle: #27272a; /* zinc-800, visible against zinc-900 surface */
     --theme-panel-text: #ffffff; /* white */
     --theme-panel-text-muted: #a1a1aa; /* zinc-400 */
     --theme-panel-text-subtle: #71717a; /* zinc-500 */
