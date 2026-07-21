@@ -1,13 +1,18 @@
-import { useState, useMemo, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react"
-import { getTzDateString } from "@/lib/formatters"
+import { getTzDateString, formatTime } from "@/lib/formatters"
 import type { Appointment, TimetableColumn, TimetableViewType } from "@/types/models"
 import Avatar from "@/components/Avatar"
-import { formatTime } from "@/lib/formatters"
 import { PreciseTimePicker } from "./PreciseTimePicker"
-import { useToast } from "@/lib/ToastProvider"
-import { useAuth } from "@/lib/AuthProvider"
+import {
+  useTimetableLogic,
+  PPM,
+  WEEKDAYS,
+  MONTHS_RU,
+  t2px,
+  heatBg,
+  pad
+} from "@/hooks/useTimetableLogic"
 
 export type TimetableViewMode = "1day" | "week" | "month"
 
@@ -30,32 +35,6 @@ interface TimetableProps {
   currentUserId?: string
 }
 
-const PPM = 1.5 // pixels per minute
-const WEEKDAYS = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]
-const MONTHS_RU = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-
-function t2m(t: string) {
-  if (!t) return 0
-  const [h, m] = t.split(":").map(Number)
-  return (h || 0) * 60 + (m || 0)
-}
-
-function t2px(t: string, startHour: number) {
-  return (t2m(t) - startHour * 60) * PPM
-}
-
-function heatBg(count: number) {
-  if (count === 0) return ""
-  if (count === 1) return "bg-panel-text/10"
-  if (count <= 3) return "bg-panel-text/20"
-  if (count <= 6) return "bg-panel-text/35"
-  return "bg-panel-text/55"
-}
-
-function pad(n: number) {
-  return String(n).padStart(2, "0")
-}
-
 export default function Timetable({
   viewType, currentDate, events, columns,
   onPrev, onNext, onEventClick, onDateSelect, onSlotClick, onViewModeChange,
@@ -65,121 +44,33 @@ export default function Timetable({
   currentUserId,
 }: TimetableProps) {
 
-  const { user } = useAuth()
-  const { showToast } = useToast()
-  const isFormal = user?.isFormal ?? true
-  const yearMonth = `${currentDate.getFullYear()}-${currentDate.getMonth()}`
-  const [prevYearMonth, setPrevYearMonth] = useState(yearMonth)
-  const [calMonth, setCalMonth] = useState(() => new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
-  const [showCal, setShowCal] = useState(false)
-  const [now, setNow] = useState(new Date())
-
-  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pointerStart = useRef({ x: 0, y: 0 })
-  const isLongPressTriggered = useRef(false)
-
-  const [longPressPopover, setLongPressPopover] = useState<{
-    show: boolean
-    x: number
-    y: number
-    dateString: string
-    staffId?: string
-    initialHour: number
-    initialMinute: number
-  } | null>(null)
-
-  if (prevYearMonth !== yearMonth) {
-    setPrevYearMonth(yearMonth)
-    setCalMonth(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
-  }
-
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 60000)
-    return () => clearInterval(t)
-  }, [])
-
-  const byDate = useMemo(() => {
-    const m: Record<string, number> = {}
-    events.forEach(e => { const d = e.startDateTime.split("T")[0]; m[d] = (m[d] || 0) + 1 })
-    return m
-  }, [events])
-
-  const byDateStaff = useMemo(() => {
-    const m: Record<string, number> = {}
-    events.forEach(e => {
-      const d = e.startDateTime.split("T")[0]
-      const k = `${d}_${e.staff?.id || "me"}`
-      m[k] = (m[k] || 0) + 1
-    })
-    return m
-  }, [events])
-
-  const allTimes = columns.flatMap(c => c.schedule.flatMap(s => [
-    t2m(formatTime(s.startDateTime, workspaceTimezone)),
-    t2m(formatTime(s.endDateTime, workspaceTimezone)),
-  ]))
-  const minM = allTimes.length > 0 ? Math.min(...allTimes) : 8 * 60
-  const maxM = allTimes.length > 0 ? Math.max(...allTimes) : 22 * 60
-  const gStart = Math.max(0, (minM - 30) / 60)
-  const gEnd = Math.min(24, (maxM + 30) / 60)
-  const startHour = Math.ceil(gStart)
-  const endHour = Math.floor(gEnd)
-  const hours = Array.from({ length: Math.max(0, endHour - startHour + 1) }, (_, i) => startHour + i)
-  const gH = (gEnd - gStart) * 60 * PPM
-  const nowM = now.getHours() * 60 + now.getMinutes()
-  const headerHeightClass = viewType === "team" ? "h-20" : "h-12"
-
-  // Title logic: DD.MM or DD.MM — DD.MM
-  const formatMD = (d: Date) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`
-  let startD = currentDate
-  let endD = currentDate
-
-  if (viewMode === "month") {
-    if (viewType === "personal") {
-      startD = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-      endD = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
-    } else {
-      endD = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 29)
-    }
-  } else if (viewMode === "week") {
-    endD = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 6)
-  }
-
-  const isRange = startD.getTime() !== endD.getTime()
-  const startDateStr = formatMD(startD)
-  const endDateStr = isRange ? formatMD(endD) : ""
-
-  // Mini calendar days
-  const calY = calMonth.getFullYear(), calM = calMonth.getMonth()
-  const daysInM = new Date(calY, calM + 1, 0).getDate()
-  const firstWd = (new Date(calY, calM, 1).getDay() + 6) % 7
-  const calDays: (Date | null)[] = [
-    ...Array(firstWd).fill(null),
-    ...Array.from({ length: daysInM }, (_, i) => new Date(calY, calM, i + 1, 12, 0, 0)),
-  ]
-  while (calDays.length % 7 !== 0) calDays.push(null)
-
-  const todayStr = getTzDateString(new Date(), timezone)
-  const curStr = getTzDateString(currentDate, timezone)
-
-  const uniqueStaff = useMemo(() => {
-    if (viewType !== "team") return []
-    const map = new Map<string, NonNullable<TimetableColumn["staff"]>>()
-    columns.forEach(c => { if (c.staff) map.set(c.id, c.staff) })
-    return [...map.values()]
-  }, [columns, viewType])
-
-  // Generate 30 days for team month view
-  const teamMonthDates = useMemo(() => {
-    return Array.from({ length: 30 }, (_, i) => {
-      const d = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + i, 12, 0, 0)
-      return {
-        date: d,
-        str: getTzDateString(d, timezone),
-        label: new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit", timeZone: timezone }).format(d),
-      }
-    })
-  }, [currentDate, timezone])
+  const {
+    setCalMonth,
+    showCal, setShowCal,
+    nowM,
+    longPressPopover, setLongPressPopover,
+    byDate,
+    byDateStaff,
+    gStart, gEnd, gH, hours,
+    headerHeightClass,
+    isRange, startDateStr, endDateStr,
+    calY, calM, calDays,
+    todayStr, curStr,
+    uniqueStaff,
+    teamMonthDates,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerCancelOrUp,
+    handleClick,
+  } = useTimetableLogic(
+    currentDate,
+    events,
+    columns,
+    viewType,
+    viewMode,
+    timezone,
+    workspaceTimezone
+  )
 
   const VIEW_LABELS: Record<TimetableViewMode, string> = { "1day": "1 день", week: "Неделя", month: "Месяц" }
   const allowedModes = viewType === "personal" ? ["week", "month"] : ["1day", "month"]
@@ -405,61 +296,11 @@ export default function Timetable({
                         className="relative cursor-pointer select-none"
                         style={{ height: gH }}
                         onContextMenu={(e) => e.preventDefault()}
-                        onPointerDown={(e) => {
-                          if (!col.dateString) return
-                          isLongPressTriggered.current = false
-                          const rect = e.currentTarget.getBoundingClientRect()
-                          const y = e.clientY - rect.top
-                          pointerStart.current = { x: e.clientX, y: e.clientY }
-
-                          longPressRef.current = setTimeout(() => {
-                            isLongPressTriggered.current = true
-                            const minutes = Math.floor(y / PPM) + (gStart * 60)
-                            const snappedMinutes = Math.round(minutes / 15) * 15
-                            const h = Math.floor(snappedMinutes / 60)
-                            const m = snappedMinutes % 60
-
-                            setLongPressPopover({
-                              show: true,
-                              x: e.clientX,
-                              y: e.clientY,
-                              dateString: col.dateString!,
-                              staffId: col.id !== col.dateString ? col.id : undefined,
-                              initialHour: h,
-                              initialMinute: m
-                            })
-                          }, 400)
-                        }}
-                        onPointerMove={(e) => {
-                          if (longPressRef.current) {
-                            const dx = Math.abs(e.clientX - pointerStart.current.x)
-                            const dy = Math.abs(e.clientY - pointerStart.current.y)
-                            if (dx > 10 || dy > 10) {
-                              clearTimeout(longPressRef.current)
-                              longPressRef.current = null
-                            }
-                          }
-                        }}
-                        onPointerUp={() => {
-                          if (longPressRef.current) {
-                            clearTimeout(longPressRef.current)
-                            longPressRef.current = null
-                          }
-                        }}
-                        onPointerCancel={() => {
-                          if (longPressRef.current) {
-                            clearTimeout(longPressRef.current)
-                            longPressRef.current = null
-                          }
-                        }}
-                        onClick={() => {
-                          if (isLongPressTriggered.current) return
-                          if (!col.dateString) return
-                          const msg = isFormal
-                            ? "Нажмите и удерживайте свободное время, чтобы создать запись"
-                            : "Нажми и удерживай свободное время, чтобы создать запись"
-                          showToast(msg, "info")
-                        }}
+                        onPointerDown={(e) => col.dateString && handlePointerDown(e, col.dateString, col.id)}
+                        onPointerMove={handlePointerMove}
+                        onPointerUp={handlePointerCancelOrUp}
+                        onPointerCancel={handlePointerCancelOrUp}
+                        onClick={() => col.dateString && handleClick()}
                       >
                         <div className="absolute inset-0 bg-timetable-busy pointer-events-none" />
                         {col.schedule.map((slot, i) => {
