@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState } from "react"
 import type { KeyboardEvent } from "react"
-import { Camera, X, Star } from "lucide-react"
+import { Camera, X, Star, Trash2 } from "lucide-react"
 import type { CreateWorkspaceFormData } from "../CreateWorkspacePage"
 import type { Workspace } from "@/types/models"
 import Avatar from "@/components/Avatar"
@@ -11,7 +11,6 @@ interface Step2DetailsProps {
   data: CreateWorkspaceFormData
   onChange: (patch: Partial<CreateWorkspaceFormData>) => void
 }
-
 
 const CATEGORIES_INDIVIDUAL = [
   "Колорист", "Стилист по волосам", "Массажист",
@@ -73,44 +72,77 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
     }
   }
 
-  // Filter out already selected categories for the suggestions list
+  // Filter out already selected categories for suggestions
   const suggestedCategories = availableCategories.filter(c => !selectedCategories.includes(c))
 
-  return (
-    <div className="flex flex-col gap-8 py-2">
-      {/* Avatar + name row */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => fileRef.current?.click()}
-          className="relative w-20 h-20 rounded-full shrink-0 overflow-hidden group border-2 border-dashed border-panel-border hover:border-panel-text-muted transition-colors"
-        >
-          {(() => {
-            const draftWorkspace: Workspace = {
-              id: "temp",
-              name: data.name,
-              type: data.type || "individual",
-              category: data.category,
-              color: data.color,
-              avatarUrl: data.avatarUrl,
-              timezone: data.timezone,
-              address: data.address,
-              schedule: data.schedule,
-              staff: [],
-            }
-            return (
-              <Avatar
-                data={draftWorkspace}
-                className="w-full h-full rounded-full text-2xl font-bold"
-              />
-            )
-          })()}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <Camera className="w-6 h-6 text-white" />
-          </div>
-        </button>
-        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+  const draftWorkspace: Workspace = {
+    id: "temp",
+    name: data.name || "Пространство",
+    type: data.type || "individual",
+    category: data.category,
+    color: data.color,
+    avatarUrl: data.avatarUrl,
+    timezone: data.timezone,
+    address: data.address,
+    schedule: data.schedule,
+    staff: [],
+  }
 
-        <div className="flex-1 flex flex-col gap-1 relative">
+  return (
+    <div className="flex flex-col pt-2 pb-6">
+      {/* 1. Top Banner Card: Avatar Photo Left + ColorPicker Directly Right */}
+      <div className="mb-6 bg-panel-surface border border-panel-border rounded-[32px] p-6 shadow-sm flex flex-row items-center gap-6">
+        <div className="relative group shrink-0">
+          <Avatar
+            data={draftWorkspace}
+            className="w-24 h-24 rounded-full text-2xl shadow-md border-2 border-panel-border transition-transform group-hover:scale-105"
+          />
+          {data.avatarUrl ? (
+            <button
+              type="button"
+              onClick={() => {
+                onChange({ avatarUrl: "" })
+                if (fileRef.current) fileRef.current.value = ""
+              }}
+              className="absolute bottom-0 right-0 p-2 rounded-full bg-red-500 text-white shadow-lg hover:bg-red-600 transition-all active:scale-95"
+              title="Удалить фото"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="absolute bottom-0 right-0 p-2 rounded-full bg-panel-text text-panel-base shadow-lg hover:opacity-90 transition-all active:scale-95"
+              title="Загрузить фото"
+            >
+              <Camera className="w-4 h-4" />
+            </button>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
+
+        <div className="h-12 w-px bg-panel-border-subtle shrink-0" />
+
+        <div className="flex-1 min-w-0 flex justify-start">
+          <ColorPicker
+            label="Фирменный цвет"
+            value={data.color}
+            onChange={(color) => onChange({ color })}
+          />
+        </div>
+      </div>
+
+      {/* 2. Main Workspace Form Fields Card */}
+      <div className="bg-panel-surface border border-panel-border rounded-[32px] p-6 shadow-sm flex flex-col gap-5">
+        {/* Workspace Name */}
+        <div className="flex flex-col gap-1 relative">
           <Input
             label="Название"
             theme="panel"
@@ -119,88 +151,85 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
             onChange={e => onChange({ name: e.target.value })}
             placeholder="Моё пространство"
             maxLength={32}
-            inputClassName="pr-16"
+            inputClassName="py-3 text-base font-medium pr-16"
           />
           <span className={`absolute right-4 bottom-3 text-xs font-medium pointer-events-none ${
-            data.name.length < 4 ? 'text-red-500' : 'text-panel-text-subtle'
+            data.name.length < 4 ? "text-red-500" : "text-panel-text-subtle"
           }`}>
             {data.name.length}/32
           </span>
         </div>
-      </div>
 
-      {/* Color accent */}
-      <ColorPicker
-        label="Фирменный цвет"
-        value={data.color}
-        onChange={(color) => onChange({ color })}
-      />
+        {/* Categories Tag Input */}
+        <div className="flex flex-col gap-2.5">
+          <label className="text-xs font-semibold text-panel-text-muted">
+            Категории и направления
+          </label>
 
-      {/* Categories Tag Input */}
-      <div className="flex flex-col gap-3">
-        <label className="text-xs font-semibold text-panel-text-subtle uppercase tracking-wider">
-          Категории и направления
-        </label>
-
-        {/* Input container */}
-        <div
-          className="w-full bg-panel-surface border border-panel-border rounded-2xl p-2 min-h-13 flex flex-wrap items-center gap-2 focus-within:border-panel-text-muted transition-colors cursor-text"
-          onClick={() => inputRef.current?.focus()}
-        >
-          {selectedCategories.map((cat, idx) => {
-            const isMain = idx === 0
-            return (
-              <div
-                key={cat}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium animate-in zoom-in-95 duration-150 ${
-                  isMain
-                    ? "bg-panel-text text-panel-base"
-                    : "bg-panel-border-subtle text-panel-text-muted-dark"
-                }`}
-              >
-                {isMain && <Star className="w-3.5 h-3.5" fill="currentColor" />}
-                <span>{cat}</span>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    removeCategory(cat)
-                  }}
-                  className={`p-0.5 rounded-full hover:bg-black/10 transition-colors ${isMain ? "text-panel-base/80" : "text-panel-text-muted"}`}
+          {/* Tag Input Container */}
+          <div
+            className="w-full bg-panel-base border border-panel-border-subtle rounded-2xl p-2.5 min-h-13 flex flex-wrap items-center gap-2 focus-within:border-panel-text-muted transition-colors cursor-text"
+            onClick={() => inputRef.current?.focus()}
+          >
+            {selectedCategories.map((cat, idx) => {
+              const isMain = idx === 0
+              return (
+                <div
+                  key={cat}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium animate-in zoom-in-95 duration-150 ${
+                    isMain
+                      ? "bg-panel-text text-panel-base shadow-xs"
+                      : "bg-panel-surface border border-panel-border-subtle text-panel-text"
+                  }`}
                 >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )
-          })}
+                  {isMain && <Star className="w-3.5 h-3.5" fill="currentColor" />}
+                  <span>{cat}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      removeCategory(cat)
+                    }}
+                    className={`p-0.5 rounded-full hover:bg-black/10 transition-colors ${
+                      isMain ? "text-panel-base/80" : "text-panel-text-muted"
+                    }`}
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )
+            })}
 
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={() => {
-              if (inputValue) addCategory(inputValue)
-            }}
-            placeholder={selectedCategories.length === 0 ? "Например: Массаж, СПА..." : ""}
-            className="flex-1 min-w-30 bg-transparent outline-none text-sm text-panel-text placeholder:text-panel-text-subtle py-1 px-2"
-          />
-        </div>
-
-        {/* Suggestions */}
-        {suggestedCategories.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-1">
-            {suggestedCategories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => addCategory(cat)}
-                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-panel-surface border border-panel-border text-panel-text-muted-dark hover:border-panel-text-muted hover:text-panel-text transition-colors"
-              >
-                + {cat}
-              </button>
-            ))}
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={() => {
+                if (inputValue) addCategory(inputValue)
+              }}
+              placeholder={selectedCategories.length === 0 ? "Например: Массаж, СПА..." : ""}
+              className="flex-1 min-w-30 bg-transparent outline-none text-sm text-panel-text placeholder:text-panel-text-subtle py-1 px-2"
+            />
           </div>
-        )}
+
+          {/* Suggestions */}
+          {suggestedCategories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-1">
+              {suggestedCategories.map(cat => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => addCategory(cat)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-medium bg-panel-base border border-panel-border-subtle text-panel-text-muted hover:border-panel-text-muted hover:text-panel-text transition-colors"
+                >
+                  + {cat}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

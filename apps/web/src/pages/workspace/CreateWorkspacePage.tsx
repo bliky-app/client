@@ -33,7 +33,7 @@ const INITIAL_DATA: CreateWorkspaceFormData = {
   category: "",
   additionalCategories: [],
   customCategory: "",
-  color: "#6366f1",
+  color: "#ec4899",
   address: "",
   timezone: getDefaultTimezone(),
   schedule: {
@@ -69,7 +69,6 @@ export default function CreateWorkspacePage() {
 
   const handleNext = () => {
     if (isLast) {
-      // TODO: submit to API
       navigate("/")
     } else {
       setStep(s => s + 1)
@@ -110,27 +109,29 @@ export default function CreateWorkspacePage() {
       <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] mt-16 shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
 
         {/* Header */}
-        <div className="flex items-center gap-3 px-6 pt-6 pb-4 shrink-0">
+        <div className="flex items-center gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle">
           <button
+            type="button"
             onClick={handleBack}
             className="p-2 -ml-2 rounded-full text-panel-text-muted hover:text-panel-text hover:bg-panel-surface-hover transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
 
-          <div className="flex-1">
-            <p className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest mb-1">
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-bold text-panel-text-subtle uppercase tracking-wider mb-0.5">
               Шаг {step + 1} из {totalSteps}
             </p>
-            <h1 className="text-xl font-bold text-panel-text leading-tight">
+            <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
               {step === 0 && "Тип пространства"}
-              {step === 1 && "Детали"}
+              {step === 1 && "Детали пространства"}
               {step === 2 && "Адрес и часовой пояс"}
               {step === 3 && "График работы"}
             </h1>
           </div>
 
           <button
+            type="button"
             onClick={() => navigate("/")}
             className="p-2 -mr-2 rounded-full text-panel-text-muted hover:text-panel-text hover:bg-panel-surface-hover transition-colors"
           >
@@ -139,7 +140,7 @@ export default function CreateWorkspacePage() {
         </div>
 
         {/* Progress bar */}
-        <div className="px-6 pb-4 shrink-0">
+        <div className="px-6 pt-4 pb-2 shrink-0">
           <div className="h-1 bg-panel-border-subtle rounded-full overflow-hidden">
             <div
               className="h-full bg-panel-text rounded-full transition-all duration-500 ease-out"
@@ -148,24 +149,24 @@ export default function CreateWorkspacePage() {
           </div>
         </div>
 
-        {/* Step content */}
-        <div className="flex-1 overflow-y-auto px-6 pb-4">
+        {/* Step content scroll body */}
+        <div className="flex-1 overflow-y-auto px-6 relative flex flex-col">
           {renderStep()}
-        </div>
 
-        {/* Footer navigation */}
-        <div className="px-6 py-5 shrink-0 border-t border-panel-border-subtle">
-          <Button
-            variant="primary"
-            theme="panel"
-            fullWidth
-            disabled={!canProceed()}
-            onClick={handleNext}
-          >
-            {isLast
-              ? (isFormal ? "Создайте пространство" : "Создай пространство")
-              : (isFormal ? "Продолжить" : "Далее")}
-          </Button>
+          {/* Sticky Navigation Footer (Padded & solid bg-panel-base) */}
+          <div className="sticky bottom-0 -mx-6 px-6 py-4 bg-panel-base border-t border-panel-border-subtle shadow-[0_-4px_16px_rgba(0,0,0,0.06)] z-20 shrink-0 mt-auto">
+            <Button
+              variant="primary"
+              theme="panel"
+              fullWidth
+              disabled={!canProceed()}
+              onClick={handleNext}
+            >
+              {isLast
+                ? (isFormal ? "Создайте пространство" : "Создай пространство")
+                : (isFormal ? "Продолжить" : "Далее")}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

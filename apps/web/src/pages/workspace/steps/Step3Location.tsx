@@ -1,4 +1,3 @@
-import { useState, useMemo } from "react"
 import { MapPin, Globe } from "lucide-react"
 import type { CreateWorkspaceFormData } from "../CreateWorkspacePage"
 import Input from "@/components/ui/Input"
@@ -46,37 +45,40 @@ export default function Step3Location({ data, onChange }: Step3LocationProps) {
   const isFormal = user?.isFormal ?? true
 
   return (
-    <div className="flex flex-col gap-6 py-2">
-      {/* Address */}
-      <Input
-        theme="panel"
-        label="Адрес"
-        type="text"
-        value={data.address}
-        onChange={e => onChange({ address: e.target.value })}
-        placeholder="ул. Примерная, д. 1"
-        icon={<MapPin className="w-4 h-4" />}
-        hint={isFormal ? "Необязательно, но поможет клиентам быстрее вас найти" : "Необязательно, но поможет клиентам быстрее тебя найти"}
-      />
-
-      {/* Timezone */}
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-panel-text-muted">
-          Часовой пояс
-        </label>
-        <Select
+    <div className="flex flex-col pt-2 pb-6">
+      <div className="bg-panel-surface border border-panel-border rounded-[32px] p-6 shadow-sm flex flex-col gap-5">
+        {/* Address */}
+        <Input
           theme="panel"
-          searchable
-          hideIcon
-          value={data.timezone}
-          options={TZ_OPTIONS}
-          placeholder="Выбрать часовой пояс"
-          onChange={(val) => onChange({ timezone: val })}
+          label="Адрес"
+          type="text"
+          value={data.address}
+          onChange={e => onChange({ address: e.target.value })}
+          placeholder="ул. Примерная, д. 1"
+          icon={<MapPin className="w-4 h-4" />}
+          hint={isFormal ? "Необязательно, но поможет клиентам быстрее вас найти" : "Необязательно, но поможет клиентам быстрее тебя найти"}
+          inputClassName="py-3 text-base font-medium"
         />
-        <p className="text-xs pl-1 text-panel-text-subtle flex items-center gap-1.5">
-          <Globe className="w-3 h-3 shrink-0" />
-          Влияет на отображение расписания и уведомления клиентам
-        </p>
+
+        {/* Timezone */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-panel-text-muted">
+            Часовой пояс
+          </label>
+          <Select
+            theme="panel"
+            searchable
+            hideIcon
+            value={data.timezone}
+            options={TZ_OPTIONS}
+            placeholder="Выбрать часовой пояс"
+            onChange={(val) => onChange({ timezone: val })}
+          />
+          <p className="text-xs pt-1 text-panel-text-subtle flex items-center gap-1.5 font-medium">
+            <Globe className="w-3.5 h-3.5 shrink-0" />
+            Влияет на отображение расписания и уведомления клиентам
+          </p>
+        </div>
       </div>
     </div>
   )
