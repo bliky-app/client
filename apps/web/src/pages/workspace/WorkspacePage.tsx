@@ -1,31 +1,24 @@
-import { useState, useEffect } from "react"
-import { useQuery } from "@tanstack/react-query"
 import { Loader2, Users, Package, UserCheck, BarChart2, Clock, ClipboardList, List } from "lucide-react"
 import WorkspaceSchedule from "./WorkspaceSchedule"
 import WorkspaceStub from "./WorkspaceStub"
 import WorkspaceLayout from "@/layouts/WorkspaceLayout"
-import { workspaceApi } from "@/lib/api/workspaceApi"
-import type { WorkspaceSectionId } from "@/types/models"
-import { usePermissions } from "@/lib/permissions"
+import { useWorkspacePage } from "@/hooks/useWorkspacePage"
 
 interface WorkspacePageProps {
   id: string
 }
 
 export default function WorkspacePage({ id }: WorkspacePageProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState<WorkspaceSectionId>("overview")
-  const { can, user } = usePermissions(id)
-  const isFormal = user?.isFormal ?? true
-
-  useEffect(() => {
-    setActiveSection("overview")
-  }, [id])
-
-  const { data: workspace, isLoading } = useQuery({
-    queryKey: ["workspace", id],
-    queryFn: () => workspaceApi.getWorkspace(id),
-  })
+  const {
+    drawerOpen,
+    setDrawerOpen,
+    activeSection,
+    setActiveSection,
+    can,
+    isFormal,
+    workspace,
+    isLoading
+  } = useWorkspacePage(id)
 
   if (isLoading) {
     return (
