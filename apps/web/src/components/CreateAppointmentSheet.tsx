@@ -295,6 +295,42 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
           <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full pb-32">
             
             <div className="flex flex-col gap-3">
+              <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Дата и время</h3>
+              <label className="relative flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle hover:border-panel-text-muted transition-colors rounded-2xl shadow-sm cursor-pointer group">
+                <input 
+                  type="datetime-local"
+                  value={draft.startDateTime || ""}
+                  onChange={e => setDraft({ ...draft, startDateTime: e.target.value })}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center shrink-0 text-panel-text">
+                    <Calendar className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    {draft.startDateTime ? (
+                      <>
+                        <span className="text-base font-semibold text-panel-text capitalize truncate">
+                          {new Date(draft.startDateTime).toLocaleDateString("ru-RU", { weekday: 'short', day: 'numeric', month: 'long' })}
+                        </span>
+                        <span className="text-sm text-panel-text-muted truncate">
+                          {new Date(draft.startDateTime).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-base font-medium text-panel-text-subtle truncate">
+                        Установить время...
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="px-4 py-2 bg-panel-base border border-panel-border-subtle group-hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0">
+                  {draft.startDateTime ? "Изменить" : "Выбрать"}
+                </div>
+              </label>
+            </div>
+
+            <div className="flex flex-col gap-3">
               <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Пространство</h3>
               {isWorkspaceSearchActive ? (
                 <SearchableSelect
@@ -483,9 +519,8 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-6">
-                  <div className="flex-1 flex flex-col gap-3">
-                    <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Мастер</h3>
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Мастер</h3>
                     {isMasterSearchActive ? (
                       <SearchableSelect
                         value={draft.masterId}
@@ -522,42 +557,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 flex flex-col gap-3">
-                    <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Дата и время</h3>
-                    <label className="relative flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle hover:border-panel-text-muted transition-colors rounded-2xl shadow-sm cursor-pointer group h-full min-h-[82px]">
-                      <input 
-                        type="datetime-local"
-                        value={draft.startDateTime || ""}
-                        onChange={e => setDraft({ ...draft, startDateTime: e.target.value })}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                      />
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center shrink-0 text-panel-text">
-                          <Calendar className="w-5 h-5" />
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          {draft.startDateTime ? (
-                            <>
-                              <span className="text-base font-semibold text-panel-text capitalize truncate">
-                                {new Date(draft.startDateTime).toLocaleDateString("ru-RU", { weekday: 'short', day: 'numeric', month: 'long' })}
-                              </span>
-                              <span className="text-sm text-panel-text-muted truncate">
-                                {new Date(draft.startDateTime).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-base font-medium text-panel-text-subtle truncate">
-                              Установить время...
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="px-4 py-2 bg-panel-base border border-panel-border-subtle group-hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0">
-                        {draft.startDateTime ? "Изменить" : "Выбрать"}
-                      </div>
-                    </label>
-                  </div>
-                </div>
 
                 <div className="flex flex-col gap-3">
                   <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Услуга</h3>
