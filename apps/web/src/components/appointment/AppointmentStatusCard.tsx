@@ -1,6 +1,5 @@
 import { CheckCircle2, Clock } from "lucide-react"
 import IconBox from "@/components/ui/IconBox"
-import Badge from "@/components/ui/Badge"
 
 interface AppointmentStatusCardProps {
   isConfirmed: boolean
@@ -24,23 +23,36 @@ export function AppointmentStatusCard({
           )}
         </IconBox>
         <div className="flex flex-col min-w-0">
-          <span className="text-xs font-medium text-panel-text-muted">Статус записи</span>
-          <span className={`text-base font-bold truncate ${isConfirmed ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
-            {isConfirmed ? "Подтверждена" : "Ожидает"}
+          <span className="text-xs font-medium text-panel-text-muted">Запись подтверждена</span>
+          <span
+            className={`text-sm font-semibold truncate ${
+              isConfirmed ? "text-emerald-600 dark:text-emerald-400" : "text-panel-text-muted"
+            }`}
+          >
+            {isConfirmed ? "Да" : "Нет (ожидает)"}
           </span>
         </div>
       </div>
 
       {canEdit && onToggleConfirm && (
-        <Badge
-          variant={isConfirmed ? "warning" : "success"}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isConfirmed}
           onClick={onToggleConfirm}
-          className="px-3 py-1.5 text-xs font-semibold rounded-xl shrink-0"
+          className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+            isConfirmed ? "bg-emerald-500" : "bg-panel-border"
+          }`}
         >
-          {isConfirmed ? "Снять" : "Подтвердить"}
-        </Badge>
+          <span
+            className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+              isConfirmed ? "translate-x-5" : "translate-x-0"
+            }`}
+          />
+        </button>
       )}
     </div>
   )
 }
+
 export default AppointmentStatusCard
