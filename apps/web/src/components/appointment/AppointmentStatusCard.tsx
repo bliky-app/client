@@ -35,9 +35,9 @@ export function AppointmentStatusCard({
         <Badge
           variant={isConfirmed ? "warning" : "success"}
           onClick={onToggleConfirm}
-          className="px-4 py-2 text-xs font-semibold"
+          className="px-3 py-1.5 text-xs font-semibold rounded-xl"
         >
-          {isConfirmed ? "Снять подтверждение" : "Подтвердить запись"}
+          {isConfirmed ? "Снять" : "Подтвердить"}
         </Badge>
       )}
     </div>

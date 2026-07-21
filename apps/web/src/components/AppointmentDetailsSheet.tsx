@@ -247,7 +247,6 @@ export default function AppointmentDetailsSheet({
                 <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center gap-3">
                   <Avatar data={event.staff} className="w-12 h-12 rounded-full text-sm shrink-0" />
                   <div className="flex flex-col min-w-0">
-                    <span className="text-xs font-medium text-panel-text-muted">Мастер</span>
                     <span className="text-base font-semibold text-panel-text truncate">
                       {event.staff.shortName || event.staff.user?.shortName || event.staff.fullName}
                     </span>
@@ -263,7 +262,6 @@ export default function AppointmentDetailsSheet({
                 <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center gap-3">
                   <Avatar data={event.workspace} className="w-12 h-12 rounded-2xl text-sm shrink-0" />
                   <div className="flex flex-col min-w-0">
-                    <span className="text-xs font-medium text-panel-text-muted">Пространство</span>
                     <span className="text-base font-semibold text-panel-text truncate">
                       {event.workspace.name}
                     </span>
