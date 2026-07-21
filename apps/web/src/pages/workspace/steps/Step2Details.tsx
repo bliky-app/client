@@ -191,35 +191,7 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
           </span>
         </div>
 
-        {/* Address */}
-        <Input
-          theme="panel"
-          label="Адрес"
-          type="text"
-          value={data.address}
-          onChange={e => onChange({ address: e.target.value })}
-          placeholder="ул. Примерная, д. 1"
-          icon={<MapPin className="w-4 h-4" />}
-          inputClassName="py-3 text-base font-medium"
-        />
-
-        {/* Timezone */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-panel-text-muted">
-            Часовой пояс
-          </label>
-          <Select
-            theme="panel"
-            searchable
-            hideIcon
-            value={data.timezone}
-            options={TZ_OPTIONS}
-            placeholder="Выбрать часовой пояс"
-            onChange={(val) => onChange({ timezone: val })}
-          />
-        </div>
-
-        {/* Categories Tag Input */}
+        {/* Categories Tag Input (Moved above Address) */}
         <div className="flex flex-col gap-2.5">
           <label className="text-xs font-semibold text-panel-text-muted">
             Категории и направления
@@ -288,6 +260,34 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Address */}
+        <Input
+          theme="panel"
+          label="Адрес"
+          type="text"
+          value={data.address}
+          onChange={e => onChange({ address: e.target.value })}
+          placeholder="ул. Примерная, д. 1"
+          icon={<MapPin className="w-4 h-4" />}
+          inputClassName="py-3 text-base font-medium"
+        />
+
+        {/* Timezone */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-panel-text-muted">
+            Часовой пояс
+          </label>
+          <Select
+            theme="panel"
+            searchable
+            hideIcon
+            value={data.timezone}
+            options={TZ_OPTIONS}
+            placeholder="Выбрать часовой пояс"
+            onChange={(val) => onChange({ timezone: val })}
+          />
         </div>
       </div>
     </div>
