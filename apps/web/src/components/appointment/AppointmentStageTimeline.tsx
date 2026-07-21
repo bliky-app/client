@@ -33,15 +33,33 @@ export function AppointmentStageTimeline({
           stageStartTimeStr = formatTime(stageStartTimeISO, workspaceTimezone)
         }
 
+        const isActive = stage.isActive ?? true
+
         return (
           <div key={stage.id || idx} className="flex gap-4 min-h-10">
             <div className="flex flex-col items-center">
-              <div className={`w-3 h-3 rounded-full mt-1.5 z-10 ${stage.isActive ? 'bg-panel-text' : 'bg-panel-border'}`} />
-              <div className="w-0.5 flex-1 -mt-1.5 mb-1 bg-panel-border-subtle" />
+              <div
+                className={`w-3 h-3 rounded-full mt-1.5 z-10 ${
+                  isActive
+                    ? "bg-panel-text"
+                    : "border-2 border-panel-text-muted/70 bg-panel-surface"
+                }`}
+              />
+              <div
+                className={`flex-1 -mt-1.5 mb-1 ${
+                  isActive
+                    ? "w-0.5 bg-panel-border-subtle"
+                    : "w-0 border-l-2 border-dashed border-panel-border-subtle"
+                }`}
+              />
             </div>
 
             <div className="flex flex-col pb-3">
-              <span className={`text-sm font-semibold leading-tight ${stage.isActive ? 'text-panel-text' : 'text-panel-text-muted'}`}>
+              <span
+                className={`text-sm font-semibold leading-tight ${
+                  isActive ? "text-panel-text" : "text-panel-text-muted"
+                }`}
+              >
                 {stage.name}
               </span>
               <span className="text-xs text-panel-text-subtle mt-0.5 flex items-center gap-1.5">
