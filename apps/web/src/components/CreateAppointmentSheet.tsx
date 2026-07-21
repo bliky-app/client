@@ -405,7 +405,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                         )}
                       </div>
                       
-                      {clientSearch && draft.clientId !== "new_pending" && (
+                      {draft.clientId !== "new_pending" && (
                         <div className="flex flex-col gap-2 bg-panel-surface border border-panel-border-subtle rounded-xl p-2 mt-1 shadow-sm">
                           <button 
                             onClick={() => {
@@ -421,21 +421,23 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             </div>
                           </button>
                           
-                          <button 
-                            onClick={() => {
-                              setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
-                              setIsClientSearchActive(false)
-                            }}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-base transition-colors border border-transparent hover:border-panel-border-subtle text-left"
-                          >
-                            <div className="w-10 h-10 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-panel-text shrink-0">
-                              А
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                              <span className="text-sm font-medium text-panel-text truncate">Алина Смирнова</span>
-                              <span className="text-xs text-panel-text-muted truncate">+7 (999) 123-45-67</span>
-                            </div>
-                          </button>
+                          {clientSearch.trim().length > 0 && (
+                            <button 
+                              onClick={() => {
+                                setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
+                                setIsClientSearchActive(false)
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-base transition-colors border border-transparent hover:border-panel-border-subtle text-left"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-panel-text shrink-0">
+                                А
+                              </div>
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-sm font-medium text-panel-text truncate">Алина Смирнова</span>
+                                <span className="text-xs text-panel-text-muted truncate">+7 (999) 123-45-67</span>
+                              </div>
+                            </button>
+                          )}
                         </div>
                       )}
 
