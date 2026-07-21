@@ -374,7 +374,7 @@ export default function Timetable({
                           if (!col.dateString) return
                           const rect = e.currentTarget.getBoundingClientRect()
                           const y = e.clientY - rect.top
-                          const minutes = Math.floor(y / PPM) + (startHour * 60)
+                          const minutes = Math.floor(y / PPM) + (gStart * 60)
                           // Snap to 15 minute intervals
                           const snappedMinutes = Math.round(minutes / 15) * 15
                           const h = Math.floor(snappedMinutes / 60)
