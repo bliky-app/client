@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { X, Search, ChevronDown, Check, UserPlus } from "lucide-react"
+import { X, Search, ChevronDown, Check, UserPlus, Plus } from "lucide-react"
 import type { Workspace } from "@/types/models"
 
 const ACCENT_COLORS = [
@@ -132,7 +132,23 @@ function SearchableSelect({
             </div>
           </div>
           <div className="flex-1 overflow-y-auto p-1">
-            {filtered.length === 0 && !showCustomOption ? (
+            {showCustomOption && (
+              <button
+                onClick={() => { onChange("custom"); setIsOpen(false); setSearch("") }}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-surface transition-colors text-left group mb-1 ${value === "custom" ? "bg-panel-surface" : ""}`}
+              >
+                <div className="w-10 h-10 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium group-hover:scale-105 transition-transform shrink-0">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col flex-1">
+                  <span className="text-sm font-medium text-panel-text">{customOptionLabel}</span>
+                  <span className="text-xs text-panel-text-muted">Ввести вручную</span>
+                </div>
+                {value === "custom" && <Check className="w-4 h-4 text-panel-text shrink-0" />}
+              </button>
+            )}
+
+            {filtered.length === 0 ? (
               <div className="p-4 text-center text-sm text-panel-text-subtle">Ничего не найдено</div>
             ) : (
               <>
@@ -149,18 +165,6 @@ function SearchableSelect({
                     {value === opt.id && <Check className="w-4 h-4 text-panel-text" />}
                   </button>
                 ))}
-                {showCustomOption && (
-                  <button
-                    onClick={() => { onChange("custom"); setIsOpen(false); setSearch("") }}
-                    className={`w-full flex items-center justify-between p-3 rounded-lg hover:bg-panel-surface transition-colors text-left border-t border-dashed border-panel-border-subtle mt-1 ${value === "custom" ? "bg-panel-surface" : ""}`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-panel-text">{customOptionLabel}</span>
-                      <span className="text-xs text-panel-text-muted">Ввести вручную</span>
-                    </div>
-                    {value === "custom" && <Check className="w-4 h-4 text-panel-text" />}
-                  </button>
-                )}
               </>
             )}
           </div>
