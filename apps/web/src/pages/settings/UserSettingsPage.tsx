@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { X, Check, Sun, Moon, Monitor, LogOut, Camera, Trash2 } from "lucide-react"
+import { X, Check, Sun, Moon, Monitor, LogOut, Camera, Trash2, ShieldCheck } from "lucide-react"
 import { useAuth } from "@/lib/AuthProvider"
 import { useTheme } from "@/lib/ThemeProvider"
+import { useToast } from "@/lib/ToastProvider"
 import Avatar from "@/components/Avatar"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
+import PasswordInput from "@/components/ui/PasswordInput"
 import ColorPicker from "@/components/ui/ColorPicker"
 import Select, { type SelectOption } from "@/components/ui/Select"
 import { getDefaultTimezone } from "@/lib/formatters"
@@ -36,8 +38,9 @@ const TIMEZONE_OPTIONS: SelectOption[] = [
 
 export default function UserSettingsPage() {
   const navigate = useNavigate()
-  const { user, updateProfile, logout } = useAuth()
+  const { user, updateProfile, changePassword, logout } = useAuth()
   const { theme, setTheme } = useTheme()
+  const { showToast } = useToast()
 
   const [firstName, setFirstName] = useState(user?.firstName || "")
   const [lastName, setLastName] = useState(user?.lastName || "")
@@ -50,6 +53,15 @@ export default function UserSettingsPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [savedSuccess, setSavedSuccess] = useState(false)
   const [error, setError] = useState("")
+
+  // Password Change State
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [passwordError, setPasswordError] = useState("")
+  const [passwordSuccess, setPasswordSuccess] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -114,6 +126,37 @@ export default function UserSettingsPage() {
       setError(e.message || "Ошибка при сохранении")
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleChangePasswordSubmit = async () => {
+    if (!currentPassword) {
+      setPasswordError(isFormal ? "Пожалуйста, введите текущий пароль" : "Пожалуйста, введи текущий пароль")
+      return
+    }
+    if (newPassword.length < 8) {
+      setPasswordError("Новый пароль должен содержать минимум 8 символов")
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Пароли не совпадают")
+      return
+    }
+
+    setIsChangingPassword(true)
+    setPasswordError("")
+    try {
+      await changePassword(currentPassword, newPassword)
+      setPasswordSuccess(true)
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      showToast("Пароль успешно обновлён!", "success")
+      setTimeout(() => setPasswordSuccess(false), 3000)
+    } catch (e: any) {
+      setPasswordError(e.message || "Ошибка при смене пароля")
+    } finally {
+      setIsChangingPassword(false)
     }
   }
 
@@ -398,8 +441,82 @@ export default function UserSettingsPage() {
             </Button>
           </div>
 
-          {/* 4. Danger Zone / Logout (Placed cleanly below Sticky Save bar) */}
-          <div className="mt-6 mb-6 bg-red-500/5 border border-red-500/10 rounded-[32px] p-6 flex items-center justify-between">
+          {/* 4. Password Change Card */}
+          <div className="mt-6 mb-6 bg-panel-surface border border-panel-border rounded-[32px] p-6 shadow-sm flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col min-w-0">
+                <h2 className="text-sm font-semibold text-panel-text truncate">Смена пароля</h2>
+                <span className="text-xs text-panel-text-muted truncate">
+                  {isFormal ? "Для защиты вашего аккаунта" : "Для защиты твоего аккаунта"}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPasswordForm(!showPasswordForm)
+                  setPasswordError("")
+                  setPasswordSuccess(false)
+                }}
+                className="px-3.5 py-2 rounded-xl bg-panel-base hover:bg-panel-surface-hover text-panel-text border border-panel-border-subtle text-xs font-semibold transition-colors shrink-0"
+              >
+                {showPasswordForm ? "Отмена" : "Изменить"}
+              </button>
+            </div>
+
+            {showPasswordForm && (
+              <div className="flex flex-col gap-4 pt-3 border-t border-panel-border-subtle animate-in fade-in slide-in-from-top-2 duration-200">
+                {passwordError && (
+                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-medium">
+                    {passwordError}
+                  </div>
+                )}
+
+                {passwordSuccess && (
+                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-medium flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 shrink-0" />
+                    <span>Пароль успешно обновлён!</span>
+                  </div>
+                )}
+
+                <PasswordInput
+                  label="Текущий пароль"
+                  placeholder="••••••••"
+                  value={currentPassword}
+                  onChange={(e) => { setCurrentPassword(e.target.value); setPasswordError("") }}
+                />
+
+                <PasswordInput
+                  label="Новый пароль"
+                  placeholder="••••••••"
+                  value={newPassword}
+                  onChange={(e) => { setNewPassword(e.target.value); setPasswordError("") }}
+                  showRules
+                />
+
+                <PasswordInput
+                  label={isFormal ? "Подтвердите пароль" : "Подтверди пароль"}
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError("") }}
+                />
+
+                <div className="pt-1 flex justify-end">
+                  <Button
+                    variant="secondary"
+                    theme="panel"
+                    disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
+                    onClick={handleChangePasswordSubmit}
+                  >
+                    {isChangingPassword ? "Сохранение..." : "Сохранить"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 5. Danger Zone / Logout (Placed cleanly below Password Change card) */}
+          <div className="mb-6 bg-red-500/5 border border-red-500/10 rounded-[32px] p-6 flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-sm font-medium text-red-500">Завершить сеанс</span>
               <span className="text-[11px] text-panel-text-muted">Выйти из текущего аккаунта на этом устройстве</span>

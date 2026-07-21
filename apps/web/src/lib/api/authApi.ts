@@ -90,6 +90,17 @@ export const authApi = {
     return updatedUser
   },
 
+  changePassword: async (currentPassword: string, newPassword: string): Promise<boolean> => {
+    await delay(400)
+    if (currentPassword && currentPassword !== "password" && currentPassword !== "12345678") {
+      throw new Error("Неверный текущий пароль")
+    }
+    if (newPassword.length < 8) {
+      throw new Error("Пароль должен содержать минимум 8 символов")
+    }
+    return true
+  },
+
   logout: async () => {
     await delay(200)
     localStorage.removeItem(AUTH_KEY)

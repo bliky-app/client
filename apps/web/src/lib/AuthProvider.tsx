@@ -14,6 +14,7 @@ type AuthContextType = {
   logout: typeof authApi.logout
   checkPhone: typeof authApi.checkPhone
   updateProfile: typeof authApi.updateProfile
+  changePassword: typeof authApi.changePassword
   isLoading: boolean
 }
 
@@ -76,8 +77,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     )
   }
 
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    return authApi.changePassword(currentPassword, newPassword)
+  }
+
   return (
-    <AuthContext.Provider value={{ user: user ?? null, login, register, logout, checkPhone, updateProfile, isLoading: isUserLoading }}>
+    <AuthContext.Provider value={{ user: user ?? null, login, register, logout, checkPhone, updateProfile, changePassword, isLoading: isUserLoading }}>
       <PermissionsProvider user={user ?? null} workspaces={workspaces}>
         {children}
       </PermissionsProvider>
