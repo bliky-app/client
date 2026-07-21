@@ -1,19 +1,19 @@
 import { Plus } from "lucide-react"
 
 const DEFAULT_PRESET_COLORS = [
-  "#6366f1", // Indigo
-  "#8b5cf6", // Purple
-  "#a855f7", // Violet
-  "#ec4899", // Pink
-  "#f43f5e", // Rose Red
-  "#ef4444", // Crimson
-  "#f97316", // Orange
-  "#f59e0b", // Amber
-  "#10b981", // Emerald Green
-  "#06b6d4", // Cyan
-  "#3b82f6", // Royal Blue
-  "#64748b", // Slate
-  "#a1a1aa", // Silver
+  "#6366f1",
+  "#8b5cf6",
+  "#a855f7",
+  "#ec4899",
+  "#f43f5e",
+  "#ef4444",
+  "#f97316",
+  "#f59e0b",
+  "#10b981",
+  "#06b6d4",
+  "#3b82f6",
+  "#64748b",
+  "#a1a1aa",
 ]
 
 interface ColorPickerProps {
@@ -31,7 +31,7 @@ export default function ColorPicker({
   className = "",
   size = "md",
 }: ColorPickerProps) {
-  // Normalize color format to lowercase for comparison
+
   const normalizedValue = (value || "").toLowerCase()
   const isCustomColor =
     normalizedValue &&
@@ -60,7 +60,6 @@ export default function ColorPicker({
         </span>
       )}
       <div className="flex flex-wrap items-center gap-2.5">
-        {/* Preset colors */}
         {DEFAULT_PRESET_COLORS.map((color) => {
           const isSelected = normalizedValue === color.toLowerCase()
           return (
@@ -83,8 +82,6 @@ export default function ColorPicker({
             />
           )
         })}
-
-        {/* Dynamic Custom Color (appears if current value is custom) */}
         {isCustomColor && (
           <button
             type="button"
@@ -96,8 +93,6 @@ export default function ColorPicker({
             title={`Свой цвет: ${value}`}
           />
         )}
-
-        {/* Custom Color Picker Button */}
         <label
           className={`${currentSize} rounded-full border border-dashed border-panel-border cursor-pointer flex items-center justify-center hover:border-panel-text-muted transition-all active:scale-95 shadow-sm bg-panel-base relative overflow-hidden group`}
           title="Выбрать свой цвет"

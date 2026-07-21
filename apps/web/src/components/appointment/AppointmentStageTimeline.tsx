@@ -136,8 +136,6 @@ export function AppointmentStageTimeline({
           </div>
         )
       })}
-
-      {/* Completion Stage item with empty circle indicator */}
       <div className="flex gap-4 min-h-8 items-start">
         <div className="flex flex-col items-center">
           <div className="w-3 h-3 rounded-full mt-1.5 z-10 border-2 border-panel-text-muted/60 bg-panel-surface" />

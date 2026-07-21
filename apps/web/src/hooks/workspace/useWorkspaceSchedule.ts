@@ -11,12 +11,11 @@ export function useWorkspaceSchedule(workspace: Workspace, forcedViewType?: "per
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null)
   const [viewMode, setViewMode] = useState<TimetableViewMode>("week")
 
-  // Appointment Sheet State
   const [isAppointmentSheetOpen, setIsAppointmentSheetOpen] = useState(false)
   const [appointmentDraft, setAppointmentDraft] = useState<AppointmentDraft | undefined>(undefined)
 
   const { can } = usePermissions(workspace.id)
-  const canViewGlobalSchedule = workspace.type === "individual" ? false : can("view_global_schedule")
+  const canViewGlobalSchedule = workspace.type === "individual" ? false : can("view_all_schedule")
   const viewType = forcedViewType || (canViewGlobalSchedule ? "team" : "personal")
   const stepDays = viewMode === "month" ? 30 : viewMode === "week" ? 7 : 1
 

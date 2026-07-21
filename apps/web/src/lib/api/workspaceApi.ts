@@ -15,7 +15,7 @@ export const workspaceApi = {
     await delay(300)
     syncMockUserWithSession()
     const cols: TimetableColumn[] = []
-    const tz = "+03:00" // Use valid ISO 8601 offset
+    const tz = "+03:00"
 
     const ws = MOCK_WORKSPACES.find(w => w.id === workspaceId)
     const staff = ws?.staff?.find(s => s.user?.id === MOCK_USER.id)
@@ -60,7 +60,7 @@ export const workspaceApi = {
     const dateString = getTzDateString(date, wsTz)
     const todayString = getTzDateString(new Date(), wsTz)
     const isToday = dateString === todayString
-    const tz = "+03:00" // Use valid ISO 8601 offset
+    const tz = "+03:00"
 
     return ws.staff.map(member => {
       const schedule = STAFF_SCHEDULE_HOURS[member.id] ?? {}
@@ -73,7 +73,7 @@ export const workspaceApi = {
 
       return {
         id: member.id,
-        label: member.shortName || member.user?.shortName || "?",
+        label: member.firstName || member.user?.firstName || "?",
         subLabel: member.mainCategory.name,
         dateString: dateString,
         isToday,

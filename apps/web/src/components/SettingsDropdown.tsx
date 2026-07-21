@@ -21,7 +21,6 @@ export default function SettingsDropdown({
 
   const content = (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 z-50 pointer-events-auto bg-transparent"
         onClick={(e) => {
@@ -29,8 +28,6 @@ export default function SettingsDropdown({
           onClose()
         }}
       />
-
-      {/* Popover Card */}
       <div
         className="fixed z-50 w-72 bg-hub-surface border border-hub-border rounded-2xl shadow-xl p-3 flex flex-col gap-2.5 animate-in fade-in zoom-in-95 duration-200"
         style={
@@ -43,10 +40,7 @@ export default function SettingsDropdown({
         }
         onClick={(e) => e.stopPropagation()}
       >
-        {/* User Profile Block */}
         <UserProfileCard onClose={onClose} />
-
-        {/* Real Telegram Channel Link */}
         <div className="flex flex-col py-0.5">
           <a
             href="https://t.me/bliky_app"
@@ -66,8 +60,6 @@ export default function SettingsDropdown({
         </div>
 
         <div className="h-px bg-hub-border mx-3 my-0.5" />
-
-        {/* Theme Selector */}
         <div className="flex bg-hub-base p-1 rounded-xl border border-hub-border">
           <button
             type="button"
@@ -109,8 +101,6 @@ export default function SettingsDropdown({
             <span>Авто</span>
           </button>
         </div>
-
-        {/* Subtle Footer */}
         <div className="text-center pt-0.5 pb-0.5">
           <span className="text-[10px] font-medium text-hub-text-muted/50 tracking-wider">
             bliky v1.0

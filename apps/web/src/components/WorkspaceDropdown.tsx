@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom"
 import { Check, Home, Plus } from "lucide-react"
 import { createPortal } from "react-dom"
 import Avatar from "@/components/Avatar"
-import { usePermissions } from "@/lib/permissions"
+import { useWorkspaces } from "@/lib/permissions"
 
 interface WorkspaceDropdownProps {
   isOpen: boolean
@@ -10,8 +10,8 @@ interface WorkspaceDropdownProps {
   activeWorkspaceId?: string
   className?: string
   onSelect?: () => void
-  // When provided, dropdown is positioned via fixed coords (portal mode).
-  // Pass the DOMRect of the trigger button, captured synchronously on click.
+
+
   triggerRect?: DOMRect
 }
 
@@ -25,17 +25,14 @@ export default function WorkspaceDropdown({
 }: WorkspaceDropdownProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { workspaces, user } = usePermissions()
+  const { workspaces, user } = useWorkspaces()
   const isHub = location.pathname === "/"
 
   if (!isOpen) return null
 
   const content = (
     <>
-      {/* Backdrop */}
       <div className="fixed inset-0 z-[200]" onClick={onClose} />
-
-      {/* Dropdown */}
       <div
         className={`z-[201] bg-hub-surface border border-hub-border rounded-2xl shadow-xl py-2 flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${
           triggerRect ? "fixed w-64" : `absolute ${className}`
@@ -76,7 +73,7 @@ export default function WorkspaceDropdown({
                 Личная страница
               </span>
               <span className="text-hub-text-muted text-[11px] truncate">
-                {user?.shortName || user?.fullName || "Обзор"}
+                {user?.firstName || "Обзор"}
               </span>
             </div>
           </div>

@@ -77,7 +77,6 @@ export default function Timetable({
 
   return (
     <div className="flex flex-col bg-panel-surface w-full">
-      {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-panel-border-subtle bg-panel-surface z-20 flex-nowrap overflow-hidden">
         <h2 className="text-base font-semibold text-panel-text whitespace-nowrap pl-1 shrink min-w-0">
           {propHeaderTitle ? (
@@ -93,7 +92,6 @@ export default function Timetable({
         </h2>
 
         <div className="flex items-center gap-2">
-          {/* View mode */}
           <div className="flex items-center bg-panel-base rounded-xl border border-panel-border-subtle p-1 shrink-0">
             {(allowedModes as TimetableViewMode[]).map(m => (
               <button key={m} onClick={() => { onViewModeChange?.(m); setShowCal(false) }}
@@ -102,8 +100,6 @@ export default function Timetable({
               </button>
             ))}
           </div>
-
-          {/* Calendar toggle + nav */}
           <div className="flex items-center gap-0.5 shrink-0">
             <button onClick={() => setShowCal(v => !v)}
               className={`p-2 rounded-full transition-colors ${showCal ? "bg-panel-border-subtle text-panel-text" : "hover:bg-panel-surface-hover text-panel-text-muted"}`}>
@@ -118,8 +114,6 @@ export default function Timetable({
           </div>
         </div>
       </div>
-
-      {/* Mini calendar takes full space if open */}
       {showCal ? (
         <div className="flex-1 overflow-auto bg-panel-base p-6">
           <div className="max-w-md mx-auto">
@@ -155,11 +149,11 @@ export default function Timetable({
           </div>
         </div>
       ) : (
-        // Body (month or grid)
+
         viewMode === "month" ? (
           <div className="overflow-x-auto pb-4">
             {viewType === "team" && uniqueStaff.length > 0 ? (
-              // Team: rows=dates, cols=staff
+
               <table className="w-full text-sm border-collapse">
                 <thead className="sticky top-0 z-10 bg-panel-surface">
                   <tr>
@@ -169,7 +163,7 @@ export default function Timetable({
                         <div className="flex flex-row items-center justify-center gap-1.5">
                           <Avatar data={s} className="w-6 h-6 rounded-full text-[9px] shrink-0" />
                           <span className={`text-[10px] truncate max-w-20 ${currentUserId && s.user?.id === currentUserId ? "bg-panel-text text-panel-base px-1.5 py-0.5 rounded-full font-semibold" : "text-panel-text-muted font-medium"}`}>
-                            {s.shortName || s.user?.shortName}
+                            {s.firstName || s.user?.firstName || "Мастер"}
                           </span>
                         </div>
                       </th>
@@ -204,7 +198,7 @@ export default function Timetable({
                 </tbody>
               </table>
             ) : (
-              // Personal: full month calendar grid with counts
+
               <div className="p-4 max-w-2xl mx-auto">
                 {(() => {
                   const y = currentDate.getFullYear(), m = currentDate.getMonth()
@@ -247,7 +241,7 @@ export default function Timetable({
             )}
           </div>
         ) : (
-          // Normal timetable
+
           <div className="overflow-x-auto relative scrollbar-thin pb-4">
             <div className="flex min-w-full w-max">
               <div className="w-16 shrink-0 border-r border-panel-border-subtle bg-panel-surface sticky left-0 z-20">
@@ -280,7 +274,7 @@ export default function Timetable({
                         {viewType === "team" && col.staff && (
                           <Avatar data={col.staff} className="w-9 h-9 rounded-full text-xs shrink-0" />
                         )}
-                        <div className="flex flex-col items-start justify-center min-w-0">
+                        <div className="flex flex-col items-center justify-center min-w-0 text-center">
                           <span className={`text-sm truncate max-w-full ${col.isToday && viewType !== "team" ? "font-bold text-panel-text" : (viewType === "team" && currentUserId && col.staff?.user?.id === currentUserId) ? "bg-panel-text text-panel-base px-2 py-0.5 rounded-full font-semibold" : "font-semibold text-panel-text-muted"}`}>
                             {col.label}
                           </span>
@@ -313,15 +307,11 @@ export default function Timetable({
                         </div>
                         {colEvents.map(event => {
                           const top = t2px(formatTime(event.startDateTime, workspaceTimezone), gStart)
-                          const height = event.totalDurationMinutes * PPM
+                          const totalDurationMinutes = event.stages.reduce((acc, s) => acc + (s.durationMinutes || 0), 0)
+                          const height = totalDurationMinutes * PPM
                           const eventColor = event.color || (viewType === "personal"
                             ? event.workspace.color
                             : (event.staff?.color || event.staff?.user?.color))
-
-                          const knownDuration = event.stages.reduce((acc, s) => acc + (s.durationMinutes || 0), 0)
-                          const unknownCount = event.stages.filter(s => s.durationMinutes === undefined).length
-                          const remainingDuration = Math.max(0, event.totalDurationMinutes - knownDuration)
-                          const durationPerUnknown = unknownCount > 0 ? remainingDuration / unknownCount : 0
 
                           return (
                             <div key={event.id} onClick={(e) => { e.stopPropagation(); onEventClick?.(event); }}
@@ -332,11 +322,11 @@ export default function Timetable({
                               )}
                               <div className="w-1 shrink-0 flex flex-col h-full bg-panel-base/50">
                                 {event.stages.map(s => {
-                                  const duration = s.durationMinutes !== undefined ? s.durationMinutes : durationPerUnknown
+                                  const duration = s.durationMinutes || 0
                                   return (
                                     <div key={s.id}
                                       style={{
-                                        height: `${(duration / Math.max(1, event.totalDurationMinutes)) * 100}%`,
+                                        height: `${(duration / Math.max(1, totalDurationMinutes)) * 100}%`,
                                         ...(s.isActive ? { backgroundColor: eventColor } : { borderColor: eventColor })
                                       }}
                                       className={`w-full box-border ${s.isActive ? (eventColor ? "" : "bg-panel-text") : `border-l-4 border-dashed bg-transparent ${eventColor ? "" : "border-panel-border"}`}`} />

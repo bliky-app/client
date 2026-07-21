@@ -1,6 +1,6 @@
+import { useState } from "react"
 import type { User, Workspace, Member } from "@/types/models"
 
-/** Минимальный набор данных для отображения аватара */
 export interface AvatarDisplayData {
   id: string
   name?: string
@@ -32,22 +32,21 @@ export default function Avatar({ data, className = "" }: AvatarProps) {
   const color = "color" in target ? (target as { color?: string }).color : undefined
 
   let name = ""
-  if ("shortName" in target && target.shortName) {
-    name = target.shortName
-  } else if ("fullName" in target && target.fullName) {
-    name = target.fullName
-  } else if ("firstName" in target && target.firstName) {
-    name = `${target.firstName} ${target.lastName || ""}`.trim()
+  if ("firstName" in target && target.firstName) {
+    name = `${target.firstName} ${"lastName" in target && target.lastName ? target.lastName : ""}`.trim()
   } else if ("name" in target && target.name) {
     name = target.name
   }
 
-  if (avatarUrl) {
+  const [imgError, setImgError] = useState(false)
+
+  if (avatarUrl && !imgError) {
     return (
       <img
         src={avatarUrl}
         alt={name}
         className={`object-cover shrink-0 ${className}`}
+        onError={() => setImgError(true)}
       />
     )
   }

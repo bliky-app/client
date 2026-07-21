@@ -28,7 +28,6 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
 
   return (
     <div className="flex flex-col pt-2 pb-6">
-      {/* 1. Top Banner Card: Avatar Photo Left + ColorPicker Directly Right */}
       <div className="mb-6 bg-panel-surface border border-panel-border rounded-[32px] p-6 shadow-sm flex flex-row items-center gap-6">
         <div className="relative group shrink-0">
           <Avatar
@@ -75,10 +74,7 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
           />
         </div>
       </div>
-
-      {/* 2. Main Workspace Form Fields Card */}
       <div className="bg-panel-surface border border-panel-border rounded-[32px] p-6 shadow-sm flex flex-col gap-5">
-        {/* Workspace Name */}
         <div className="flex flex-col gap-1 relative">
           <Input
             label="Название"
@@ -96,14 +92,10 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
             {data.name.length}/32
           </span>
         </div>
-
-        {/* Categories Tag Input (Moved above Address) */}
         <div className="flex flex-col gap-2.5">
           <label className="text-xs font-semibold text-panel-text-muted">
             Категории и направления
           </label>
-
-          {/* Tag Input Container */}
           <div
             className="w-full bg-panel-base border border-panel-border-subtle rounded-2xl p-2.5 min-h-13 flex flex-wrap items-center gap-2 focus-within:border-panel-text-muted transition-colors cursor-text"
             onClick={() => inputRef.current?.focus()}
@@ -150,8 +142,6 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
               className="flex-1 min-w-30 bg-transparent outline-none text-sm text-panel-text placeholder:text-panel-text-subtle py-1 px-2"
             />
           </div>
-
-          {/* Suggestions */}
           {suggestedCategories.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-1">
               {suggestedCategories.map(cat => (
@@ -167,8 +157,6 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
             </div>
           )}
         </div>
-
-        {/* Address */}
         <Input
           theme="panel"
           label="Адрес"
@@ -179,8 +167,6 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
           icon={<MapPin className="w-4 h-4" />}
           inputClassName="py-3 text-base font-medium"
         />
-
-        {/* Timezone */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-panel-text-muted">
             Часовой пояс

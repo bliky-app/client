@@ -27,16 +27,16 @@ export function useHubOverviewLogic(data: HubOverviewData) {
   const clientDate = requestAt ? new Date(requestAt) : new Date()
   const { gender, isFormal } = user
 
-  const { canInAnyWorkspace } = usePermissions()
+  const { canInAnyWorkspace, workspaces, user: contextUser } = usePermissions()
   const canViewFinancials = canInAnyWorkspace("view_financials")
   const canViewAnalytics = canInAnyWorkspace("view_analytics")
-  const isAdmin = canInAnyWorkspace("is_administrator")
-  const isOwner = canInAnyWorkspace("is_owner")
+  
+  const isAdmin = workspaces.some((w) => w.staff?.some((s) => s.user?.id === contextUser?.id && s.isAdministrator))
+  const isOwner = workspaces.some((w) => w.staff?.some((s) => s.user?.id === contextUser?.id && s.isOwner))
 
   const greeting = getGreeting(clientDate, user.timezone)
   const remainingAppointments = todayAppointments - completeAppointments
 
-  // Texts depending on formality and gender
   const pronounGenitive = isFormal ? "вас" : "тебя"
   const pronounPossessive = isFormal ? "вашим" : "твоим"
   const pronounDative = isFormal ? "Вам" : "Тебе"
@@ -57,13 +57,11 @@ export function useHubOverviewLogic(data: HubOverviewData) {
   const verbCreate = isFormal ? "Создайте" : "Создай"
   const verbTell = isFormal ? "расскажите" : "расскажи"
 
-  // Formatted values
   const formattedExpectedRevenue = formatCurrency(expectedRevenue)
   const formattedTodayRevenue = formatCurrency(todayRevenue)
   const formattedWorkspaceRevenue = formatCurrency(totalWorkspaceRevenue)
   const formattedLastEndTime = lastAppointmentEndTime ? formatTime(lastAppointmentEndTime) : null
 
-  // Pluralized words
   const todayAppointmentsWord = pluralizeAppointment(todayAppointments)
   const todayAppointmentsWordGenitive = pluralizeAppointmentGenitive(todayAppointments)
   const workspacesDativeWord = pluralizeWorkspaceDative(totalWorkspaces)

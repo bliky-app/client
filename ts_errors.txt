@@ -1,0 +1,53 @@
+src/components/AppointmentDetailsSheet.tsx(165,36): error TS2339: Property 'shortName' does not exist on type 'Member'.
+src/components/AppointmentDetailsSheet.tsx(165,67): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/components/AppointmentDetailsSheet.tsx(165,92): error TS2339: Property 'fullName' does not exist on type 'Member'.
+src/components/CreateAppointmentSheet.tsx(380,39): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/components/CreateAppointmentSheet.tsx(380,60): error TS2339: Property 'fullName' does not exist on type 'User'.
+src/components/Timetable.tsx(172,32): error TS2339: Property 'shortName' does not exist on type 'Member'.
+src/components/Timetable.tsx(172,53): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/components/Timetable.tsx(316,48): error TS2339: Property 'totalDurationMinutes' does not exist on type 'Appointment'.
+src/components/Timetable.tsx(323,71): error TS2339: Property 'totalDurationMinutes' does not exist on type 'Appointment'.
+src/components/Timetable.tsx(339,82): error TS2339: Property 'totalDurationMinutes' does not exist on type 'Appointment'.
+src/components/UserProfileCard.tsx(48,19): error TS2339: Property 'fullName' does not exist on type 'User'.
+src/components/UserProfileCard.tsx(48,36): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/components/WorkspaceDropdown.tsx(79,24): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/components/WorkspaceDropdown.tsx(79,43): error TS2339: Property 'fullName' does not exist on type 'User'.
+src/hooks/auth/useAccountSetup.ts(71,5): error TS2322: Type '{ firstName: string; lastName: string; fullName: string; shortName: string; avatarUrl: string; color: string; gender: "male" | "female"; isFormal: boolean; timezone: string; id: string; phone: string; globalRole: Role; } | null' is not assignable to type 'User | null'.
+  Object literal may only specify known properties, and 'fullName' does not exist in type 'User'.
+src/hooks/components/useAppointmentDetailsSheet.ts(51,15): error TS2339: Property 'totalDurationMinutes' does not exist on type 'Appointment'.
+src/hooks/components/useAppointmentDetailsSheet.ts(97,7): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/hooks/components/useAppointmentDetailsSheet.ts(117,9): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/hooks/components/useAppointmentSheetLogic.ts(97,21): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/hooks/components/useAppointmentSheetLogic.ts(97,40): error TS2339: Property 'fullName' does not exist on type 'User'.
+src/hooks/components/useAppointmentSheetLogic.ts(103,30): error TS2339: Property 'shortName' does not exist on type 'Member'.
+src/hooks/components/useAppointmentSheetLogic.ts(104,36): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/hooks/components/useAppointmentSheetLogic.ts(105,36): error TS2339: Property 'fullName' does not exist on type 'User'.
+src/hooks/components/useAppointmentSheetLogic.ts(106,30): error TS2339: Property 'fullName' does not exist on type 'Member'.
+src/hooks/components/useAppointmentSheetLogic.ts(148,17): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/hooks/components/useAppointmentSheetLogic.ts(148,36): error TS2339: Property 'fullName' does not exist on type 'User'.
+src/hooks/settings/useUserSettings.ts(170,9): error TS2322: Type '{ firstName: string; lastName: string; fullName: string; shortName: string; avatarUrl: string; color: string; gender: "male" | "female"; isFormal: boolean; timezone: string; id: string; phone: string; globalRole: Role; } | null' is not assignable to type 'User | null'.
+  Object literal may only specify known properties, and 'fullName' does not exist in type 'User'.
+src/lib/api/authApi.ts(83,7): error TS2353: Object literal may only specify known properties, and 'fullName' does not exist in type 'User'.
+src/lib/api/mockData.ts(48,3): error TS2353: Object literal may only specify known properties, and 'fullName' does not exist in type 'User'.
+src/lib/api/mockData.ts(66,47): error TS2339: Property 'fullName' does not exist on type 'User'.
+src/lib/api/mockData.ts(68,21): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/lib/api/mockData.ts(87,3): error TS2353: Object literal may only specify known properties, and 'fullName' does not exist in type 'User'.
+src/lib/api/mockData.ts(92,3): error TS2353: Object literal may only specify known properties, and 'fullName' does not exist in type 'User'.
+src/lib/api/mockData.ts(97,3): error TS2353: Object literal may only specify known properties, and 'fullName' does not exist in type 'User'.
+src/lib/api/mockData.ts(102,3): error TS2353: Object literal may only specify known properties, and 'fullName' does not exist in type 'User'.
+src/lib/api/mockData.ts(107,3): error TS2353: Object literal may only specify known properties, and 'fullName' does not exist in type 'User'.
+src/lib/api/mockData.ts(264,5): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/lib/api/mockData.ts(280,5): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/lib/api/mockData.ts(297,5): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/lib/api/mockData.ts(311,5): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/lib/api/mockData.ts(327,5): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/lib/api/mockData.ts(343,5): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/lib/api/mockData.ts(359,5): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/lib/api/mockData.ts(375,5): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/lib/api/mockData.ts(392,5): error TS2353: Object literal may only specify known properties, and 'totalDurationMinutes' does not exist in type 'Appointment'.
+src/lib/api/mockData.ts(433,61): error TS2339: Property 'totalDurationMinutes' does not exist on type 'Appointment'.
+src/lib/api/workspaceApi.ts(76,23): error TS2339: Property 'shortName' does not exist on type 'Member'.
+src/lib/api/workspaceApi.ts(76,49): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/pages/hub/HubHeader.tsx(54,23): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/pages/workspace/WorkspaceSchedule.tsx(51,43): error TS2339: Property 'shortName' does not exist on type 'User'.
+src/pages/workspace/WorkspaceSchedule.tsx(51,74): error TS2339: Property 'fullName' does not exist on type 'User'.

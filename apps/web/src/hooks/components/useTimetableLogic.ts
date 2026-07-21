@@ -5,7 +5,7 @@ import type { Appointment, TimetableColumn, TimetableViewType } from "@/types/mo
 import type { TimetableViewMode } from "@/components/Timetable"
 import { formatTime, getTzDateString } from "@/lib/formatters"
 
-export const PPM = 1.5 // pixels per minute
+export const PPM = 1.5
 export const WEEKDAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
 export const MONTHS_RU = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"]
 

@@ -13,7 +13,6 @@ export function useAppointmentDetailsSheet(
   const { user } = useAuth()
   const isFormal = user?.isFormal ?? true
 
-  // Permission Checks
   const workspaceId = event?.workspace?.id
   const { can } = usePermissions(workspaceId)
 
@@ -22,10 +21,8 @@ export function useAppointmentDetailsSheet(
     event?.staff?.user?.id === user.id
   )
 
-  const hasManagePermission = can("manage_schedule")
-  const canEdit = hasManagePermission || isAssignedStaff
+  const canEdit = can("manage_all_schedule") || (isAssignedStaff && can("manage_own_schedule"))
 
-  // Form State (Always open in edit mode)
   const [startDateTime, setStartDateTime] = useState("")
   const [price, setPrice] = useState<number>(0)
   const [color, setColor] = useState("#ec4899")
@@ -48,7 +45,7 @@ export function useAppointmentDetailsSheet(
 
   const totalDuration = stages && stages.length > 0
     ? stages.reduce((acc, s) => acc + (s.durationMinutes || 0), 0)
-    : (event?.totalDurationMinutes || 60)
+    : (event?.stages?.reduce((acc, s) => acc + (s.durationMinutes || 0), 0) || 60)
 
   const handleStageDurationChange = (stageId: string, delta: number) => {
     setStages((prev) =>
@@ -71,7 +68,6 @@ export function useAppointmentDetailsSheet(
 
   const hasStageChanges = JSON.stringify(stages) !== JSON.stringify(event?.stages || [])
 
-  // Check if any field has actually been modified
   const hasChanges =
     event && (
       currentStartISO !== event.startDateTime ||
@@ -94,7 +90,6 @@ export function useAppointmentDetailsSheet(
       color,
       notes,
       stages,
-      totalDurationMinutes: totalDuration,
       isConfirmed,
     }
 
@@ -114,7 +109,6 @@ export function useAppointmentDetailsSheet(
         color,
         notes,
         stages,
-        totalDurationMinutes: totalDuration,
         isConfirmed: newStatus,
       })
     }

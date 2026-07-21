@@ -32,18 +32,7 @@ export default function Hub() {
 
   return (
     <div className="flex flex-col flex-1 bg-hub-base w-full overflow-y-auto">
-      {/*
-        CSS-Grid overlay: два слоя в одной grid-ячейке.
-
-        СЛОЙ 1 (z-0): sticky Header + Overview с невидимым клоном-спейсером.
-        Высота спейсера = высота Overview, что определяет момент открепления sticky-блока.
-
-        СЛОЙ 2 (z-20): невидимые клоны Header + Overview смещают белую панель вниз.
-        Панель съезжает поверх Overview, пока sticky держится, затем они скроллятся вместе.
-      */}
       <div className="grid grid-cols-1 items-start w-full">
-
-        {/* СЛОЙ 1 */}
         <div className="col-start-1 row-start-1 w-full flex flex-col self-start">
           <div className="sticky top-0 z-10 w-full flex flex-col bg-hub-base">
             <div className="px-6 pt-8 pb-4 w-full">
@@ -53,15 +42,11 @@ export default function Hub() {
               <HubOverview data={overview} />
             </div>
           </div>
-          {/* Спейсер — клон Overview, задаёт высоту sticky-контейнера */}
           <div className="px-6 pt-4 pb-10 w-full invisible pointer-events-none" aria-hidden="true">
             <HubOverview data={overview} />
           </div>
         </div>
-
-        {/* СЛОЙ 2 */}
         <div className="col-start-1 row-start-1 w-full flex flex-col z-20 pointer-events-none min-h-full">
-          {/* Пушеры — повторяют высоту sticky-блока */}
           <div className="w-full flex flex-col invisible" aria-hidden="true">
             <div className="px-6 pt-8 pb-4 w-full">
               <HubHeader user={overview.user} date={clientDate} />
@@ -70,11 +55,7 @@ export default function Hub() {
               <HubOverview data={overview} />
             </div>
           </div>
-
-          {/* Буфер 4px поглощается тенью панели (8px) */}
           <div className="h-1 w-full shrink-0" aria-hidden="true" />
-
-          {/* Белая панель */}
           <div className="pointer-events-auto flex-1 flex flex-col bg-panel-base rounded-t-[32px] pt-4 pb-4 px-4 sm:px-6 gap-6 shadow-[0_-8px_32px_rgba(0,0,0,0.18)]">
 
             <div className="w-12 h-1.5 bg-panel-border rounded-full mx-auto shrink-0 -mb-2" />

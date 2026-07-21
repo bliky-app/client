@@ -48,7 +48,7 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
               masters={
                 workspace.staff?.map((staffMember) => ({
                   id: staffMember.id,
-                  name: staffMember.user?.shortName || staffMember.user?.fullName || staffMember.id,
+                  name: staffMember.user?.firstName || staffMember.firstName || staffMember.id,
                   subtitle: staffMember.mainCategory?.name,
                   color: staffMember.user?.color,
                   avatarUrl: staffMember.user?.avatarUrl,

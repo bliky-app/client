@@ -57,8 +57,6 @@ export default function QuickActionsRow({
   return (
     <SectionCard title="Быстрая запись">
       <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-6 pb-6 pt-2 w-full scroll-pl-6 scrollbar-none">
-
-        {/* Новая запись */}
         <div
           onClick={() => onOpenForm({})}
           className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 active:scale-[0.97] transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle cursor-pointer group hover:border-panel-text-muted"
@@ -75,8 +73,6 @@ export default function QuickActionsRow({
             </button>
           </div>
         </div>
-
-        {/* В пространство (только Hub) */}
         {context === "hub" && (
           <div className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle relative group">
             <div className="flex justify-between items-start w-full gap-2 pointer-events-none">
@@ -94,8 +90,6 @@ export default function QuickActionsRow({
             </div>
           </div>
         )}
-
-        {/* К мастеру */}
         {context === "workspace_schedule" && showMasterCard && (
           <div className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle relative group">
             <div className="flex justify-between items-start w-full gap-2 pointer-events-none">
@@ -113,8 +107,6 @@ export default function QuickActionsRow({
             </div>
           </div>
         )}
-
-        {/* На услугу */}
         {context === "workspace_schedule" && (
           <div className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle relative group">
             <div className="flex justify-between items-start w-full gap-2 pointer-events-none">
@@ -133,8 +125,6 @@ export default function QuickActionsRow({
             </div>
           </div>
         )}
-
-        {/* Ко времени */}
         <DatePickerCard onOpenForm={onOpenForm} />
 
         <div className="w-px shrink-0" />

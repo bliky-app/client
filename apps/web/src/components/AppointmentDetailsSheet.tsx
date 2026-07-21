@@ -52,15 +52,11 @@ export default function AppointmentDetailsSheet({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
-      {/* Dark backdrop overlay */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
         onClick={onClose}
       />
-
-      {/* Bottom Slide-up Sheet */}
       <div className="relative w-full h-[calc(100svh-64px)] bg-panel-base rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.18)] flex flex-col animate-in slide-in-from-bottom duration-300 overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle bg-panel-base">
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
@@ -76,25 +72,17 @@ export default function AppointmentDetailsSheet({
             <X className="w-5 h-5" />
           </button>
         </div>
-
-        {/* Scroll Body */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="flex flex-col gap-4 max-w-2xl mx-auto w-full pb-32">
-
-            {/* 1. Client Info Card */}
             <AppointmentClientCard
               name={event.client.name}
               phone={event.client.phone}
             />
-
-            {/* 2. Status Card */}
             <AppointmentStatusCard
               isConfirmed={isConfirmed}
               canEdit={canEdit}
               onToggleConfirm={handleToggleConfirm}
             />
-
-            {/* 3. Date & Time Card */}
             <AppointmentDateCard
               startDateTime={currentStartISO}
               totalDurationMinutes={totalDuration}
@@ -102,8 +90,6 @@ export default function AppointmentDetailsSheet({
               isEditable={canEdit}
               onChange={setStartDateTime}
             />
-
-            {/* 3. Service Details & Price Input Card */}
             <div className="bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden p-5 flex flex-col gap-4">
               <div className="flex items-center gap-3">
                 <IconBox size="lg" shape="squircle">
@@ -118,8 +104,6 @@ export default function AppointmentDetailsSheet({
                   </span>
                 </div>
               </div>
-
-              {/* Stage timeline with completion stage & duration editing */}
               {stages && stages.length > 0 && (
                 <AppointmentStageTimeline
                   stages={stages}
@@ -131,8 +115,6 @@ export default function AppointmentDetailsSheet({
                   onStageDurationInput={handleStageDurationInput}
                 />
               )}
-
-              {/* Dedicated Prominent Price Section */}
               <div className="pt-3 border-t border-panel-border-subtle flex items-center justify-between">
                 <span className="text-xs font-semibold text-panel-text-muted">Стоимость услуги</span>
 
@@ -153,16 +135,13 @@ export default function AppointmentDetailsSheet({
                 )}
               </div>
             </div>
-
-            {/* 5. Workspace & Master Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Master */}
               {event.staff && (
                 <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center gap-3">
                   <Avatar data={event.staff} className="w-12 h-12 rounded-full text-sm shrink-0" />
                   <div className="flex flex-col min-w-0">
                     <span className="text-base font-semibold text-panel-text truncate">
-                      {event.staff.shortName || event.staff.user?.shortName || event.staff.fullName}
+                      {event.staff.firstName || event.staff.user?.firstName || "Мастер"}
                     </span>
                     <span className="text-xs text-panel-text-subtle truncate">
                       {event.staff.mainCategory.name}
@@ -170,8 +149,6 @@ export default function AppointmentDetailsSheet({
                   </div>
                 </div>
               )}
-
-              {/* Workspace */}
               {event.workspace && (
                 <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center gap-3">
                   <Avatar data={event.workspace} className="w-12 h-12 rounded-2xl text-sm shrink-0" />
@@ -188,8 +165,6 @@ export default function AppointmentDetailsSheet({
                 </div>
               )}
             </div>
-
-            {/* 6. Refined Color & Notes Unified Card */}
             <AppointmentNotesCard
               color={color}
               onColorChange={setColor}
@@ -197,8 +172,6 @@ export default function AppointmentDetailsSheet({
               onNotesChange={setNotes}
               isEditable={canEdit}
             />
-
-            {/* Read-Only Notice if user cannot edit */}
             {!canEdit && (
               <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-medium flex items-center gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
@@ -210,8 +183,6 @@ export default function AppointmentDetailsSheet({
 
           </div>
         </div>
-
-        {/* Footer (Sticky Save & Delete buttons) */}
         {canEdit && (
           <div className="px-6 py-4 shrink-0 border-t border-panel-border-subtle bg-panel-base">
             <div className="max-w-2xl mx-auto w-full flex items-center gap-3">

@@ -2,7 +2,7 @@ import { ChevronRight, User, Store, Layers, Plus, type LucideIcon } from "lucide
 import { useNavigate } from "react-router-dom"
 import type { Workspace, WorkspaceType } from "@/types/models"
 import Avatar from "@/components/Avatar"
-import { usePermissions } from "@/lib/permissions"
+import { useWorkspaces } from "@/lib/permissions"
 
 interface WorkspaceListProps {
   workspaces: Workspace[]
@@ -34,7 +34,7 @@ const WORKSPACE_CONFIGS: Record<WorkspaceType, WorkspaceConfig> = {
 
 export default function WorkspaceList({ workspaces }: WorkspaceListProps) {
   const navigate = useNavigate()
-  const { user } = usePermissions()
+  const { user } = useWorkspaces()
 
   return (
     <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-6 pb-6 pt-2 w-full scroll-pl-6 scrollbar-none">

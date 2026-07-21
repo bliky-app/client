@@ -41,21 +41,16 @@ export default function Step3Schedule({ data, onChange }: Step3ScheduleProps) {
                 !isLast ? "border-b border-panel-border-subtle" : ""
               } ${!enabled ? "opacity-50" : ""}`}
             >
-              {/* Toggle */}
               <Toggle
                 checked={enabled}
                 onChange={() => toggleDay(key)}
                 theme="panel"
               />
-
-              {/* Day — short name */}
               <span className={`text-base flex-1 min-w-0 font-semibold ${
                 enabled ? (isWeekend ? "text-red-500" : "text-panel-text") : "text-panel-text-muted"
               }`}>
                 {short}
               </span>
-
-              {/* Time inputs or "Выходной" */}
               {enabled && slot ? (
                 <div className="flex items-center gap-1.5 shrink-0">
                   <input

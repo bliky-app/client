@@ -1,19 +1,16 @@
 import { useState, useEffect, useRef } from "react"
 import { X, Search, ChevronDown, Check, Plus } from "lucide-react"
 import type { Workspace } from "@/types/models"
-import Avatar from "@/components/Avatar"
 import Button from "@workspace/ui/components/AppButton"
-import Input from "@/components/ui/Input"
-import PhoneInput from "@/components/ui/PhoneInput"
-import IconBox from "@workspace/ui/components/IconBox"
-import { formatDuration } from "@/lib/formatters"
+import Avatar from "@/components/Avatar"
 
 import AppointmentDateCard from "@/components/appointment/AppointmentDateCard"
-import AppointmentClientCard from "@/components/appointment/AppointmentClientCard"
 import AppointmentNotesCard from "@/components/appointment/AppointmentNotesCard"
-import AppointmentStageTimeline from "@/components/appointment/AppointmentStageTimeline"
+import AppointmentClientSelect from "@/components/appointment/AppointmentClientSelect"
+import AppointmentMasterSelect from "@/components/appointment/AppointmentMasterSelect"
+import AppointmentServiceSelect from "@/components/appointment/AppointmentServiceSelect"
 
-import { useAppointmentSheetLogic, MOCK_SERVICES } from "@/hooks/components/useAppointmentSheetLogic"
+import { useAppointmentSheetLogic, MOCK_SERVICES, MOCK_CLIENTS } from "@/hooks/components/useAppointmentSheetLogic"
 import type { SearchableSelectOption } from "@/hooks/components/useAppointmentSheetLogic"
 
 export type ServiceStage = {
@@ -29,6 +26,8 @@ export type AppointmentDraft = {
   clientId?: string
   clientName?: string
   clientPhone?: string
+  clientColor?: string
+  clientAvatarUrl?: string
   serviceId?: string
   customService?: {
     name: string
@@ -47,7 +46,7 @@ interface CreateAppointmentSheetProps {
   workspaces?: Workspace[]
 }
 
-function SearchableSelect({
+export function SearchableSelect({
   value,
   onChange,
   options,
@@ -62,7 +61,7 @@ function SearchableSelect({
   hideIcon = false
 }: {
   value: string | undefined
-  onChange: (val: string) => void
+  onChange: (value: string) => void
   options: SearchableSelectOption[]
   placeholder: string
   searchPlaceholder?: string
@@ -71,7 +70,7 @@ function SearchableSelect({
   customOptionLabel?: string
   autoOpen?: boolean
   searchValue?: string
-  onSearchChange?: (val: string) => void
+  onSearchChange?: (value: string) => void
   hideIcon?: boolean
 }) {
   const [isOpen, setIsOpen] = useState(autoOpen)
@@ -82,22 +81,28 @@ function SearchableSelect({
   const setSearch = onSearchChange ?? setInternalSearch
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false)
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
     }
     document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
   }, [])
 
-  const filtered = options.filter(o => o.name.toLowerCase().includes(search.toLowerCase()))
-  const selected = options.find(o => o.id === value) || (value === "custom" ? { id: "custom", name: customOptionLabel } : undefined)
+  const filtered = options.filter(option => option.name.toLowerCase().includes(search.toLowerCase()))
+  const selected = options.find(option => option.id === value) || (value === "custom" ? { id: "custom", name: customOptionLabel } : undefined)
 
   return (
     <div className="relative w-full" ref={ref}>
       <button
         type="button"
         disabled={disabled}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen)
+        }}
         className="w-full bg-panel-surface border border-panel-border-subtle rounded-xl px-4 py-3.5 flex items-center justify-between hover:border-panel-text-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed outline-none focus:border-panel-text shadow-sm"
       >
         <span className={`text-sm ${selected ? "text-panel-text font-medium" : "text-panel-text-subtle"}`}>
@@ -114,7 +119,9 @@ function SearchableSelect({
               <input
                 autoFocus
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={event => {
+                  setSearch(event.target.value)
+                }}
                 placeholder={searchPlaceholder}
                 className="w-full bg-panel-surface rounded-lg pl-9 pr-3 py-2 text-sm text-panel-text outline-none focus:border-panel-text border border-transparent transition-colors"
               />
@@ -123,7 +130,11 @@ function SearchableSelect({
           <div className="flex-1 overflow-y-auto p-1">
             {showCustomOption && (
               <button
-                onClick={() => { onChange("custom"); setIsOpen(false); setSearch("") }}
+                onClick={() => {
+                  onChange("custom")
+                  setIsOpen(false)
+                  setSearch("")
+                }}
                 className={`w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-surface transition-colors text-left group mb-1 ${value === "custom" ? "bg-panel-surface" : ""}`}
               >
                 <div className="w-10 h-10 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium group-hover:scale-105 transition-transform shrink-0">
@@ -141,33 +152,37 @@ function SearchableSelect({
               <div className="p-4 text-center text-sm text-panel-text-subtle">Ничего не найдено</div>
             ) : (
               <>
-                {filtered.map(opt => (
+                {filtered.map(option => (
                   <button
-                    key={opt.id}
-                    onClick={() => { onChange(opt.id); setIsOpen(false); setSearch("") }}
-                    className={`w-full flex items-center justify-between p-3 rounded-lg hover:bg-panel-surface transition-colors text-left ${value === opt.id ? "bg-panel-surface" : ""}`}
+                    key={option.id}
+                    onClick={() => {
+                      onChange(option.id)
+                      setIsOpen(false)
+                      setSearch("")
+                    }}
+                    className={`w-full flex items-center justify-between p-3 rounded-lg hover:bg-panel-surface transition-colors text-left ${value === option.id ? "bg-panel-surface" : ""}`}
                   >
                     <div className="flex items-center gap-3 pr-3 flex-1 min-w-0">
                       {!hideIcon && (
-                        opt.avatarUrl ? (
-                          <img src={opt.avatarUrl} alt={opt.name} className="w-8 h-8 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
+                        option.avatarUrl ? (
+                          <img src={option.avatarUrl} alt={option.name} className="w-8 h-8 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
                         ) : (
-                          (opt.subtitle || opt.color) ? (
+                          (option.subtitle || option.color) ? (
                             <div
                               className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-xs shrink-0 text-white"
-                              style={{ backgroundColor: opt.color || 'var(--panel-text)' }}
+                              style={{ backgroundColor: option.color || 'var(--panel-text)' }}
                             >
-                              {opt.name?.[0]?.toUpperCase()}
+                              {option.name?.[0]?.toUpperCase()}
                             </div>
                           ) : null
                         )
                       )}
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium text-panel-text">{opt.name}</span>
-                        {opt.subtitle && <span className="text-xs text-panel-text-muted">{opt.subtitle}</span>}
+                        <span className="text-sm font-medium text-panel-text">{option.name}</span>
+                        {option.subtitle && <span className="text-xs text-panel-text-muted">{option.subtitle}</span>}
                       </div>
                     </div>
-                    {value === opt.id && <Check className="w-4 h-4 text-panel-text" />}
+                    {value === option.id && <Check className="w-4 h-4 text-panel-text" />}
                   </button>
                 ))}
               </>
@@ -213,8 +228,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
       />
 
       <div className="relative w-full h-[calc(100svh-64px)] bg-panel-base rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.18)] flex flex-col animate-in slide-in-from-bottom duration-300 overflow-hidden">
-
-        {/* Header */}
         <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle bg-panel-base">
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
@@ -228,26 +241,25 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
             <X className="w-5 h-5" />
           </button>
         </div>
-
-        {/* Scroll Body */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="flex flex-col gap-4 max-w-2xl mx-auto w-full pb-32">
-
-            {/* 1. Date & Time Card */}
             <AppointmentDateCard
               startDateTime={draft.startDateTime}
               isEditable={true}
               onChange={(val) => setDraft({ ...draft, startDateTime: val })}
               placeholder={isFormal ? "Выберите время..." : "Выбери время..."}
             />
-
-            {/* 2. Workspace Select Card */}
             {isWorkspaceSearchActive ? (
               <SearchableSelect
                 value={draft.workspaceId}
                 onChange={val => {
-                  setDraft({ ...draft, workspaceId: val, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
+                  const ws = workspaces?.find(w => w.id === val)
+                  const onlyMaster = ws?.staff?.length === 1 ? ws.staff[0].id : undefined
+                  
+                  setDraft({ ...draft, workspaceId: val, masterId: onlyMaster, serviceId: undefined, stages: undefined, price: undefined })
                   setIsWorkspaceSearchActive(false)
+                  setIsMasterSearchActive(!onlyMaster)
+                  setIsServiceSearchActive(true)
                 }}
                 options={workspaces?.map(w => ({ id: w.id, name: w.name, subtitle: w.address, color: w.color, avatarUrl: w.avatarUrl })) || []}
                 placeholder={isFormal ? "Выберите пространство..." : "Выбери пространство..."}
@@ -255,13 +267,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
             ) : (
               <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  {selectedWorkspace?.avatarUrl ? (
-                    <img src={selectedWorkspace.avatarUrl} alt={selectedWorkspace.name} className="w-12 h-12 rounded-2xl object-cover shrink-0 border border-panel-border-subtle" />
-                  ) : (
-                    <IconBox size="lg" shape="squircle" className="bg-panel-base text-panel-text">
-                      {selectedWorkspace?.name?.[0]?.toUpperCase() || "П"}
-                    </IconBox>
-                  )}
+                  <Avatar data={selectedWorkspace} className="w-12 h-12 rounded-2xl text-base shrink-0 border border-panel-border-subtle" />
                   <div className="flex flex-col min-w-0">
                     <span className="text-base font-semibold text-panel-text truncate">{selectedWorkspace?.name}</span>
                     {selectedWorkspace?.address && (
@@ -282,219 +288,56 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                 )}
               </div>
             )}
-
-            {/* 3. Client & Master Section (active when workspace selected) */}
             {draft.workspaceId && (
               <>
-                {/* Client Selection */}
-                {isClientSearchActive ? (
-                  draft.clientId === "new_pending" ? (
-                    <div className="flex flex-col gap-4 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 mt-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="text-sm font-semibold text-panel-text">Новый клиент</h4>
-                        <button
-                          onClick={() => setDraft({ ...draft, clientId: undefined })}
-                          className="p-1.5 -mr-1.5 rounded-lg text-panel-text-muted hover:text-panel-text hover:bg-panel-base transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="flex flex-col gap-3">
-                        <Input
-                          theme="panel"
-                          type="text"
-                          placeholder="Имя"
-                          value={newClientName}
-                          onChange={e => setNewClientName(e.target.value)}
-                        />
-                        <PhoneInput
-                          theme="panel"
-                          placeholder="Телефон"
-                          value={newClientPhone}
-                          error={phoneError || undefined}
-                          onChange={(val) => {
-                            setNewClientPhone(val)
-                            setPhoneError("")
-                          }}
-                        />
-                        <Button
-                          variant="primary"
-                          theme="panel"
-                          fullWidth
-                          onClick={() => {
-                            if (newClientName && validatePhone(newClientPhone)) {
-                              setDraft({ ...draft, clientId: "new", clientName: newClientName, clientPhone: newClientPhone })
-                              setIsClientSearchActive(false)
-                            } else {
-                              setPhoneError("Некорректный номер")
-                            }
-                          }}
-                        >
-                          Сохранить клиента
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <SearchableSelect
-                      value={draft.clientId}
-                      onChange={val => {
-                        if (val === "custom") {
-                          setDraft({ ...draft, clientId: "new_pending" })
-                        } else {
-                          setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
-                          setIsClientSearchActive(false)
-                        }
-                      }}
-                      options={[{ id: "client-1", name: "Алина Смирнова", subtitle: "+7 (999) 123-45-67", color: "#ec4899" }]}
-                      placeholder={isFormal ? "Выберите клиента..." : "Выбери клиента..."}
-                      showCustomOption={true}
-                      customOptionLabel="Создать нового клиента"
-                      searchValue={clientSearch}
-                      onSearchChange={(val: string) => {
-                        setClientSearch(val)
-                        setNewClientName(val.replace(/[\d+()-]/g, "").trim())
-                        const phoneMatch = val.match(/[\d+()-]+/)
-                        if (phoneMatch) setNewClientPhone(phoneMatch[0])
-                      }}
-                    />
-                  )
-                ) : (
-                  <AppointmentClientCard
-                    name={draft.clientName || "Клиент"}
-                    phone={draft.clientPhone}
-                    onEdit={() => {
-                      setDraft({ ...draft, clientId: undefined, clientName: undefined, clientPhone: undefined })
-                      setIsClientSearchActive(true)
-                    }}
-                  />
-                )}
-
-                {/* Master & Workspace Grid layout matching Details */}
-                {isMasterSearchActive ? (
-                  <SearchableSelect
-                    value={draft.masterId}
-                    onChange={val => { setDraft({ ...draft, masterId: val }); setIsMasterSearchActive(false) }}
-                    options={
-                      selectedWorkspace?.staff?.map(s => ({
-                        id: s.id,
-                        name: s.user?.shortName || s.user?.fullName || "Мастер",
-                        subtitle: s.mainCategory?.name,
-                        avatarUrl: s.user?.avatarUrl,
-                        color: s.user?.color
-                      })) || [currentUserMasterOption]
-                    }
-                    placeholder={isFormal ? "Выберите мастера..." : "Выбери мастера..."}
-                  />
-                ) : (
-                  <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <Avatar
-                        data={selectedMasterUser}
-                        className="w-12 h-12 rounded-full text-sm shrink-0"
-                      />
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-base font-semibold text-panel-text truncate">{selectedMasterDisplayName}</span>
-                        {selectedMasterDisplaySubtitle && (
-                          <span className="text-xs text-panel-text-subtle truncate">{selectedMasterDisplaySubtitle}</span>
-                        )}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setDraft({ ...draft, masterId: undefined })
-                        setIsMasterSearchActive(true)
-                      }}
-                      className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
-                    >
-                      Изменить
-                    </button>
-                  </div>
-                )}
-
-                {/* Service Card Section */}
-                {isServiceSearchActive ? (
-                  <SearchableSelect
-                    value={draft.serviceId}
-                    onChange={val => {
-                      if (val === "custom") {
-                        setDraft({ ...draft, serviceId: "custom", customService: { name: "" }, price: undefined, stages: [{ id: "custom-stage-1", name: "Основной этап", durationMinutes: 60 }] })
-                      } else {
-                        const srv = MOCK_SERVICES.find(s => s.id === val)
-                        if (srv) setDraft({ ...draft, serviceId: srv.id, customService: undefined, price: srv.price, stages: srv.stages })
-                      }
-                      setIsServiceSearchActive(false)
-                    }}
-                    options={MOCK_SERVICES.map(s => ({ id: s.id, name: s.name, subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽` }))}
-                    placeholder={isFormal ? "Выберите услугу..." : "Выбери услугу..."}
-                    showCustomOption={true}
-                    hideIcon={true}
-                  />
-                ) : (
-                  <div className="bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden p-5 flex flex-col gap-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <IconBox size="lg" shape="squircle">
-                          {draft.serviceId === "custom" ? "У" : selectedService?.name?.[0]?.toUpperCase() || "У"}
-                        </IconBox>
-                        <div className="flex flex-col min-w-0 flex-1">
-                          {draft.serviceId === "custom" ? (
-                            <input
-                              autoFocus
-                              type="text"
-                              value={draft.customService?.name || ""}
-                              onChange={e => setDraft({ ...draft, customService: { name: e.target.value } })}
-                              placeholder="Свободная услуга"
-                              className="bg-transparent text-base font-semibold text-panel-text outline-none placeholder:text-panel-text-muted w-full"
-                            />
-                          ) : (
-                            <span className="text-base font-semibold text-panel-text truncate leading-tight">{selectedService?.name}</span>
-                          )}
-                          <span className="text-sm text-panel-text-muted truncate mt-0.5">
-                            {totalDuration > 0 ? formatDuration(totalDuration) : "Длительность не указана"}
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setDraft({ ...draft, serviceId: undefined, customService: undefined, stages: undefined, price: undefined })
-                          setIsServiceSearchActive(true)
-                        }}
-                        className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
-                      >
-                        Изменить
-                      </button>
-                    </div>
-
-                    {/* Interactive Stage Timeline with Completion Stage */}
-                    {draft.stages && draft.stages.length > 0 && (
-                      <AppointmentStageTimeline
-                        stages={draft.stages.map(stage => ({ ...stage, isActive: stage.isActive ?? true }))}
-                        startDateTime={draft.startDateTime || ""}
-                        totalDurationMinutes={totalDuration}
-                        isEditable={true}
-                        onStageDurationChange={handleStageDurationChange}
-                        onStageDurationInput={handleStageDurationInput}
-                      />
-                    )}
-
-                    {/* Dedicated Prominent Price Input Section */}
-                    <div className="pt-3 border-t border-panel-border-subtle flex items-center justify-between">
-                      <span className="text-xs font-semibold text-panel-text-muted">Стоимость услуги</span>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <input
-                          type="number"
-                          value={draft.price || ""}
-                          onChange={e => setDraft({ ...draft, price: Number(e.target.value) })}
-                          placeholder="0"
-                          className="w-32 bg-panel-base border border-panel-border-subtle rounded-xl px-3 py-2 text-base font-bold text-panel-text text-right outline-none focus:border-panel-text transition-colors"
-                        />
-                        <span className="text-base font-bold text-panel-text">₽</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Notes & Color Card */}
+                <AppointmentClientSelect
+                  draft={draft}
+                  setDraft={setDraft}
+                  isFormal={isFormal}
+                  isActive={isClientSearchActive}
+                  setIsActive={setIsClientSearchActive}
+                  search={clientSearch}
+                  setSearch={setClientSearch}
+                  newName={newClientName}
+                  setNewName={setNewClientName}
+                  newPhone={newClientPhone}
+                  setNewPhone={setNewClientPhone}
+                  phoneError={phoneError}
+                  setPhoneError={setPhoneError}
+                  validatePhone={validatePhone}
+                  options={MOCK_CLIENTS}
+                />
+                <AppointmentMasterSelect
+                  draft={draft}
+                  setDraft={setDraft}
+                  isFormal={isFormal}
+                  isActive={isMasterSearchActive}
+                  setIsActive={setIsMasterSearchActive}
+                  options={
+                    selectedWorkspace?.staff?.map(s => ({
+                      id: s.id,
+                      name: s.user?.firstName || "Мастер",
+                      subtitle: s.mainCategory?.name,
+                      avatarUrl: s.user?.avatarUrl,
+                      color: s.user?.color
+                    })) || [currentUserMasterOption]
+                  }
+                  selectedMasterDisplayName={selectedMasterDisplayName}
+                  selectedMasterDisplaySubtitle={selectedMasterDisplaySubtitle}
+                  selectedMasterUser={selectedMasterUser}
+                />
+                <AppointmentServiceSelect
+                  draft={draft}
+                  setDraft={setDraft}
+                  isFormal={isFormal}
+                  isActive={isServiceSearchActive}
+                  setIsActive={setIsServiceSearchActive}
+                  options={MOCK_SERVICES.map(s => ({ id: s.id, name: s.name, subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽` }))}
+                  selectedService={selectedService}
+                  totalDuration={totalDuration}
+                  handleStageDurationChange={handleStageDurationChange}
+                  handleStageDurationInput={handleStageDurationInput}
+                />
                 <AppointmentNotesCard
                   color={draft.color || "#ec4899"}
                   onColorChange={(c) => setDraft({ ...draft, color: c })}
@@ -506,8 +349,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
 
           </div>
         </div>
-
-        {/* Footer */}
         <div className="px-6 py-4 shrink-0 border-t border-panel-border-subtle bg-panel-base">
           <div className="max-w-2xl mx-auto w-full">
             <Button

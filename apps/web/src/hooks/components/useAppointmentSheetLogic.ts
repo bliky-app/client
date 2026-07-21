@@ -38,8 +38,12 @@ export const MOCK_SERVICES = [
 ]
 
 export const MOCK_MASTERS = [
-  { id: "me", name: "Я (Александр)", subtitle: "Топ-мастер", avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" },
+  { id: "me", name: "Я", subtitle: "Мастер", avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" },
   { id: "other", name: "Елена", subtitle: "Мастер", avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Elena" },
+]
+
+export const MOCK_CLIENTS = [
+  { id: "client-1", name: "Алина Смирнова", subtitle: "+7 (999) 123-45-67", color: "#ec4899" },
 ]
 
 export function useAppointmentSheetLogic(
@@ -49,7 +53,6 @@ export function useAppointmentSheetLogic(
 ) {
   const { user } = useAuth()
   const isFormal = user?.isFormal ?? true
-  const currentUserMasterId = user?.id || "me"
 
   const [draft, setDraft] = useState<AppointmentDraft>(initialData || {})
 
@@ -66,9 +69,16 @@ export function useAppointmentSheetLogic(
   useEffect(() => {
     if (isOpen) {
       const data = { ...(initialData || {}) }
-      if (!data.masterId) {
-        data.masterId = currentUserMasterId
+      
+      const initialWorkspace = workspaces?.find(w => w.id === data.workspaceId) || workspaces?.[0]
+      
+      if (!data.masterId && initialWorkspace && initialWorkspace.staff?.length === 1) {
+        data.masterId = initialWorkspace.staff[0].id
       }
+      if (!data.workspaceId && workspaces && workspaces.length === 1) {
+        data.workspaceId = workspaces[0].id
+      }
+      
       if (data.serviceId && !data.stages && data.serviceId !== "custom") {
         const srv = MOCK_SERVICES.find(s => s.id === data.serviceId)
         if (srv) {
@@ -85,30 +95,31 @@ export function useAppointmentSheetLogic(
       setIsMasterSearchActive(!data.masterId)
       setIsServiceSearchActive(!data.serviceId)
     }
-  }, [isOpen, initialData, currentUserMasterId])
+  }, [isOpen, initialData, workspaces, user])
 
   const selectedWorkspace = workspaces?.find(w => w.id === draft.workspaceId) || workspaces?.[0]
+  const currentUserMember = selectedWorkspace?.staff?.find(s => s.user?.id === user?.id)
+  const currentMasterId = currentUserMember?.id || user?.id || "me"
 
   const selectedMasterAsMember = selectedWorkspace?.staff?.find(s => s.id === draft.masterId)
   const selectedMasterAsOption = selectedMasterAsMember
     ? null
     : MOCK_MASTERS.find(m => m.id === draft.masterId) || {
-        id: currentUserMasterId,
-        name: user?.shortName || user?.fullName || "Я (Александр)",
-        subtitle: "Топ-мастер",
+        id: currentMasterId,
+        name: user?.firstName || "Я",
+        subtitle: currentUserMember?.mainCategory?.name || "Мастер",
         avatarUrl: user?.avatarUrl,
+        color: user?.color,
       }
 
   const selectedMasterDisplayName = selectedMasterAsMember
-    ? selectedMasterAsMember.shortName ||
-      selectedMasterAsMember.user?.shortName ||
-      selectedMasterAsMember.user?.fullName ||
-      selectedMasterAsMember.fullName ||
+    ? selectedMasterAsMember.firstName ||
+      selectedMasterAsMember.user?.firstName ||
       "—"
     : selectedMasterAsOption?.name || "—"
 
   const selectedMasterDisplaySubtitle = selectedMasterAsMember
-    ? selectedMasterAsMember.mainCategory.name
+    ? selectedMasterAsMember.mainCategory?.name
     : selectedMasterAsOption?.subtitle || ""
 
   const selectedMasterUser = selectedMasterAsMember
@@ -144,9 +155,9 @@ export function useAppointmentSheetLogic(
   const totalDuration = draft.stages ? draft.stages.reduce((acc, s) => acc + s.durationMinutes, 0) : 0
 
   const currentUserMasterOption: SearchableSelectOption = {
-    id: currentUserMasterId,
-    name: user?.shortName || user?.fullName || "Я (Александр)",
-    subtitle: "Топ-мастер",
+    id: currentMasterId,
+    name: user?.firstName || "Я",
+    subtitle: currentUserMember?.mainCategory?.name || "Мастер",
     avatarUrl: user?.avatarUrl,
     color: user?.color,
   }

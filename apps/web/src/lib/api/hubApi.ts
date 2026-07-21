@@ -83,7 +83,6 @@ export const hubApi = {
     return cols
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getTimetableEvents: async (_startDate?: Date): Promise<Appointment[]> => {
     await delay(600)
     return MOCK_APPOINTMENTS.filter(e => e.staff.user?.id === MOCK_USER.id)

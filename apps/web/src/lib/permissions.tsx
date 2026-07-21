@@ -28,6 +28,14 @@ export function PermissionsProvider({
   )
 }
 
+export function useWorkspaces() {
+  const context = useContext(PermissionsContext)
+  if (!context) {
+    throw new Error("useWorkspaces must be used within a PermissionsProvider")
+  }
+  return { workspaces: context.workspaces, user: context.user }
+}
+
 export function usePermissions(workspaceId?: string) {
   const context = useContext(PermissionsContext)
   if (!context) {
@@ -40,12 +48,10 @@ export function usePermissions(workspaceId?: string) {
     return (action: Permission): boolean => {
       if (!user) return false
 
-      // Check global permissions first
       if (user.globalRole.permissions.includes(action)) {
         return true
       }
 
-      // If a specific workspace is provided, check permissions for that workspace
       if (workspaceId) {
         const workspace = workspaces.find((w) => w.id === workspaceId)
         if (!workspace || !workspace.staff) return false
@@ -68,7 +74,6 @@ export function usePermissions(workspaceId?: string) {
         return true
       }
 
-      // Check if the user has the permission in ANY workspace
       return workspaces.some((workspace) => {
         if (!workspace.staff) return false
         const staffMember = workspace.staff.find((s) => s.user?.id === user.id)
@@ -77,7 +82,13 @@ export function usePermissions(workspaceId?: string) {
     }
   }, [user, workspaces])
 
+  // Backward compatibility: we still return user and workspaces, but ideally they should use useWorkspaces()
   return { can, canInAnyWorkspace, user, workspaces }
+}
+
+export function useWorkspacePermissions(workspaceId: string) {
+  const { can, user } = usePermissions(workspaceId)
+  return { can, user }
 }
 
 export function RequirePermission({

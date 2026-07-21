@@ -24,7 +24,7 @@ function RequireAuth({ children, requireName = true }: { children: React.ReactNo
   if (!user) {
     return <Navigate to="/auth" replace />
   }
-  // If user is logged in but hasn't set their name, force setup
+
   if (requireName && (!user.firstName || !user.lastName)) {
     return <Navigate to="/setup" replace />
   }
@@ -82,7 +82,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5,
     },
   },
 })

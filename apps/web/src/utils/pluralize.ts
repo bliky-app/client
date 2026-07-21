@@ -11,7 +11,6 @@ export function pluralize(count: number, forms: [string, string, string]): strin
   return forms[caseIndex]
 }
 
-// --- Доменные обёртки ---
 
 export function pluralizeAppointment(count: number): string {
   return pluralize(count, ["запись", "записи", "записей"])

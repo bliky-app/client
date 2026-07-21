@@ -28,9 +28,7 @@ export default function ModalSheetLayout({
 
   return (
     <div className="flex flex-col flex-1 bg-hub-base h-svh overflow-hidden">
-      {/* White wizard panel */}
       <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] mt-16 shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
-        {/* Header */}
         <div className="flex items-center gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle">
           {showBack && (
             <button
@@ -61,15 +59,9 @@ export default function ModalSheetLayout({
             <X className="w-5 h-5" />
           </button>
         </div>
-
-        {/* Optional Progress bar */}
         {progressBar}
-
-        {/* Content Body */}
         <div className="flex-1 overflow-y-auto px-6 pt-6 relative flex flex-col">
           {children}
-
-          {/* Footer (e.g. Sticky Save Bar / Step Buttons) */}
           {footer}
         </div>
       </div>

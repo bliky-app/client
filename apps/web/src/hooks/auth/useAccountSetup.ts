@@ -68,8 +68,6 @@ export function useAccountSetup() {
     ...user,
     firstName,
     lastName,
-    fullName: `${firstName} ${lastName}`.trim(),
-    shortName: firstName || lastName || "Пользователь",
     avatarUrl,
     color,
     gender,

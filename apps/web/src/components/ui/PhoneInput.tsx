@@ -16,19 +16,16 @@ interface PhoneInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElemen
 export function formatPhoneNumber(val: string): string {
   if (!val) return ""
 
-  // Extract all numeric digits
   let digits = val.replace(/\D/g, "")
 
   if (digits.length === 0) {
     return ""
   }
 
-  // If user typed 7 or 8 at start, strip it to get subscriber number
   if (digits.startsWith("7") || digits.startsWith("8")) {
     digits = digits.slice(1)
   }
 
-  // Limit to 10 subscriber digits
   digits = digits.slice(0, 10)
 
   if (digits.length === 0) {

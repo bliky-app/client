@@ -103,12 +103,10 @@ export default function SearchableSelect({
 
       {isOpen && rect && createPortal(
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 z-50 pointer-events-auto"
             onClick={(e) => { e.stopPropagation(); close() }}
           />
-          {/* Dropdown */}
           <div
             style={{
               top: rect.bottom + 8,

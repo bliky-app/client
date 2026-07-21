@@ -34,7 +34,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: authApi.getCurrentUser,
   })
 
-  // Only fetch workspaces if user is authenticated
   const { data: workspaces = [], isLoading: isWorkspacesLoading } = useQuery({
     queryKey: ["workspaces"],
     queryFn: hubApi.getWorkspaces,

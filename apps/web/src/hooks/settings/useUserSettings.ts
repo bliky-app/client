@@ -27,7 +27,6 @@ export function useUserSettings() {
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // --- Форма профиля ---
   const [firstName, setFirstName] = useState(user?.firstName || "")
   const [lastName, setLastName] = useState(user?.lastName || "")
   const [isFormal, setIsFormal] = useState(user?.isFormal ?? true)
@@ -40,7 +39,6 @@ export function useUserSettings() {
   const [savedSuccess, setSavedSuccess] = useState(false)
   const [profileError, setProfileError] = useState("")
 
-  // --- Форма смены пароля ---
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
@@ -167,8 +165,6 @@ export function useUserSettings() {
         ...user,
         firstName,
         lastName,
-        fullName: `${firstName} ${lastName}`.trim(),
-        shortName: firstName || lastName || "Пользователь",
         avatarUrl,
         color,
         gender,
@@ -178,11 +174,11 @@ export function useUserSettings() {
     : null
 
   return {
-    // Данные
+
     user,
     draftUser,
     fileInputRef,
-    // Поля профиля
+
     firstName, setFirstName,
     lastName, setLastName,
     isFormal, setIsFormal,
@@ -190,16 +186,16 @@ export function useUserSettings() {
     color, setColor,
     timezone, setTimezone,
     avatarUrl,
-    // Статус сохранения
+
     isSaving,
     savedSuccess,
     profileError, setProfileError,
     canSaveProfile,
-    // Аватар
+
     handleAvatarFileChange,
     handleRemoveAvatar,
     handlePickAvatar,
-    // Смена пароля
+
     showPasswordForm,
     handleTogglePasswordForm,
     currentPassword, setCurrentPassword,
@@ -209,7 +205,7 @@ export function useUserSettings() {
     passwordError, setPasswordError,
     passwordSuccess,
     handlePasswordSubmit,
-    // Профиль и сессия
+
     handleSaveProfile,
     handleLogout,
   }

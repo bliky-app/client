@@ -23,7 +23,6 @@ export interface Service {
   categoryId: string
   allowedStaffIds: string[]
   price: number
-  totalDurationMinutes: number
   stages: AppointmentStage[]
 }
 
@@ -31,14 +30,12 @@ export interface CustomService {
   id: string
   name: string
   price: number
-  totalDurationMinutes: number
   stages: AppointmentStage[]
 }
 
 export interface Appointment {
   id: string
   startDateTime: string
-  totalDurationMinutes: number
   color?: string
   client: Client
   service?: Service

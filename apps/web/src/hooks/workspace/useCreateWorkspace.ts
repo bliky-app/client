@@ -5,9 +5,9 @@ import type { WorkspaceType, WorkspaceSchedule } from "@/types/models"
 import { getDefaultTimezone } from "@/lib/formatters"
 
 export interface CreateWorkspaceFormData {
-  // Step 1
+
   type: WorkspaceType | null
-  // Step 2
+
   name: string
   category: string
   additionalCategories: string[]
@@ -16,7 +16,7 @@ export interface CreateWorkspaceFormData {
   avatarUrl?: string
   address: string
   timezone: string
-  // Step 3
+
   schedule: WorkspaceSchedule
 }
 

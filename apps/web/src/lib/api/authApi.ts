@@ -16,7 +16,7 @@ export const getSession = (): SessionData => {
       return JSON.parse(rawData)
     }
   } catch {
-    // Игнорируем ошибки парсинга localStorage
+
   }
   return { user: null }
 }
@@ -52,6 +52,8 @@ export const authApi = {
     const newUser: User = {
       id: "u-" + Date.now(),
       phone,
+      firstName: "",
+      lastName: "",
       isFormal: true,
       gender: "male",
       color: "#ec4899",
@@ -80,8 +82,6 @@ export const authApi = {
       ...session.user,
       firstName: data.firstName,
       lastName: data.lastName,
-      fullName: `${data.firstName} ${data.lastName}`.trim(),
-      shortName: data.firstName,
       isFormal: data.isFormal,
       gender: data.gender ?? session.user.gender ?? "female",
       avatarUrl: data.avatarUrl ?? session.user.avatarUrl,

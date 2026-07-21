@@ -8,10 +8,12 @@ export interface StaffCategory {
 export interface Member {
   id: string
   user?: User
-  fullName?: string
-  shortName?: string
+  firstName?: string
+  lastName?: string
   color?: string
   workspaceRole: Role
+  isOwner?: boolean
+  isAdministrator?: boolean
   mainCategory: StaffCategory
   additionalCategories: StaffCategory[]
 }

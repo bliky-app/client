@@ -14,8 +14,7 @@ interface HubHeaderProps {
 export default function HubHeader({ user, date }: HubHeaderProps) {
   const [showWorkspaceDropdown, setShowWorkspaceDropdown] = useState(false)
   const [showSettingsDropdown, setShowSettingsDropdown] = useState(false)
-  
-  // Capture rects for portal positioning
+
   const [workspaceTriggerRect, setWorkspaceTriggerRect] = useState<DOMRect | undefined>()
   const [settingsTriggerRect, setSettingsTriggerRect] = useState<DOMRect | undefined>()
 
@@ -51,7 +50,7 @@ export default function HubHeader({ user, date }: HubHeaderProps) {
           <div className="flex flex-col min-w-0 pr-2">
             <div className="flex items-center gap-1.5">
               <span className="text-hub-text font-semibold text-lg leading-tight truncate group-hover:text-hub-text-muted transition-colors">
-                {user.shortName}
+                {user.firstName}
               </span>
               <ChevronDown className={`w-4 h-4 text-hub-text-subtle transition-transform ${showWorkspaceDropdown ? "rotate-180" : ""}`} />
             </div>

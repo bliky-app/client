@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react"
 import { useNavigate, useParams, useLocation } from "react-router-dom"
 import { useAuth } from "@/lib/AuthProvider"
-import { usePermissions } from "@/lib/permissions"
+import { useWorkspaces } from "@/lib/permissions"
 import Avatar from "@/components/Avatar"
 
 interface UserProfileCardProps {
@@ -12,14 +12,13 @@ interface UserProfileCardProps {
 
 export default function UserProfileCard({ onClose, workspaceId: propWorkspaceId, className = "" }: UserProfileCardProps) {
   const { user } = useAuth()
-  const { workspaces } = usePermissions()
+  const { workspaces } = useWorkspaces()
   const navigate = useNavigate()
   const params = useParams<{ id?: string }>()
   const location = useLocation()
 
   if (!user) return null
 
-  // Determine active workspace ID if inside a workspace page
   const activeWsId = propWorkspaceId || params.id || (location.pathname.startsWith("/workspace/") ? location.pathname.split("/")[2] : undefined)
   const activeWorkspace = workspaces.find(w => w.id === activeWsId)
   const staffMember = activeWorkspace?.staff?.find(s => s.user?.id === user.id)
@@ -45,7 +44,7 @@ export default function UserProfileCard({ onClose, workspaceId: propWorkspaceId,
         />
         <div className="flex flex-col min-w-0 flex-1">
           <span className="text-sm font-medium text-hub-text truncate">
-            {user.fullName || user.shortName || "Пользователь"}
+            {user.firstName ? `${user.firstName} ${user.lastName}`.trim() : "Пользователь"}
           </span>
           <span className="text-[11px] text-hub-text-muted truncate">
             {subtitleText}

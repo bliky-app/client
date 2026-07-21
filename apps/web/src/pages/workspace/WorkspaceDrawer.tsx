@@ -21,20 +21,20 @@ interface SectionConfig {
   id: WorkspaceSectionId
   label: string
   icon: LucideIcon
-  permission: Permission | null
+  permission: Permission | Permission[] | null
 }
 
 const SECTIONS: SectionConfig[] = [
   { id: "overview", label: "Обзор", icon: LayoutDashboard, permission: null },
-  { id: "schedule", label: "Расписание", icon: Calendar, permission: "view_global_schedule" },
+  { id: "schedule", label: "Расписание", icon: Calendar, permission: ["view_all_schedule", "view_own_schedule"] },
   { id: "appointments", label: "Записи", icon: ClipboardList, permission: null },
   { id: "work_schedule", label: "График", icon: Clock, permission: null },
   { id: "services", label: "Услуги", icon: List, permission: null },
   { id: "staff", label: "Сотрудники", icon: Users, permission: "manage_staff" },
   { id: "resources", label: "Ресурсы", icon: Package, permission: "manage_services" },
   { id: "analytics", label: "Аналитика", icon: BarChart2, permission: "view_analytics" },
-  { id: "clients", label: "Клиенты", icon: UserCheck, permission: null },
-  { id: "settings", label: "Настройки", icon: Settings, permission: "manage_workspace" },
+  { id: "clients", label: "Клиенты", icon: UserCheck, permission: ["view_all_clients", "view_own_clients"] },
+  { id: "settings", label: "Настройки", icon: Settings, permission: "manage_workspace_settings" },
 ]
 
 interface WorkspaceDrawerProps {
@@ -56,20 +56,21 @@ export default function WorkspaceDrawer({
 
   const visibleSections = SECTIONS.filter((section) => {
     if ((section.id === "staff" || section.id === "schedule") && workspace.type === "individual") return false
-    return section.permission === null || can(section.permission)
+    if (section.permission === null) return true
+    if (Array.isArray(section.permission)) {
+      return section.permission.some((p) => can(p))
+    }
+    return can(section.permission)
   })
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={`fixed inset-0 z-40 bg-overlay/60 backdrop-blur-sm transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
       />
-
-      {/* Drawer */}
       <div
         className={`fixed top-0 right-0 bottom-0 z-50 w-72 bg-hub-base flex flex-col transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
@@ -128,8 +129,6 @@ export default function WorkspaceDrawer({
             })}
           </div>
         </nav>
-
-        {/* User profile at bottom */}
         <div className="p-3 pb-6 flex flex-col mt-auto pt-3 border-t border-hub-border">
           <UserProfileCard onClose={onClose} />
         </div>
