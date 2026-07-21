@@ -130,14 +130,26 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
               onClick={() => onChange({ color })}
               className={`w-9 h-9 rounded-full transition-all duration-150 active:scale-90 ${
                 data.color === color
-                  ? "ring-2 ring-offset-2 ring-panel-text scale-110"
+                  ? "ring-2 ring-offset-1 ring-panel-text scale-105"
                   : "hover:scale-105"
               }`}
               style={{ backgroundColor: color }}
             />
           ))}
-          {/* Custom color */}
-          <label className="w-9 h-9 rounded-full border-2 border-dashed border-panel-border cursor-pointer flex items-center justify-center hover:border-panel-text-muted transition-colors overflow-hidden relative">
+
+          {/* Render custom color if selected */}
+          {!ACCENT_COLORS.includes(data.color) && (
+            <button
+              className="w-9 h-9 rounded-full transition-all duration-150 active:scale-90 ring-2 ring-offset-1 ring-panel-text scale-105 relative flex items-center justify-center"
+              style={{ backgroundColor: data.color }}
+            >
+              <span className="absolute inset-0 rounded-full border border-black/10 mix-blend-overlay"></span>
+              <div className="w-2 h-2 rounded-full bg-white/80 shadow-sm mix-blend-overlay"></div>
+            </button>
+          )}
+
+          {/* Custom color picker (+) */}
+          <label className="w-9 h-9 rounded-full border-2 border-dashed border-panel-border cursor-pointer flex items-center justify-center hover:border-panel-text-muted transition-colors overflow-hidden relative active:scale-95">
             <span className="text-xs text-panel-text-subtle select-none">+</span>
             <input
               type="color"
@@ -152,28 +164,28 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
       {/* Categories Tag Input */}
       <div className="flex flex-col gap-3">
         <label className="text-xs font-semibold text-panel-text-subtle uppercase tracking-wider">
-          Направления и услуги
+          Категории и направления
         </label>
-        
+
         {/* Input container */}
-        <div 
+        <div
           className="w-full bg-panel-surface border border-panel-border rounded-2xl p-2 min-h-[52px] flex flex-wrap items-center gap-2 focus-within:border-panel-text-muted transition-colors cursor-text"
           onClick={() => inputRef.current?.focus()}
         >
           {selectedCategories.map((cat, idx) => {
             const isMain = idx === 0
             return (
-              <div 
-                key={cat} 
+              <div
+                key={cat}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium animate-in zoom-in-95 duration-150 ${
-                  isMain 
-                    ? "bg-panel-text text-panel-base" 
+                  isMain
+                    ? "bg-panel-text text-panel-base"
                     : "bg-panel-border-subtle text-panel-text-muted-dark"
                 }`}
               >
                 {isMain && <Star className="w-3.5 h-3.5" fill="currentColor" />}
                 <span>{cat}</span>
-                <button 
+                <button
                   onClick={(e) => {
                     e.stopPropagation()
                     removeCategory(cat)
@@ -185,7 +197,7 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
               </div>
             )
           })}
-          
+
           <input
             ref={inputRef}
             type="text"
