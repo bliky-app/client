@@ -10,7 +10,7 @@ import EventPopup from "@/components/EventPopup"
 import { hubApi } from "@/lib/api/hubApi"
 import { MOCK_USER } from "@/lib/api/mockData"
 import type { User, Appointment } from "@/types/models"
-import type { QuickActionType } from "@/components/QuickActionsRow"
+import type { QuickActionDraft } from "@/components/QuickActionsRow"
 import CreateAppointmentSheet, { type AppointmentDraft } from "@/components/CreateAppointmentSheet"
 
 export default function Hub() {
@@ -35,16 +35,8 @@ export default function Hub() {
   const [isAppointmentSheetOpen, setIsAppointmentSheetOpen] = useState(false)
   const [appointmentDraft, setAppointmentDraft] = useState<AppointmentDraft | undefined>(undefined)
 
-  const handleQuickAction = (action: QuickActionType) => {
-    // Determine draft context based on action
-    const draft: AppointmentDraft = {}
-    if (action === "master") {
-      // Just open to pick master if allowed
-    } else if (action === "time") {
-      // Open to pick time (would pre-fill current date/time ideally)
-    } else if (action === "service") {
-      // Open to pick service
-    }
+  const handleOpenForm = (draft: QuickActionDraft) => {
+    // Map QuickActionDraft to AppointmentDraft (they are basically the same for these fields)
     setAppointmentDraft(draft)
     setIsAppointmentSheetOpen(true)
   }
@@ -129,7 +121,7 @@ export default function Hub() {
 
             <div className="w-12 h-1.5 bg-panel-border rounded-full mx-auto shrink-0 -mb-2" />
 
-            <QuickActionsRow onAction={handleQuickAction} />
+            <QuickActionsRow context="hub" onOpenForm={handleOpenForm} />
 
             {/* Workspaces */}
             <div className="flex flex-col bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden shrink-0">
