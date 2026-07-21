@@ -1,48 +1,47 @@
 import { User, Store } from "lucide-react"
 import type { WorkspaceType } from "@/types/models"
+import { usePermissions } from "@/lib/permissions"
 
 interface Step1TypeProps {
   value: WorkspaceType | null
   onChange: (type: WorkspaceType) => void
 }
 
-interface TypeOption {
-  type: WorkspaceType
-  label: string
-  tagline: string
-  description: string
-  icon: typeof User
-  bullets: string[]
-}
-
-const TYPE_OPTIONS: TypeOption[] = [
-  {
-    type: "individual",
-    label: "Частный мастер",
-    tagline: "Для себя",
-    icon: User,
-    description: "Для тех, кто работает на себя. Простое расписание, клиенты и услуги в одном месте.",
-    bullets: [
-      "Простое управление расписанием",
-      "Ваша собственная база клиентов",
-      "Идеально для частной практики",
-    ],
-  },
-  {
-    type: "shared",
-    label: "Команда / Салон",
-    tagline: "Для команды",
-    icon: Store,
-    description: "Общее пространство для команды мастеров. Управление расписанием всего салона, ролями и доступами.",
-    bullets: [
-      "Расписание нескольких мастеров",
-      "Разделение ролей и прав доступа",
-      "Общая клиентская база",
-    ],
-  },
-]
-
 export default function Step1Type({ value, onChange }: Step1TypeProps) {
+  const { user } = usePermissions()
+  const isFormal = user?.isFormal ?? true
+
+
+
+  const TYPE_OPTIONS = [
+    {
+      type: "individual" as WorkspaceType,
+      label: "Индивидуальное",
+      tagline: "Для себя",
+      icon: User,
+      description: isFormal 
+        ? "Вы работаете как самостоятельный мастер. Простое расписание, клиенты и услуги в одном месте."
+        : "Ты работаешь как самостоятельный мастер. Простое расписание, клиенты и услуги в одном месте.",
+      bullets: [
+        "Простое управление расписанием",
+        "Ваша собственная база клиентов",
+        "Идеально для частной практики",
+      ],
+    },
+    {
+      type: "shared" as WorkspaceType,
+      label: "Совместное",
+      tagline: "Для команды",
+      icon: Store,
+      description: "Общее пространство для команды мастеров. Управление расписанием всего салона, ролями и доступами.",
+      bullets: [
+        "Расписание нескольких мастеров",
+        "Разделение ролей и прав доступа",
+        "Общая клиентская база",
+      ],
+    },
+  ]
+
   return (
     <div className="flex flex-col gap-4 py-2">
       {TYPE_OPTIONS.map(option => {
