@@ -33,7 +33,18 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
 
   const updateTime = (day: number, field: "start" | "end", value: string) => {
     const updated: WorkspaceSchedule = { ...schedule }
-    updated[day] = [{ ...updated[day][0], [field]: value }]
+    const currentSlot = updated[day][0]
+    
+    let newStart = field === "start" ? value : currentSlot.start
+    let newEnd = field === "end" ? value : currentSlot.end
+
+    // Validation: start cannot be > end
+    if (newStart > newEnd) {
+      if (field === "start") newEnd = newStart
+      else newStart = newEnd
+    }
+
+    updated[day] = [{ start: newStart, end: newEnd }]
     onChange({ schedule: updated })
   }
 
@@ -98,7 +109,7 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
                         type="time"
                         value={slot.start}
                         onChange={e => updateTime(key, "start", e.target.value)}
-                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text text-center outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px] [&::-webkit-calendar-picker-indicator]:hidden"
+                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text text-center outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:w-0 [&::-webkit-inner-spin-button]:hidden [&::-webkit-clear-button]:hidden"
                       />
                     </div>
                     <span className="text-panel-text-subtle text-sm font-medium">—</span>
@@ -107,7 +118,7 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
                         type="time"
                         value={slot.end}
                         onChange={e => updateTime(key, "end", e.target.value)}
-                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text text-center outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px] [&::-webkit-calendar-picker-indicator]:hidden"
+                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text text-center outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:w-0 [&::-webkit-inner-spin-button]:hidden [&::-webkit-clear-button]:hidden"
                       />
                     </div>
                   </>
