@@ -255,11 +255,11 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-8">
-          <div className="flex flex-col gap-10 max-w-2xl mx-auto w-full pb-32">
+        <div className="flex-1 overflow-y-auto px-6 py-6">
+          <div className="flex flex-col gap-8 max-w-2xl mx-auto w-full pb-32">
             
-            <div className="flex flex-col gap-4">
-              <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Пространство</h3>
+            <div className="flex flex-col gap-3">
+              <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Пространство</h3>
               <SearchableSelect
                 value={draft.workspaceId}
                 onChange={val => setDraft({ ...draft, workspaceId: val, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })}
@@ -270,8 +270,8 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
 
             {draft.workspaceId && (
               <>
-                <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-top-2">
-                  <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Клиент</h3>
+                <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2">
+                  <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Клиент</h3>
                   
                   {isClientSearchActive ? (
                     <div className="flex flex-col gap-2">
@@ -300,19 +300,19 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       </div>
                       
                       {clientSearch && draft.clientId !== "new_pending" && (
-                        <div className="flex flex-col gap-2 bg-panel-surface border border-panel-border-subtle rounded-xl p-2 mt-2 shadow-sm animate-in fade-in slide-in-from-top-2">
+                        <div className="flex flex-col gap-2 bg-panel-surface border border-panel-border-subtle rounded-xl p-2 mt-1 shadow-sm animate-in fade-in slide-in-from-top-2">
                           <button 
                             onClick={() => {
                               setDraft({ ...draft, clientId: "new_pending" })
                             }}
                             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-base transition-colors border border-transparent hover:border-panel-border-subtle text-left group"
                           >
-                            <div className="w-10 h-10 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium group-hover:scale-105 transition-transform">
+                            <div className="w-10 h-10 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium group-hover:scale-105 transition-transform shrink-0">
                               <UserPlus className="w-5 h-5" />
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium text-panel-text">Создать нового клиента</span>
-                              <span className="text-xs text-panel-text-muted">Заполнить имя и телефон</span>
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-sm font-medium text-panel-text truncate">Создать нового клиента</span>
+                              <span className="text-xs text-panel-text-muted truncate">Заполнить имя и телефон</span>
                             </div>
                           </button>
                           
@@ -324,19 +324,19 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             }}
                             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-panel-base transition-colors border border-transparent hover:border-panel-border-subtle text-left"
                           >
-                            <div className="w-10 h-10 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-panel-text">
+                            <div className="w-10 h-10 rounded-full bg-panel-border-subtle flex items-center justify-center font-medium text-panel-text shrink-0">
                               А
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium text-panel-text">Алина Смирнова</span>
-                              <span className="text-xs text-panel-text-muted">+7 (999) 123-45-67</span>
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-sm font-medium text-panel-text truncate">Алина Смирнова</span>
+                              <span className="text-xs text-panel-text-muted truncate">+7 (999) 123-45-67</span>
                             </div>
                           </button>
                         </div>
                       )}
 
                       {draft.clientId === "new_pending" && (
-                        <div className="flex flex-col gap-4 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 mt-2">
+                        <div className="flex flex-col gap-4 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 mt-1">
                           <div className="flex items-center justify-between">
                             <h4 className="text-sm font-semibold text-panel-text">Новый клиент</h4>
                             <button 
@@ -407,7 +407,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
 
                 <div className="flex flex-col sm:flex-row gap-6">
                   <div className="flex-1 flex flex-col gap-3">
-                    <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Мастер</h3>
+                    <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Мастер</h3>
                     <SearchableSelect
                       value={draft.masterId}
                       onChange={val => setDraft({ ...draft, masterId: val })}
@@ -417,7 +417,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     />
                   </div>
                   <div className="flex-1 flex flex-col gap-3">
-                    <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Начало</h3>
+                    <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Начало</h3>
                     <input 
                       type="datetime-local"
                       value={draft.startDateTime || ""}
@@ -428,7 +428,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Услуга</h3>
+                  <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Услуга</h3>
                   
                   <SearchableSelect
                     value={draft.serviceId}
