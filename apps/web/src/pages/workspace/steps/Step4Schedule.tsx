@@ -1,69 +1,20 @@
-import type { CreateWorkspaceFormData } from "../CreateWorkspacePage"
-import type { WorkspaceSchedule } from "@/types/models"
+import type { CreateWorkspaceFormData } from "@/hooks/useCreateWorkspace"
 import Toggle from "@/components/ui/Toggle"
+import { useStep4Schedule, DAYS } from "@/hooks/useStep4Schedule"
 
 interface Step4ScheduleProps {
   data: CreateWorkspaceFormData
   onChange: (patch: Partial<CreateWorkspaceFormData>) => void
 }
 
-const DAYS: { key: number; label: string; short: string }[] = [
-  { key: 1, label: "Понедельник", short: "Пн" },
-  { key: 2, label: "Вторник",     short: "Вт" },
-  { key: 3, label: "Среда",       short: "Ср" },
-  { key: 4, label: "Четверг",     short: "Чт" },
-  { key: 5, label: "Пятница",     short: "Пт" },
-  { key: 6, label: "Суббота",     short: "Сб" },
-  { key: 0, label: "Воскресенье", short: "Вс" },
-]
-
 export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
-  const schedule = data.schedule
-
-  const isEnabled = (day: number) => !!schedule[day]?.length
-
-  const toggleDay = (day: number) => {
-    const updated: WorkspaceSchedule = { ...schedule }
-    if (isEnabled(day)) {
-      delete updated[day]
-    } else {
-      updated[day] = [{ start: "09:00", end: "19:00" }]
-    }
-    onChange({ schedule: updated })
-  }
-
-  const updateTime = (day: number, field: "start" | "end", value: string) => {
-    const updated: WorkspaceSchedule = { ...schedule }
-    const currentSlot = updated[day][0]
-    
-    let newStart = field === "start" ? value : currentSlot.start
-    let newEnd = field === "end" ? value : currentSlot.end
-
-    const addHour = (t: string) => {
-      const [h, m] = t.split(':').map(Number)
-      return `${Math.min(23, h + 1).toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
-    }
-    const subHour = (t: string) => {
-      const [h, m] = t.split(':').map(Number)
-      return `${Math.max(0, h - 1).toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
-    }
-
-    // Validation: start cannot be >= end
-    if (newStart >= newEnd) {
-      if (field === "start") {
-        newEnd = addHour(newStart)
-        if (newStart >= newEnd) newStart = subHour(newEnd) // clamp if 23:xx
-      } else {
-        newStart = subHour(newEnd)
-        if (newStart >= newEnd) newEnd = addHour(newStart) // clamp if 00:xx
-      }
-    }
-
-    updated[day] = [{ start: newStart, end: newEnd }]
-    onChange({ schedule: updated })
-  }
-
-  const enabledCount = DAYS.filter(d => isEnabled(d.key)).length
+  const {
+    schedule,
+    isEnabled,
+    toggleDay,
+    updateTime,
+    enabledCount,
+  } = useStep4Schedule(data, onChange)
 
   return (
     <div className="flex flex-col gap-6 py-2">
