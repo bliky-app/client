@@ -47,8 +47,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return res
   }
 
-  const register: typeof authApi.register = async (phone, password) => {
-    const res = await authApi.register(phone, password)
+  const register: typeof authApi.register = async (phone) => {
+    const res = await authApi.register(phone)
     await queryClient.invalidateQueries({ queryKey: ["currentUser"] })
     return res
   }

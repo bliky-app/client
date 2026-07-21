@@ -59,7 +59,7 @@ export function useAuthForm() {
       if (isLoginFlow) {
         await login(phone, password)
       } else {
-        await register(phone, password)
+        await register(phone)
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Неверный пароль"
