@@ -384,8 +384,9 @@ export default function Timetable({
                       </div>
 
                       <div 
-                        className="relative cursor-pointer touch-none" 
+                        className="relative cursor-pointer select-none" 
                         style={{ height: gH }}
+                        onContextMenu={(e) => e.preventDefault()}
                         onPointerDown={(e) => {
                           if (!col.dateString) return
                           isLongPressTriggered.current = false
