@@ -512,7 +512,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     value={draft.serviceId}
                     onChange={val => {
                       if (val === "custom") {
-                        setDraft({ ...draft, serviceId: "custom", customService: { name: "" }, price: undefined, stages: [{ id: "custom-stage-1", name: "Общее время", durationMinutes: 60 }] })
+                        setDraft({ ...draft, serviceId: "custom", customService: { name: "" }, price: undefined, stages: [{ id: "custom-stage-1", name: "Основной этап", durationMinutes: 60 }] })
                       } else {
                         const srv = MOCK_SERVICES.find(s => s.id === val)
                         if (srv) setDraft({ ...draft, serviceId: srv.id, customService: undefined, price: srv.price, stages: srv.stages })
