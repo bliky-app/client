@@ -163,7 +163,6 @@ export default function Step2Details({ data, onChange }: Step2DetailsProps) {
 
         <div className="flex-1 min-w-0 flex justify-start">
           <ColorPicker
-            label="Фирменный цвет"
             value={data.color}
             onChange={(color) => onChange({ color })}
           />
