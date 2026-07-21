@@ -98,7 +98,7 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
                         type="time"
                         value={slot.start}
                         onChange={e => updateTime(key, "start", e.target.value)}
-                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px]"
+                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text text-center outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px] [&::-webkit-calendar-picker-indicator]:hidden"
                       />
                     </div>
                     <span className="text-panel-text-subtle text-sm font-medium">—</span>
@@ -107,7 +107,7 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
                         type="time"
                         value={slot.end}
                         onChange={e => updateTime(key, "end", e.target.value)}
-                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px]"
+                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text text-center outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px] [&::-webkit-calendar-picker-indicator]:hidden"
                       />
                     </div>
                   </>
