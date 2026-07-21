@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { X, Search, ChevronDown, Check, UserPlus, Plus } from "lucide-react"
+import { X, Search, ChevronDown, Check, UserPlus, Plus, Calendar } from "lucide-react"
 import type { Workspace } from "@/types/models"
 
 const ACCENT_COLORS = [
@@ -35,8 +35,8 @@ const MOCK_SERVICES = [
 ]
 
 const MOCK_MASTERS = [
-  { id: "me", name: "Я (Александр)", subtitle: "Топ-мастер", avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026024d" },
-  { id: "other", name: "Елена", subtitle: "Мастер", avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
+  { id: "me", name: "Я (Александр)", subtitle: "Топ-мастер", avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" },
+  { id: "other", name: "Елена", subtitle: "Мастер", avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Elena" },
 ]
 
 export type ServiceStage = {
@@ -192,6 +192,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
   const [isClientSearchActive, setIsClientSearchActive] = useState(!initialData?.clientId)
   const [isMasterSearchActive, setIsMasterSearchActive] = useState(!initialData?.masterId)
   const [isServiceSearchActive, setIsServiceSearchActive] = useState(!initialData?.serviceId)
+  const [isStartTimeActive, setIsStartTimeActive] = useState(!initialData?.startDateTime)
 
   const [clientSearch, setClientSearch] = useState("")
   const [newClientName, setNewClientName] = useState("")
@@ -206,6 +207,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
       setIsClientSearchActive(!data.clientId)
       setIsMasterSearchActive(!data.masterId)
       setIsServiceSearchActive(!data.serviceId)
+      setIsStartTimeActive(!data.startDateTime)
     } else {
       setClientSearch("")
       setNewClientName("")
@@ -345,7 +347,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             className="w-full bg-panel-surface border border-panel-border rounded-xl pl-11 pr-4 py-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text transition-colors"
                           />
                         </div>
-                        {draft.clientId && (
+                        {draft.clientId && draft.clientId !== "new_pending" && (
                           <button 
                             onClick={() => setIsClientSearchActive(false)}
                             className="px-3 py-3 text-sm font-medium text-panel-text-muted hover:text-panel-text shrink-0"
@@ -391,6 +393,15 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
 
                       {draft.clientId === "new_pending" && (
                         <div className="flex flex-col gap-4 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 mt-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-sm font-semibold text-panel-text">Новый клиент</h4>
+                            <button 
+                              onClick={() => setDraft({ ...draft, clientId: undefined })}
+                              className="text-xs font-medium text-panel-text-muted hover:text-panel-text transition-colors"
+                            >
+                              Отмена
+                            </button>
+                          </div>
                           <div className="flex flex-col gap-3">
                             <input 
                               type="text" 
@@ -483,14 +494,36 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                   </div>
                   <div className="flex-1 flex flex-col gap-3">
                     <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Начало</h3>
-                    <div className="h-full min-h-[82px]">
-                      <input 
-                        type="datetime-local"
-                        value={draft.startDateTime || ""}
-                        onChange={e => setDraft({ ...draft, startDateTime: e.target.value })}
-                        className="w-full h-full bg-panel-surface border border-panel-border rounded-xl px-4 py-3 text-sm text-panel-text outline-none focus:border-panel-text"
-                      />
-                    </div>
+                    {isStartTimeActive ? (
+                      <div className="h-full min-h-[82px] flex items-center bg-panel-surface border border-panel-border rounded-xl px-4 focus-within:border-panel-text transition-colors relative">
+                        <input 
+                          type="datetime-local"
+                          value={draft.startDateTime || ""}
+                          onChange={e => setDraft({ ...draft, startDateTime: e.target.value })}
+                          className="w-full bg-transparent text-sm font-medium text-panel-text outline-none"
+                        />
+                        {draft.startDateTime && (
+                          <button onClick={() => setIsStartTimeActive(false)} className="absolute right-3 px-4 py-2 bg-panel-text text-panel-base rounded-lg text-xs font-semibold shrink-0">ОК</button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm h-full min-h-[82px]">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center shrink-0 text-panel-text">
+                            <Calendar className="w-5 h-5" />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-base font-semibold text-panel-text capitalize truncate">
+                              {draft.startDateTime ? new Date(draft.startDateTime).toLocaleDateString("ru-RU", { weekday: 'short', day: 'numeric', month: 'long' }) : ""}
+                            </span>
+                            <span className="text-sm text-panel-text-muted truncate">
+                              {draft.startDateTime ? new Date(draft.startDateTime).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' }) : ""}
+                            </span>
+                          </div>
+                        </div>
+                        <button onClick={() => setIsStartTimeActive(true)} className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0">Изменить</button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -513,10 +546,10 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       showCustomOption={true}
                     />
                   ) : (
-                    <div className="flex flex-col gap-4 p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="w-12 h-12 rounded-2xl bg-panel-border-subtle flex items-center justify-center font-medium text-lg shrink-0 text-panel-text">
+                    <div className="flex flex-col bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">
+                      <div className="flex items-center justify-between p-4">
+                        <div className="flex items-center gap-3 w-full pr-4">
+                          <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center font-medium text-lg shrink-0 text-panel-text">
                             {draft.serviceId === "custom" ? "У" : selectedService?.name?.[0]?.toUpperCase() || "У"}
                           </div>
                           <div className="flex flex-col min-w-0 flex-1">
@@ -534,100 +567,83 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             )}
                             <span className="text-sm text-panel-text-muted truncate">
                               {totalDuration > 0 ? formatDuration(totalDuration) : "Длительность не указана"}
-                              {draft.price ? ` • ${draft.price} ₽` : ""}
                             </span>
                           </div>
                         </div>
-                        <button onClick={() => setIsServiceSearchActive(true)} className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text ml-4 shrink-0">Изменить</button>
+                        <button onClick={() => setIsServiceSearchActive(true)} className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0">Изменить</button>
                       </div>
-                    </div>
-                  )}
 
-                  {draft.serviceId === "custom" && draft.customService && !isServiceSearchActive && (
-                    <div className="mt-2 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl flex flex-col gap-5 animate-in slide-in-from-top-2">
-                      <div className="flex flex-col gap-2">
-                        <label className="text-xs font-semibold text-panel-text-muted uppercase tracking-wider">Название услуги</label>
-                        <input 
-                          type="text" 
-                          value={draft.customService.name}
-                          onChange={e => setDraft({ ...draft, customService: { ...draft.customService!, name: e.target.value }})}
-                          placeholder="Например: Сложное окрашивание..."
-                          className="w-full bg-panel-base border border-panel-border rounded-xl px-4 py-3 text-sm text-panel-text outline-none focus:border-panel-text transition-colors"
-                        />
-                      </div>
+                      {draft.serviceId && draft.stages && (
+                        <div className="flex flex-col gap-6 p-4 pt-0">
+                          <div className="h-px w-full bg-panel-border mb-2" />
+                          <div className="flex flex-col sm:flex-row gap-6">
+                            <div className="flex-1 flex flex-col gap-3">
+                              <h3 className="text-[11px] font-bold text-panel-text-subtle uppercase tracking-widest">Этапы</h3>
+                              <div className="flex flex-col gap-2">
+                                {draft.stages.map((stage) => {
+                                  const h = Math.floor(stage.durationMinutes / 60)
+                                  const m = stage.durationMinutes % 60
+                                  return (
+                                    <div key={stage.id} className="p-3 bg-panel-base border border-panel-border rounded-xl flex items-center justify-between gap-4 group">
+                                      <span className="text-sm font-medium text-panel-text flex-1 truncate" title={stage.name}>{stage.name}</span>
+                                      
+                                      <div className="flex items-center gap-2 shrink-0">
+                                        <button 
+                                          onClick={() => handleStageDurationChange(stage.id, -15)}
+                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                        >
+                                          -
+                                        </button>
+                                        <div className="flex items-center justify-center gap-1 w-20">
+                                          <input 
+                                            type="number" 
+                                            value={h || ""} 
+                                            placeholder="0"
+                                            onChange={(e) => handleStageDurationInput(stage.id, parseInt(e.target.value) || 0, m)}
+                                            className="w-6 text-center bg-transparent focus:border-b focus:border-panel-text outline-none text-sm font-semibold text-panel-text p-0 transition-colors" 
+                                          />
+                                          <span className="text-xs font-medium text-panel-text-muted">ч</span>
+                                          <input 
+                                            type="number" 
+                                            value={m || ""} 
+                                            placeholder="00"
+                                            onChange={(e) => handleStageDurationInput(stage.id, h, parseInt(e.target.value) || 0)}
+                                            className="w-6 text-center bg-transparent focus:border-b focus:border-panel-text outline-none text-sm font-semibold text-panel-text p-0 transition-colors" 
+                                          />
+                                          <span className="text-xs font-medium text-panel-text-muted">м</span>
+                                        </div>
+                                        <button 
+                                          onClick={() => handleStageDurationChange(stage.id, 15)}
+                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                        >
+                                          +
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </div>
+
+                            <div className="flex-[0.5] flex flex-col gap-3">
+                              <h3 className="text-[11px] font-bold text-panel-text-subtle uppercase tracking-widest">Стоимость</h3>
+                              <div className="relative flex items-center">
+                                <input 
+                                  type="number"
+                                  value={draft.price || ""}
+                                  onChange={e => setDraft({ ...draft, price: Number(e.target.value) })}
+                                  placeholder="0"
+                                  className="w-full bg-panel-base border border-panel-border rounded-xl pl-4 pr-8 py-3 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-colors"
+                                />
+                                <span className="absolute right-4 text-panel-text-muted font-medium text-sm">₽</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-
-                {draft.serviceId && draft.stages && (
-                  <div className="flex flex-col gap-6 pt-2 border-t border-panel-border-subtle mt-4">
-                    
-                    <div className="flex flex-col sm:flex-row gap-6">
-                      <div className="flex-1 flex flex-col gap-3">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Длительность этапов</h3>
-                          <span className="text-xs font-semibold px-2 py-1 bg-panel-surface border border-panel-border rounded-lg text-panel-text">
-                            Итог: {Math.floor((draft.stages?.reduce((acc, st) => acc + st.durationMinutes, 0) || 0) / 60)}ч {(draft.stages?.reduce((acc, st) => acc + st.durationMinutes, 0) || 0) % 60}м
-                          </span>
-                        </div>
-                        
-                        <div className="flex flex-col gap-2">
-                          {draft.stages.map((stage) => {
-                            const h = Math.floor(stage.durationMinutes / 60)
-                            const m = stage.durationMinutes % 60
-                            return (
-                              <div key={stage.id} className="p-3 bg-panel-surface border border-panel-border-subtle rounded-xl flex items-center justify-between gap-4">
-                                <span className="text-sm font-medium text-panel-text flex-1 truncate" title={stage.name}>{stage.name}</span>
-                                
-                                <div className="flex items-center gap-2 shrink-0">
-                                  <button 
-                                    onClick={() => handleStageDurationChange(stage.id, -15)}
-                                    className="w-7 h-7 rounded-full bg-panel-base border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
-                                  >
-                                    -
-                                  </button>
-                                  <div className="flex items-center justify-center gap-1 w-20">
-                                    <input 
-                                      type="number" 
-                                      value={h} 
-                                      onChange={(e) => handleStageDurationInput(stage.id, parseInt(e.target.value) || 0, m)}
-                                      className="w-6 text-center bg-transparent border-b border-panel-border-subtle focus:border-panel-text outline-none text-sm font-semibold text-panel-text p-0" 
-                                    />
-                                    <span className="text-xs text-panel-text-muted">ч</span>
-                                    <input 
-                                      type="number" 
-                                      value={m} 
-                                      onChange={(e) => handleStageDurationInput(stage.id, h, parseInt(e.target.value) || 0)}
-                                      className="w-6 text-center bg-transparent border-b border-panel-border-subtle focus:border-panel-text outline-none text-sm font-semibold text-panel-text p-0" 
-                                    />
-                                    <span className="text-xs text-panel-text-muted">м</span>
-                                  </div>
-                                  <button 
-                                    onClick={() => handleStageDurationChange(stage.id, 15)}
-                                    className="w-7 h-7 rounded-full bg-panel-base border border-panel-border flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-
-                      <div className="flex-1 flex flex-col gap-3">
-                        <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Стоимость (₽)</h3>
-                        <input 
-                          type="number"
-                          value={draft.price || ""}
-                          onChange={e => setDraft({ ...draft, price: Number(e.target.value) })}
-                          placeholder="0"
-                          className="w-full bg-panel-surface border border-panel-border rounded-xl px-4 py-3 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-colors"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 <div className="flex flex-col gap-3">
                   <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Цвет записи</h3>
