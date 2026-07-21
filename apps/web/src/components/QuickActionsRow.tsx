@@ -17,6 +17,7 @@ interface QuickActionsRowProps {
   workspaces?: Workspace[]
   masters?: { id: string, name: string }[]
   services?: { id: string, name: string }[]
+  showMasterCard?: boolean
   onOpenForm: (draft: QuickActionDraft) => void
 }
 
@@ -82,7 +83,7 @@ function DatePickerButton({ placeholder, onChange }: { placeholder: string, onCh
   )
 }
 
-export default function QuickActionsRow({ context, workspaces = [], masters = [], services = [], onOpenForm }: QuickActionsRowProps) {
+export default function QuickActionsRow({ context, workspaces = [], masters = [], services = [], showMasterCard = true, onOpenForm }: QuickActionsRowProps) {
   const [isExpanded, setIsExpanded] = useState(true)
 
   return (
@@ -136,8 +137,8 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
               </div>
             )}
 
-            {/* К мастеру (только Workspace Schedule) */}
-            {context === "workspace_schedule" && (
+            {/* К мастеру (только Workspace Schedule и если есть права) */}
+            {context === "workspace_schedule" && showMasterCard && (
               <div className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle relative group">
                 <div className="flex justify-between items-start w-full gap-2 pointer-events-none">
                   <h3 className="font-semibold text-panel-text text-base tracking-tight leading-tight">

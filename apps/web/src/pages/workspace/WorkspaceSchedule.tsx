@@ -62,6 +62,7 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
                 { id: "srv-2", name: "Окрашивание" },
                 { id: "custom", name: "Свободная услуга" }
               ]}
+              showMasterCard={workspace.type !== "individual" && canViewGlobalSchedule}
               onOpenForm={(draft) => {
                 setAppointmentDraft(draft)
                 setIsAppointmentSheetOpen(true)
