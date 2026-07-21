@@ -684,17 +684,17 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                 </div>
 
                 <ColorPicker
-                  label="Цвет записи"
+                  label="Цвет метки"
                   value={draft.color}
                   onChange={(c) => setDraft({ ...draft, color: c })}
                 />
 
                 <div className="flex flex-col gap-3">
-                  <h3 className="text-xs font-semibold text-panel-text-muted-dark">Примечания</h3>
+                  <h3 className="text-xs font-semibold text-panel-text-muted">Заметка</h3>
                   <textarea 
                     value={draft.notes || ""}
                     onChange={e => setDraft({ ...draft, notes: e.target.value })}
-                    placeholder="Дополнительная информация для мастера..."
+                    placeholder="Добавить заметку..."
                     rows={3}
                     className="w-full bg-panel-surface border border-panel-border-subtle rounded-xl px-4 py-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text transition-colors resize-none"
                   />
