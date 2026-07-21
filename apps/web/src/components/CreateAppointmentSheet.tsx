@@ -1,24 +1,18 @@
 import { useState, useEffect, useRef } from "react"
-import { X, Search, ChevronDown, Check, Plus, Calendar } from "lucide-react"
+import { X, Search, ChevronDown, Check, Plus } from "lucide-react"
 import type { Workspace } from "@/types/models"
 import { useAuth } from "@/lib/AuthProvider"
 import Avatar from "@/components/Avatar"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
 import PhoneInput from "@/components/ui/PhoneInput"
-import ColorPicker from "@/components/ui/ColorPicker"
-import { formatAppointmentDate } from "@/lib/formatters"
+import IconBox from "@/components/ui/IconBox"
+import { formatDuration } from "@/lib/formatters"
 
 import AppointmentDateCard from "@/components/appointment/AppointmentDateCard"
 import AppointmentClientCard from "@/components/appointment/AppointmentClientCard"
 import AppointmentNotesCard from "@/components/appointment/AppointmentNotesCard"
-
-const ACCENT_COLORS = [
-  "#6366f1", "#8b5cf6", "#d946ef", "#ec4899",
-  "#f43f5e", "#ef4444", "#f97316", "#eab308",
-  "#84cc16", "#22c55e", "#10b981", "#14b8a6",
-  "#06b6d4", "#0ea5e9", "#3b82f6", "#64748b",
-]
+import AppointmentStageTimeline from "@/components/appointment/AppointmentStageTimeline"
 
 const MOCK_SERVICES = [
   { 
@@ -54,6 +48,7 @@ export type ServiceStage = {
   id: string
   name: string
   durationMinutes: number
+  isActive?: boolean
 }
 
 export type AppointmentDraft = {
@@ -139,7 +134,7 @@ function SearchableSelect({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-panel-surface border border-panel-border-subtle rounded-xl px-4 py-3 flex items-center justify-between hover:border-panel-text-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed outline-none focus:border-panel-text"
+        className="w-full bg-panel-surface border border-panel-border-subtle rounded-xl px-4 py-3.5 flex items-center justify-between hover:border-panel-text-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed outline-none focus:border-panel-text shadow-sm"
       >
         <span className={`text-sm ${selected ? "text-panel-text font-medium" : "text-panel-text-subtle"}`}>
           {selected ? selected.name : placeholder}
@@ -250,90 +245,60 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
           data.price = srv.price
         }
       }
+      if (!data.color) {
+        data.color = "#ec4899"
+      }
       setDraft(data)
       setIsWorkspaceSearchActive(!data.workspaceId)
       setIsClientSearchActive(!data.clientId)
-      setIsMasterSearchActive(false)
+      setIsMasterSearchActive(!data.masterId)
       setIsServiceSearchActive(!data.serviceId)
-    } else {
-      setClientSearch("")
-      setNewClientName("")
-      setNewClientPhone("")
-      setPhoneError("")
     }
   }, [isOpen, initialData, currentUserMasterId])
 
   if (!isOpen) return null
 
-  const validatePhone = (phone: string) => {
-    const digits = phone.replace(/\D/g, '')
-    if (digits.length < 10) {
-      setPhoneError("Введите корректный номер телефона")
-      return false
-    }
-    setPhoneError("")
-    return true
-  }
+  const selectedWorkspace = workspaces?.find(w => w.id === draft.workspaceId) || workspaces?.[0]
+  const selectedMaster = selectedWorkspace?.staff?.find(s => s.id === draft.masterId) || 
+    MOCK_MASTERS.find(m => m.id === draft.masterId) || 
+    { id: currentUserMasterId, name: user?.shortName || user?.fullName || "Я (Александр)", subtitle: "Топ-мастер", avatarUrl: user?.avatarUrl }
+  
+  const selectedMasterUser = selectedMaster ? ("user" in selectedMaster ? selectedMaster.user : selectedMaster) : null
+  const selectedService = MOCK_SERVICES.find(s => s.id === draft.serviceId)
 
   const handleStageDurationChange = (stageId: string, deltaMinutes: number) => {
-    setDraft(prev => {
-      const newStages = prev.stages?.map(st => {
-        if (st.id === stageId) {
-          return { ...st, durationMinutes: Math.max(0, st.durationMinutes + deltaMinutes) }
-        }
-        return st
-      })
-      return { ...prev, stages: newStages }
+    if (!draft.stages) return
+    const updated = draft.stages.map(s => {
+      if (s.id === stageId) {
+        const newDur = Math.max(0, s.durationMinutes + deltaMinutes)
+        return { ...s, durationMinutes: newDur }
+      }
+      return s
     })
+    setDraft({ ...draft, stages: updated })
   }
 
   const handleStageDurationInput = (stageId: string, hours: number, minutes: number) => {
-    setDraft(prev => {
-      const newStages = prev.stages?.map(st => {
-        if (st.id === stageId) {
-          return { ...st, durationMinutes: Math.max(0, hours * 60 + minutes) }
-        }
-        return st
-      })
-      return { ...prev, stages: newStages }
-    })
+    if (!draft.stages) return
+    const newDur = Math.max(0, hours * 60 + minutes)
+    const updated = draft.stages.map(s => (s.id === stageId ? { ...s, durationMinutes: newDur } : s))
+    setDraft({ ...draft, stages: updated })
   }
 
-  const formatDuration = (minutes: number) => {
-    const h = Math.floor(minutes / 60)
-    const m = minutes % 60
-    return h > 0 ? `${h}ч ${m > 0 ? `${m}м` : ""}` : `${m}м`
+  const validatePhone = (val: string) => {
+    const digits = val.replace(/\D/g, "")
+    return digits.length >= 10
   }
 
-  const totalDuration = draft.stages?.reduce((acc, s) => acc + s.durationMinutes, 0) || 0
+  const totalDuration = draft.stages ? draft.stages.reduce((acc, s) => acc + s.durationMinutes, 0) : 0
 
-  const selectedWorkspace = workspaces?.find(w => w.id === draft.workspaceId)
-  const selectedMasterFromWorkspace = workspaces?.flatMap(w => w.staff || []).find(s => s.id === draft.masterId || s.user?.id === draft.masterId)
-  
-  const currentUserMasterOption = {
+  const currentUserMasterOption: SearchableSelectOption = {
     id: currentUserMasterId,
-    name: user ? `${user.shortName || user.fullName} (Я)` : "Я",
-    subtitle: "Мои записи",
+    name: user?.shortName || user?.fullName || "Я (Александр)",
+    subtitle: "Топ-мастер",
     avatarUrl: user?.avatarUrl,
-    color: user?.color,
-    user: user || undefined,
+    color: user?.color
   }
-
-  const selectedMasterUser = selectedMasterFromWorkspace?.user || user
-
-  const selectedMaster = (draft.masterId === currentUserMasterId || draft.masterId === "me" || draft.masterId === user?.id)
-    ? currentUserMasterOption
-    : (selectedMasterFromWorkspace ? { 
-        id: selectedMasterFromWorkspace.id, 
-        name: selectedMasterFromWorkspace.user?.shortName || selectedMasterFromWorkspace.user?.fullName || "Мастер",
-        subtitle: selectedMasterFromWorkspace.mainCategory?.name,
-        avatarUrl: selectedMasterFromWorkspace.user?.avatarUrl,
-        color: selectedMasterFromWorkspace.user?.color,
-        user: selectedMasterFromWorkspace.user
-      } : currentUserMasterOption)
-  const selectedService = draft.serviceId === "custom" 
-    ? { name: draft.customService?.name || "Свободная услуга", price: undefined } 
-    : MOCK_SERVICES.find(s => s.id === draft.serviceId)
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
@@ -341,12 +306,13 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
         className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
         onClick={onClose}
       />
-      
+
       <div className="relative w-full h-[calc(100svh-64px)] bg-panel-base rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.18)] flex flex-col animate-in slide-in-from-bottom duration-300 overflow-hidden">
         
-        <div className="flex items-center gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle bg-panel-base">
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-panel-text leading-tight">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle bg-panel-base">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
               Новая запись
             </h1>
           </div>
@@ -358,332 +324,272 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
           </button>
         </div>
 
+        {/* Scroll Body */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full pb-32">
+          <div className="flex flex-col gap-4 max-w-2xl mx-auto w-full pb-32">
             
-            <div className="flex flex-col gap-3">
-              <AppointmentDateCard
-                startDateTime={draft.startDateTime}
-                isEditable={true}
-                onChange={(val) => setDraft({ ...draft, startDateTime: val })}
-                placeholder={isFormal ? "Выберите время..." : "Выбери время..."}
-              />
-            </div>
+            {/* 1. Date & Time Card */}
+            <AppointmentDateCard
+              startDateTime={draft.startDateTime}
+              isEditable={true}
+              onChange={(val) => setDraft({ ...draft, startDateTime: val })}
+              placeholder={isFormal ? "Выберите время..." : "Выбери время..."}
+            />
 
-            <div className="flex flex-col gap-3">
-              <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Пространство</h3>
-              {isWorkspaceSearchActive ? (
-                <SearchableSelect
-                  value={draft.workspaceId}
-                  onChange={val => {
-                    setDraft({ ...draft, workspaceId: val, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
-                    setIsWorkspaceSearchActive(false)
-                  }}
-                  options={workspaces?.map(w => ({ id: w.id, name: w.name, subtitle: w.address, color: w.color, avatarUrl: w.avatarUrl })) || []}
-                  placeholder={isFormal ? "Выберите пространство..." : "Выбери пространство..."}
-                />
-              ) : (
-                <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
-                  <div className="flex items-center gap-3">
-                    {selectedWorkspace?.avatarUrl ? (
-                      <img src={selectedWorkspace.avatarUrl} alt={selectedWorkspace.name} className="w-12 h-12 rounded-2xl object-cover shrink-0 border border-panel-border-subtle" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-medium text-lg text-panel-base shrink-0" style={{ backgroundColor: selectedWorkspace?.color || "#6366f1" }}>
-                        {selectedWorkspace?.name?.[0]?.toUpperCase() || "П"}
-                      </div>
+            {/* 2. Workspace Select Card */}
+            {isWorkspaceSearchActive ? (
+              <SearchableSelect
+                value={draft.workspaceId}
+                onChange={val => {
+                  setDraft({ ...draft, workspaceId: val, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
+                  setIsWorkspaceSearchActive(false)
+                }}
+                options={workspaces?.map(w => ({ id: w.id, name: w.name, subtitle: w.address, color: w.color, avatarUrl: w.avatarUrl })) || []}
+                placeholder={isFormal ? "Выберите пространство..." : "Выбери пространство..."}
+              />
+            ) : (
+              <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  {selectedWorkspace?.avatarUrl ? (
+                    <img src={selectedWorkspace.avatarUrl} alt={selectedWorkspace.name} className="w-12 h-12 rounded-2xl object-cover shrink-0 border border-panel-border-subtle" />
+                  ) : (
+                    <IconBox size="lg" shape="squircle" className="bg-panel-base text-panel-text">
+                      {selectedWorkspace?.name?.[0]?.toUpperCase() || "П"}
+                    </IconBox>
+                  )}
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-base font-semibold text-panel-text truncate">{selectedWorkspace?.name}</span>
+                    {selectedWorkspace?.address && (
+                      <span className="text-xs text-panel-text-subtle truncate">{selectedWorkspace.address}</span>
                     )}
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-base font-semibold text-panel-text truncate">{selectedWorkspace?.name}</span>
-                      <span className="text-sm text-panel-text-muted truncate">{selectedWorkspace?.address || "Пространство"}</span>
-                    </div>
                   </div>
-                  {!initialData?.workspaceId && (
+                </div>
+                {!initialData?.workspaceId && (
+                  <button 
+                    onClick={() => {
+                      setDraft({ ...draft, workspaceId: undefined, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
+                      setIsWorkspaceSearchActive(true)
+                    }} 
+                    className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
+                  >
+                    Изменить
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* 3. Client & Master Section (active when workspace selected) */}
+            {draft.workspaceId && (
+              <>
+                {/* Client Selection */}
+                {isClientSearchActive ? (
+                  draft.clientId === "new_pending" ? (
+                    <div className="flex flex-col gap-4 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 mt-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="text-sm font-semibold text-panel-text">Новый клиент</h4>
+                        <button 
+                          onClick={() => setDraft({ ...draft, clientId: undefined })}
+                          className="p-1.5 -mr-1.5 rounded-lg text-panel-text-muted hover:text-panel-text hover:bg-panel-base transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-3">
+                        <Input
+                          theme="panel"
+                          type="text"
+                          placeholder="Имя"
+                          value={newClientName}
+                          onChange={e => setNewClientName(e.target.value)}
+                        />
+                        <PhoneInput
+                          theme="panel"
+                          placeholder="Телефон"
+                          value={newClientPhone}
+                          error={phoneError || undefined}
+                          onChange={(val) => {
+                            setNewClientPhone(val)
+                            setPhoneError("")
+                          }}
+                        />
+                        <Button
+                          variant="primary"
+                          theme="panel"
+                          fullWidth
+                          onClick={() => {
+                            if (newClientName && validatePhone(newClientPhone)) {
+                              setDraft({ ...draft, clientId: "new", clientName: newClientName, clientPhone: newClientPhone })
+                              setIsClientSearchActive(false)
+                            } else {
+                              setPhoneError("Некорректный номер")
+                            }
+                          }}
+                        >
+                          Сохранить клиента
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <SearchableSelect
+                      value={draft.clientId}
+                      onChange={val => {
+                        if (val === "custom") {
+                          setDraft({ ...draft, clientId: "new_pending" })
+                        } else {
+                          setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
+                          setIsClientSearchActive(false)
+                        }
+                      }}
+                      options={[{ id: "client-1", name: "Алина Смирнова", subtitle: "+7 (999) 123-45-67", color: "#ec4899" }]}
+                      placeholder={isFormal ? "Выберите клиента..." : "Выбери клиента..."}
+                      showCustomOption={true}
+                      customOptionLabel="Создать нового клиента"
+                      searchValue={clientSearch}
+                      onSearchChange={(val: string) => {
+                        setClientSearch(val)
+                        setNewClientName(val.replace(/[\d+()-]/g, "").trim())
+                        const phoneMatch = val.match(/[\d+()-]+/)
+                        if (phoneMatch) setNewClientPhone(phoneMatch[0])
+                      }}
+                    />
+                  )
+                ) : (
+                  <AppointmentClientCard
+                    name={draft.clientName || "Клиент"}
+                    phone={draft.clientPhone}
+                    onEdit={() => {
+                      setDraft({ ...draft, clientId: undefined, clientName: undefined, clientPhone: undefined })
+                      setIsClientSearchActive(true)
+                    }}
+                  />
+                )}
+
+                {/* Master & Workspace Grid layout matching Details */}
+                {isMasterSearchActive ? (
+                  <SearchableSelect
+                    value={draft.masterId}
+                    onChange={val => { setDraft({ ...draft, masterId: val }); setIsMasterSearchActive(false) }}
+                    options={
+                      selectedWorkspace?.staff?.map(s => ({
+                        id: s.id,
+                        name: s.user?.shortName || s.user?.fullName || "Мастер",
+                        subtitle: s.mainCategory?.name,
+                        avatarUrl: s.user?.avatarUrl,
+                        color: s.user?.color
+                      })) || [currentUserMasterOption]
+                    }
+                    placeholder={isFormal ? "Выберите мастера..." : "Выбери мастера..."}
+                  />
+                ) : (
+                  <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Avatar
+                        data={selectedMasterUser}
+                        className="w-12 h-12 rounded-full text-sm shrink-0"
+                      />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-base font-semibold text-panel-text truncate">{selectedMaster?.name}</span>
+                        {selectedMaster?.subtitle && (
+                          <span className="text-xs text-panel-text-subtle truncate">{selectedMaster.subtitle}</span>
+                        )}
+                      </div>
+                    </div>
                     <button 
                       onClick={() => {
-                        setDraft({ ...draft, workspaceId: undefined, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
-                        setIsWorkspaceSearchActive(true)
+                        setDraft({ ...draft, masterId: undefined })
+                        setIsMasterSearchActive(true)
                       }} 
                       className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
                     >
                       Изменить
                     </button>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {draft.workspaceId && (
-              <>
-                <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2">
-                  <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Клиент</h3>
-                  
-                  {isClientSearchActive ? (
-                    draft.clientId === "new_pending" ? (
-                      <div className="flex flex-col gap-4 p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 mt-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-semibold text-panel-text">Новый клиент</h4>
-                          <button 
-                            onClick={() => setDraft({ ...draft, clientId: undefined })}
-                            className="p-1.5 -mr-1.5 rounded-lg text-panel-text-muted hover:text-panel-text hover:bg-panel-base transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                         <div className="flex flex-col gap-3">
-                          <Input
-                            theme="panel"
-                            type="text"
-                            placeholder="Имя"
-                            value={newClientName}
-                            onChange={e => setNewClientName(e.target.value)}
-                          />
-                          <PhoneInput
-                            theme="panel"
-                            placeholder="Телефон"
-                            value={newClientPhone}
-                            error={phoneError || undefined}
-                            onChange={(val) => {
-                              setNewClientPhone(val)
-                              setPhoneError("")
-                            }}
-                          />
-                          <Button
-                            variant="primary"
-                            theme="panel"
-                            fullWidth
-                            onClick={() => {
-                              if (newClientName && validatePhone(newClientPhone)) {
-                                setDraft({ ...draft, clientId: "new", clientName: newClientName, clientPhone: newClientPhone })
-                                setIsClientSearchActive(false)
-                              } else {
-                                setPhoneError("Некорректный номер")
-                              }
-                            }}
-                          >
-                            Сохранить клиента
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <SearchableSelect
-                        value={draft.clientId}
-                        onChange={val => {
-                          if (val === "custom") {
-                            setDraft({ ...draft, clientId: "new_pending" })
-                          } else {
-                            setDraft({ ...draft, clientId: "client-1", clientName: "Алина Смирнова", clientPhone: "+7 (999) 123-45-67" })
-                            setIsClientSearchActive(false)
-                          }
-                        }}
-                        options={[{ id: "client-1", name: "Алина Смирнова", subtitle: "+7 (999) 123-45-67", color: "#ec4899" }]}
-                        placeholder={isFormal ? "Выберите клиента..." : "Выбери клиента..."}
-                        showCustomOption={true}
-                        customOptionLabel="Создать нового клиента"
-                        searchValue={clientSearch}
-                        onSearchChange={(val: string) => {
-                          setClientSearch(val)
-                          setNewClientName(val.replace(/[\d+()-]/g, "").trim())
-                          const phoneMatch = val.match(/[\d+()-]+/)
-                          if (phoneMatch) setNewClientPhone(phoneMatch[0])
-                        }}
-                      />
-                    )
-                  ) : (
-                    <AppointmentClientCard
-                      name={draft.clientName || "Клиент"}
-                      phone={draft.clientPhone}
-                      onEdit={() => {
-                        setDraft({ ...draft, clientId: undefined, clientName: undefined, clientPhone: undefined })
-                        setIsClientSearchActive(true)
-                      }}
-                    />
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Мастер</h3>
-                    {isMasterSearchActive ? (
-                      <SearchableSelect
-                        value={draft.masterId}
-                        onChange={val => { setDraft({ ...draft, masterId: val }); setIsMasterSearchActive(false) }}
-                        options={
-                          selectedWorkspace?.staff?.map(s => ({
-                            id: s.id,
-                            name: s.user?.shortName || s.user?.fullName || "Мастер",
-                            subtitle: s.mainCategory?.name,
-                            avatarUrl: s.user?.avatarUrl,
-                            color: s.user?.color
-                          })) || [currentUserMasterOption]
-                        }
-                        placeholder={isFormal ? "Выберите мастера..." : "Выбери мастера..."}
-                      />
-                    ) : (
-                      <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm h-full min-h-[82px]">
-                        <div className="flex items-center gap-3">
-                          <Avatar
-                            data={selectedMasterUser}
-                            className="w-12 h-12 rounded-full text-lg shadow-sm border border-panel-border-subtle shrink-0"
-                          />
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-base font-semibold text-panel-text truncate">{selectedMaster?.name}</span>
-                            <span className="text-sm text-panel-text-muted truncate">{selectedMaster?.subtitle || "Мастер"}</span>
-                          </div>
-                        </div>
-                        <button 
-                          onClick={() => {
-                            setDraft({ ...draft, masterId: undefined })
-                            setIsMasterSearchActive(true)
-                          }} 
-                          className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text"
-                        >
-                          Изменить
-                        </button>
-                      </div>
-                    )}
                   </div>
+                )}
 
-                <div className="flex flex-col gap-3">
-                  <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Услуга</h3>
-                  {isServiceSearchActive ? (
-                    <SearchableSelect
-                      value={draft.serviceId}
-                      onChange={val => {
-                        if (val === "custom") {
-                          setDraft({ ...draft, serviceId: "custom", customService: { name: "" }, price: undefined, stages: [{ id: "custom-stage-1", name: "Общее время", durationMinutes: 60 }] })
-                        } else {
-                          const srv = MOCK_SERVICES.find(s => s.id === val)
-                          if (srv) setDraft({ ...draft, serviceId: srv.id, customService: undefined, price: srv.price, stages: srv.stages })
-                        }
-                        setIsServiceSearchActive(false)
-                      }}
-                      options={MOCK_SERVICES.map(s => ({ id: s.id, name: s.name, subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽` }))}
-                      placeholder={isFormal ? "Выберите услугу..." : "Выбери услугу..."}
-                      showCustomOption={true}
-                      hideIcon={true}
-                    />
-                  ) : (
-                    <div className="flex flex-col bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">
-                      <div className="flex items-center justify-between p-4">
-                        <div className="flex items-center gap-3 w-full pr-4">
-                          <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center font-medium text-lg shrink-0 text-panel-text">
-                            {draft.serviceId === "custom" ? "У" : selectedService?.name?.[0]?.toUpperCase() || "У"}
-                          </div>
-                          <div className="flex flex-col min-w-0 flex-1">
-                            {draft.serviceId === "custom" ? (
-                              <input 
-                                autoFocus
-                                type="text"
-                                value={draft.customService?.name || ""}
-                                onChange={e => setDraft({ ...draft, customService: { name: e.target.value } })}
-                                placeholder="Свободная услуга"
-                                className="bg-transparent text-base font-semibold text-panel-text outline-none placeholder:text-panel-text-muted w-full"
-                              />
-                            ) : (
-                              <span className="text-base font-semibold text-panel-text truncate">{selectedService?.name}</span>
-                            )}
-                            <span className="text-sm text-panel-text-muted truncate">
-                              {totalDuration > 0 ? formatDuration(totalDuration) : "Длительность не указана"}
-                              {draft.price ? ` • ${draft.price} ₽` : ""}
-                            </span>
-                          </div>
-                        </div>
-                        <button 
-                          onClick={() => {
-                            setDraft({ ...draft, serviceId: undefined, customService: undefined, stages: undefined, price: undefined })
-                            setIsServiceSearchActive(true)
-                          }} 
-                          className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
-                        >
-                          Изменить
-                        </button>
-                      </div>
-
-                      {draft.serviceId && draft.stages && (
-                        <div className="flex flex-col gap-6 p-4 pt-0">
-                          <div className="h-px w-full bg-panel-border mb-2" />
-                          
-                          {draft.serviceId === "custom" && (
-                            <div className="flex flex-col gap-3">
-                              <h3 className="text-xs font-semibold text-panel-text-subtle">Название услуги</h3>
-                              <Input
-                                theme="panel"
-                                type="text"
-                                value={draft.customService?.name || ""}
-                                onChange={e => setDraft({ ...draft, customService: { name: e.target.value }})}
-                                placeholder="Свободная услуга"
-                              />
-                            </div>
+                {/* Service Card Section */}
+                {isServiceSearchActive ? (
+                  <SearchableSelect
+                    value={draft.serviceId}
+                    onChange={val => {
+                      if (val === "custom") {
+                        setDraft({ ...draft, serviceId: "custom", customService: { name: "" }, price: undefined, stages: [{ id: "custom-stage-1", name: "Общее время", durationMinutes: 60 }] })
+                      } else {
+                        const srv = MOCK_SERVICES.find(s => s.id === val)
+                        if (srv) setDraft({ ...draft, serviceId: srv.id, customService: undefined, price: srv.price, stages: srv.stages })
+                      }
+                      setIsServiceSearchActive(false)
+                    }}
+                    options={MOCK_SERVICES.map(s => ({ id: s.id, name: s.name, subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽` }))}
+                    placeholder={isFormal ? "Выберите услугу..." : "Выбери услугу..."}
+                    showCustomOption={true}
+                    hideIcon={true}
+                  />
+                ) : (
+                  <div className="bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden p-5 flex flex-col gap-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <IconBox size="lg" shape="squircle">
+                          {draft.serviceId === "custom" ? "У" : selectedService?.name?.[0]?.toUpperCase() || "У"}
+                        </IconBox>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          {draft.serviceId === "custom" ? (
+                            <input 
+                              autoFocus
+                              type="text"
+                              value={draft.customService?.name || ""}
+                              onChange={e => setDraft({ ...draft, customService: { name: e.target.value } })}
+                              placeholder="Свободная услуга"
+                              className="bg-transparent text-base font-semibold text-panel-text outline-none placeholder:text-panel-text-muted w-full"
+                            />
+                          ) : (
+                            <span className="text-base font-semibold text-panel-text truncate leading-tight">{selectedService?.name}</span>
                           )}
-
-                          <div className="flex flex-col sm:flex-row gap-6">
-                            <div className="flex-1 flex flex-col gap-3">
-                              <h3 className="text-xs font-semibold text-panel-text-subtle">Этапы</h3>
-                              <div className="flex flex-col gap-2">
-                                {draft.stages.map((stage) => {
-                                  const h = Math.floor(stage.durationMinutes / 60)
-                                  const m = stage.durationMinutes % 60
-                                  return (
-                                    <div key={stage.id} className="p-3 bg-panel-base border border-panel-border-subtle rounded-xl flex items-center justify-between gap-4 group">
-                                      <span className="text-sm font-medium text-panel-text flex-1 truncate" title={stage.name}>{stage.name}</span>
-                                      
-                                      <div className="flex items-center gap-2 shrink-0">
-                                        <button 
-                                          onClick={() => handleStageDurationChange(stage.id, -15)}
-                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border-subtle flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
-                                        >
-                                          -
-                                        </button>
-                                        <div className="flex items-center justify-center gap-1 w-20">
-                                          <input 
-                                            type="number" 
-                                            value={h || ""} 
-                                            placeholder="0"
-                                            onChange={(e) => handleStageDurationInput(stage.id, parseInt(e.target.value) || 0, m)}
-                                            className="w-6 text-center bg-transparent focus:border-b focus:border-panel-text outline-none text-sm font-semibold text-panel-text p-0 transition-colors" 
-                                          />
-                                          <span className="text-xs font-medium text-panel-text-muted">ч</span>
-                                          <input 
-                                            type="number" 
-                                            value={m || ""} 
-                                            placeholder="00"
-                                            onChange={(e) => handleStageDurationInput(stage.id, h, parseInt(e.target.value) || 0)}
-                                            className="w-6 text-center bg-transparent focus:border-b focus:border-panel-text outline-none text-sm font-semibold text-panel-text p-0 transition-colors" 
-                                          />
-                                          <span className="text-xs font-medium text-panel-text-muted">м</span>
-                                        </div>
-                                        <button 
-                                          onClick={() => handleStageDurationChange(stage.id, 15)}
-                                          className="w-7 h-7 rounded-lg bg-panel-surface border border-panel-border-subtle flex items-center justify-center hover:border-panel-text-muted transition-colors active:scale-95 text-panel-text font-medium"
-                                        >
-                                          +
-                                        </button>
-                                      </div>
-                                    </div>
-                                  )
-                                })}
-                              </div>
-                            </div>
-
-                            <div className="flex-[0.5] flex flex-col gap-3">
-                              <h3 className="text-xs font-semibold text-panel-text-subtle">Стоимость</h3>
-                              <div className="relative flex items-center">
-                                <input 
-                                  type="number"
-                                  value={draft.price || ""}
-                                  onChange={e => setDraft({ ...draft, price: Number(e.target.value) })}
-                                  placeholder="0"
-                                  className="w-full bg-panel-base border border-panel-border-subtle rounded-xl pl-4 pr-8 py-3 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-colors"
-                                />
-                                <span className="absolute right-4 text-panel-text-muted font-medium text-sm">₽</span>
-                              </div>
-                            </div>
-                          </div>
+                          <span className="text-sm text-panel-text-muted truncate mt-0.5">
+                            {totalDuration > 0 ? formatDuration(totalDuration) : "Длительность не указана"}
+                          </span>
                         </div>
-                      )}
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setDraft({ ...draft, serviceId: undefined, customService: undefined, stages: undefined, price: undefined })
+                          setIsServiceSearchActive(true)
+                        }} 
+                        className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
+                      >
+                        Изменить
+                      </button>
                     </div>
-                  )}
-                </div>
 
+                    {/* Interactive Stage Timeline with Completion Stage */}
+                    {draft.stages && draft.stages.length > 0 && (
+                      <AppointmentStageTimeline
+                        stages={draft.stages}
+                        startDateTime={draft.startDateTime || ""}
+                        totalDurationMinutes={totalDuration}
+                        isEditable={true}
+                        onStageDurationChange={handleStageDurationChange}
+                        onStageDurationInput={handleStageDurationInput}
+                      />
+                    )}
+
+                    {/* Dedicated Prominent Price Input Section */}
+                    <div className="pt-3 border-t border-panel-border-subtle flex items-center justify-between">
+                      <span className="text-xs font-semibold text-panel-text-muted">Стоимость услуги</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <input 
+                          type="number"
+                          value={draft.price || ""}
+                          onChange={e => setDraft({ ...draft, price: Number(e.target.value) })}
+                          placeholder="0"
+                          className="w-32 bg-panel-base border border-panel-border-subtle rounded-xl px-3 py-2 text-base font-bold text-panel-text text-right outline-none focus:border-panel-text transition-colors"
+                        />
+                        <span className="text-base font-bold text-panel-text">₽</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Notes & Color Card */}
                 <AppointmentNotesCard
                   color={draft.color || "#ec4899"}
                   onColorChange={(c) => setDraft({ ...draft, color: c })}
@@ -696,7 +602,8 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
           </div>
         </div>
 
-        <div className="px-6 py-5 shrink-0 border-t border-panel-border-subtle bg-panel-base">
+        {/* Footer */}
+        <div className="px-6 py-4 shrink-0 border-t border-panel-border-subtle bg-panel-base">
           <div className="max-w-2xl mx-auto w-full">
             <Button
               variant="primary"
