@@ -38,10 +38,24 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
     let newStart = field === "start" ? value : currentSlot.start
     let newEnd = field === "end" ? value : currentSlot.end
 
-    // Validation: start cannot be > end
-    if (newStart > newEnd) {
-      if (field === "start") newEnd = newStart
-      else newStart = newEnd
+    const addHour = (t: string) => {
+      const [h, m] = t.split(':').map(Number)
+      return `${Math.min(23, h + 1).toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
+    }
+    const subHour = (t: string) => {
+      const [h, m] = t.split(':').map(Number)
+      return `${Math.max(0, h - 1).toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
+    }
+
+    // Validation: start cannot be >= end
+    if (newStart >= newEnd) {
+      if (field === "start") {
+        newEnd = addHour(newStart)
+        if (newStart >= newEnd) newStart = subHour(newEnd) // clamp if 23:xx
+      } else {
+        newStart = subHour(newEnd)
+        if (newStart >= newEnd) newEnd = addHour(newStart) // clamp if 00:xx
+      }
     }
 
     updated[day] = [{ start: newStart, end: newEnd }]
@@ -109,7 +123,7 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
                         type="time"
                         value={slot.start}
                         onChange={e => updateTime(key, "start", e.target.value)}
-                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text text-center outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:w-0 [&::-webkit-inner-spin-button]:hidden [&::-webkit-clear-button]:hidden"
+                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[115px]"
                       />
                     </div>
                     <span className="text-panel-text-subtle text-sm font-medium">—</span>
@@ -118,7 +132,7 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
                         type="time"
                         value={slot.end}
                         onChange={e => updateTime(key, "end", e.target.value)}
-                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text text-center outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[90px] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:w-0 [&::-webkit-inner-spin-button]:hidden [&::-webkit-clear-button]:hidden"
+                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[115px]"
                       />
                     </div>
                   </>
