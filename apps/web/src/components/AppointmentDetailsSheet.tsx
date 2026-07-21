@@ -4,7 +4,7 @@ import Avatar from "@/components/Avatar"
 import Button from "@/components/ui/Button"
 import ColorPicker from "@/components/ui/ColorPicker"
 import IconBox from "@/components/ui/IconBox"
-import type { Appointment } from "@/types/models"
+import type { Appointment, ServiceStage } from "@/types/models"
 import { formatCurrency, addMinutes, formatDuration, formatTime } from "@/lib/formatters"
 import { usePermissions } from "@/lib/permissions"
 import { useAuth } from "@/lib/AuthProvider"
@@ -50,6 +50,7 @@ export default function AppointmentDetailsSheet({
   const [color, setColor] = useState("#ec4899")
   const [notes, setNotes] = useState("")
   const [isConfirmed, setIsConfirmed] = useState(true)
+  const [stages, setStages] = useState<ServiceStage[]>([])
 
   useEffect(() => {
     if (event) {
@@ -58,20 +59,46 @@ export default function AppointmentDetailsSheet({
       setColor(event.color || "#ec4899")
       setNotes(event.notes || "")
       setIsConfirmed(event.isConfirmed ?? true)
+      setStages(event.stages ? JSON.parse(JSON.stringify(event.stages)) : [])
     }
   }, [event])
 
   if (!event) return null
 
-  const totalDuration = event.totalDurationMinutes || 60
   const currentStartISO = startDateTime || event.startDateTime
+
+  const totalDuration = stages && stages.length > 0
+    ? stages.reduce((acc, s) => acc + (s.durationMinutes || 0), 0)
+    : (event.totalDurationMinutes || 60)
+
+  const handleStageDurationChange = (stageId: string, delta: number) => {
+    setStages((prev) =>
+      prev.map((s) => {
+        if (s.id === stageId) {
+          const newDur = Math.max(0, (s.durationMinutes || 0) + delta)
+          return { ...s, durationMinutes: newDur }
+        }
+        return s
+      })
+    )
+  }
+
+  const handleStageDurationInput = (stageId: string, h: number, m: number) => {
+    const newDur = Math.max(0, h * 60 + m)
+    setStages((prev) =>
+      prev.map((s) => (s.id === stageId ? { ...s, durationMinutes: newDur } : s))
+    )
+  }
+
+  const hasStageChanges = JSON.stringify(stages) !== JSON.stringify(event.stages || [])
 
   // Check if any field has actually been modified
   const hasChanges =
     currentStartISO !== event.startDateTime ||
     price !== event.price ||
     color !== (event.color || "#ec4899") ||
-    notes.trim() !== (event.notes || "").trim()
+    notes.trim() !== (event.notes || "").trim() ||
+    hasStageChanges
 
   const handleSave = () => {
     if (!hasChanges || !onUpdate) {
@@ -85,6 +112,8 @@ export default function AppointmentDetailsSheet({
       price,
       color,
       notes,
+      stages,
+      totalDurationMinutes: totalDuration,
       isConfirmed,
     }
 
@@ -103,6 +132,8 @@ export default function AppointmentDetailsSheet({
         price,
         color,
         notes,
+        stages,
+        totalDurationMinutes: totalDuration,
         isConfirmed: newStatus,
       })
     }
@@ -178,13 +209,16 @@ export default function AppointmentDetailsSheet({
                 </div>
               </div>
 
-              {/* Stage timeline with completion stage */}
-              {event.stages && event.stages.length > 0 && (
+              {/* Stage timeline with completion stage & duration editing */}
+              {stages && stages.length > 0 && (
                 <AppointmentStageTimeline
-                  stages={event.stages}
+                  stages={stages}
                   startDateTime={currentStartISO}
                   totalDurationMinutes={totalDuration}
                   workspaceTimezone={workspaceTimezone}
+                  isEditable={canEdit}
+                  onStageDurationChange={handleStageDurationChange}
+                  onStageDurationInput={handleStageDurationInput}
                 />
               )}
 
