@@ -68,7 +68,7 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
   return (
     <div className="flex flex-col gap-6 py-2">
       <div className="flex items-center justify-between px-1">
-        <p className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">
+        <p className="text-sm font-semibold text-panel-text-muted-dark">
           Рабочие дни
         </p>
         <p className="text-sm text-panel-text-subtle font-medium">

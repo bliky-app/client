@@ -55,7 +55,7 @@ export default function ColorPicker({
   return (
     <div className={`flex flex-col gap-2.5 ${className}`}>
       {label && (
-        <span className="text-xs font-semibold text-panel-text-subtle uppercase tracking-wider pl-0.5">
+        <span className="text-xs font-semibold text-panel-text-subtle pl-0.5">
           {label}
         </span>
       )}

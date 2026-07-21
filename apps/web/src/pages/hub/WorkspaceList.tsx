@@ -64,10 +64,10 @@ export default function WorkspaceList({ workspaces }: WorkspaceListProps) {
               />
 
               <div className="flex flex-col min-w-0 pb-0.5">
-                <span className="text-[10px] text-panel-text-subtle font-bold uppercase tracking-wider line-clamp-1">
+                <span className="text-xs font-semibold text-panel-text-muted line-clamp-1 leading-tight">
                   {workspace.category || config.label}
                 </span>
-                <span className="text-xs text-panel-text-muted-dark font-medium line-clamp-1 mt-0.5">
+                <span className="text-[11px] text-panel-text-subtle font-medium line-clamp-1 mt-0.5 leading-tight">
                   {roleName}
                 </span>
               </div>

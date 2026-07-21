@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Loader2, Users, Package, UserCheck, BarChart2, Clock, ClipboardList, List } from "lucide-react"
-import WorkspaceHeader from "./WorkspaceHeader"
-import WorkspaceDrawer from "./WorkspaceDrawer"
 import WorkspaceSchedule from "./WorkspaceSchedule"
 import WorkspaceStub from "./WorkspaceStub"
+import WorkspaceLayout from "@/layouts/WorkspaceLayout"
 import { workspaceApi } from "@/lib/api/workspaceApi"
 import type { WorkspaceSectionId } from "@/types/models"
 import { usePermissions } from "@/lib/permissions"
@@ -57,12 +56,12 @@ export default function WorkspacePage({ id }: WorkspacePageProps) {
       case "services": {
         const hasFullAccess = can("manage_services")
         return (
-          <WorkspaceStub 
-            icon={List} 
-            title="Услуги" 
-            description={hasFullAccess 
+          <WorkspaceStub
+            icon={List}
+            title="Услуги"
+            description={hasFullAccess
               ? "Управление прайс-листом и категориями услуг всего пространства."
-              : (isFormal ? "Здесь отображаются ваши доступные услуги и цены." : "Здесь отображаются твои доступные услуги и цены.")} 
+              : (isFormal ? "Здесь отображаются ваши доступные услуги и цены." : "Здесь отображаются твои доступные услуги и цены.")}
           />
         )
       }
@@ -80,22 +79,15 @@ export default function WorkspacePage({ id }: WorkspacePageProps) {
   }
 
   return (
-    <div className="flex flex-col flex-1 h-full w-full bg-hub-base select-none overflow-hidden animate-in fade-in duration-300">
-      <WorkspaceDrawer
-        workspace={workspace}
-        isOpen={drawerOpen}
-        activeSection={activeSection}
-        onClose={() => setDrawerOpen(false)}
-        onSelectSection={setActiveSection}
-      />
-
-      <div className="bg-hub-base px-6 py-8">
-        <WorkspaceHeader workspace={workspace} onMenuOpen={() => setDrawerOpen(true)} />
-      </div>
-
-      <div className="flex-1 bg-panel-base rounded-t-[32px] overflow-y-auto flex flex-col">
-        {renderSection()}
-      </div>
-    </div>
+    <WorkspaceLayout
+      workspace={workspace}
+      drawerOpen={drawerOpen}
+      activeSection={activeSection}
+      onDrawerClose={() => setDrawerOpen(false)}
+      onMenuOpen={() => setDrawerOpen(true)}
+      onSelectSection={setActiveSection}
+    >
+      {renderSection()}
+    </WorkspaceLayout>
   )
 }

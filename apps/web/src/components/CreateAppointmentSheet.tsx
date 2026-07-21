@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
 import PhoneInput from "@/components/ui/PhoneInput"
 import ColorPicker from "@/components/ui/ColorPicker"
+import { formatAppointmentDate } from "@/lib/formatters"
 
 const ACCENT_COLORS = [
   "#6366f1", "#8b5cf6", "#d946ef", "#ec4899",
@@ -357,7 +358,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
           <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full pb-32">
             
             <div className="flex flex-col gap-3">
-              <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Дата и время</h3>
+              <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Дата и время</h3>
               <label className="relative flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle hover:border-panel-text-muted transition-colors rounded-2xl shadow-sm cursor-pointer group">
                 <input 
                   type="datetime-local"
@@ -373,7 +374,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     {draft.startDateTime ? (
                       <>
                         <span className="text-base font-semibold text-panel-text capitalize truncate">
-                          {new Date(draft.startDateTime).toLocaleDateString("ru-RU", { weekday: 'short', day: 'numeric', month: 'long' })}
+                          {formatAppointmentDate(draft.startDateTime)}
                         </span>
                         <span className="text-sm text-panel-text-muted truncate">
                           {new Date(draft.startDateTime).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' })}
@@ -393,7 +394,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
             </div>
 
             <div className="flex flex-col gap-3">
-              <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Пространство</h3>
+              <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Пространство</h3>
               {isWorkspaceSearchActive ? (
                 <SearchableSelect
                   value={draft.workspaceId}
@@ -437,7 +438,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
             {draft.workspaceId && (
               <>
                 <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2">
-                  <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Клиент</h3>
+                  <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Клиент</h3>
                   
                   {isClientSearchActive ? (
                     draft.clientId === "new_pending" ? (
@@ -535,7 +536,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Мастер</h3>
+                  <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Мастер</h3>
                     {isMasterSearchActive ? (
                       <SearchableSelect
                         value={draft.masterId}
@@ -577,7 +578,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                   </div>
 
                 <div className="flex flex-col gap-3">
-                  <h3 className="text-xs font-semibold text-panel-text-subtle uppercase tracking-widest pl-1">Услуга</h3>
+                  <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Услуга</h3>
                   {isServiceSearchActive ? (
                     <SearchableSelect
                       value={draft.serviceId}
@@ -638,7 +639,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                           
                           {draft.serviceId === "custom" && (
                             <div className="flex flex-col gap-3">
-                              <h3 className="text-[11px] font-bold text-panel-text-subtle uppercase tracking-widest">Название услуги</h3>
+                              <h3 className="text-xs font-semibold text-panel-text-subtle">Название услуги</h3>
                               <Input
                                 theme="panel"
                                 type="text"
@@ -651,7 +652,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
 
                           <div className="flex flex-col sm:flex-row gap-6">
                             <div className="flex-1 flex flex-col gap-3">
-                              <h3 className="text-[11px] font-bold text-panel-text-subtle uppercase tracking-widest">Этапы</h3>
+                              <h3 className="text-xs font-semibold text-panel-text-subtle">Этапы</h3>
                               <div className="flex flex-col gap-2">
                                 {draft.stages.map((stage) => {
                                   const h = Math.floor(stage.durationMinutes / 60)
@@ -699,7 +700,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                             </div>
 
                             <div className="flex-[0.5] flex flex-col gap-3">
-                              <h3 className="text-[11px] font-bold text-panel-text-subtle uppercase tracking-widest">Стоимость</h3>
+                              <h3 className="text-xs font-semibold text-panel-text-subtle">Стоимость</h3>
                               <div className="relative flex items-center">
                                 <input 
                                   type="number"
@@ -725,7 +726,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                 />
 
                 <div className="flex flex-col gap-3">
-                  <h3 className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">Примечания</h3>
+                  <h3 className="text-xs font-semibold text-panel-text-muted-dark">Примечания</h3>
                   <textarea 
                     value={draft.notes || ""}
                     onChange={e => setDraft({ ...draft, notes: e.target.value })}

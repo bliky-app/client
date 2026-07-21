@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { X, ArrowLeft } from "lucide-react"
 import Step1Type from "./steps/Step1Type"
 import Step2Details from "./steps/Step2Details"
 import Step4Schedule from "./steps/Step4Schedule"
 import Button from "@/components/ui/Button"
+import ModalSheetLayout from "@/layouts/ModalSheetLayout"
 import { useAuth } from "@/lib/AuthProvider"
 import type { WorkspaceType, WorkspaceSchedule } from "@/types/models"
 import { getDefaultTimezone } from "@/lib/formatters"
@@ -44,9 +44,9 @@ const INITIAL_DATA: CreateWorkspaceFormData = {
 }
 
 const STEP_LABELS = [
-  "Тип",
-  "Детали",
-  "График",
+  "Тип пространства",
+  "Детали пространства",
+  "График работы",
 ]
 
 export default function CreateWorkspacePage() {
@@ -100,40 +100,12 @@ export default function CreateWorkspacePage() {
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-hub-base h-svh overflow-hidden">
-      {/* White wizard panel */}
-      <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] mt-16 shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
-        {/* Header */}
-        <div className="flex items-center gap-3 px-6 pt-6 pb-4 shrink-0 border-b border-panel-border-subtle">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="p-2 -ml-2 rounded-full text-panel-text-muted hover:text-panel-text hover:bg-panel-surface-hover transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-bold text-panel-text-subtle uppercase tracking-wider mb-0.5">
-              Шаг {step + 1} из {totalSteps}
-            </p>
-            <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
-              {step === 0 && "Тип пространства"}
-              {step === 1 && "Детали пространства"}
-              {step === 2 && "График работы"}
-            </h1>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="p-2 -mr-2 rounded-full text-panel-text-muted hover:text-panel-text hover:bg-panel-surface-hover transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Progress bar */}
+    <ModalSheetLayout
+      title={STEP_LABELS[step]}
+      subtitle={`Шаг ${step + 1} из ${totalSteps}`}
+      showBack={!isFirst}
+      onBack={handleBack}
+      progressBar={
         <div className="px-6 pt-4 pb-2 shrink-0">
           <div className="h-1 bg-panel-border-subtle rounded-full overflow-hidden">
             <div
@@ -142,27 +114,24 @@ export default function CreateWorkspacePage() {
             />
           </div>
         </div>
-
-        {/* Step content scroll body */}
-        <div className="flex-1 overflow-y-auto px-6 relative flex flex-col">
-          {renderStep()}
-
-          {/* Sticky Navigation Footer */}
-          <div className="sticky bottom-0 -mx-6 px-6 py-4 bg-panel-base border-t border-panel-border-subtle shadow-[0_-4px_16px_rgba(0,0,0,0.06)] z-20 shrink-0 mt-auto">
-            <Button
-              variant="primary"
-              theme="panel"
-              fullWidth
-              disabled={!canProceed()}
-              onClick={handleNext}
-            >
-              {isLast
-                ? (isFormal ? "Создайте пространство" : "Создай пространство")
-                : (isFormal ? "Продолжить" : "Далее")}
-            </Button>
-          </div>
+      }
+      footer={
+        <div className="sticky bottom-0 -mx-6 px-6 py-4 bg-panel-base border-t border-panel-border-subtle shadow-[0_-4px_16px_rgba(0,0,0,0.06)] z-20 shrink-0 mt-auto">
+          <Button
+            variant="primary"
+            theme="panel"
+            fullWidth
+            disabled={!canProceed()}
+            onClick={handleNext}
+          >
+            {isLast
+              ? (isFormal ? "Создайте пространство" : "Создай пространство")
+              : (isFormal ? "Продолжить" : "Далее")}
+          </Button>
         </div>
-      </div>
-    </div>
+      }
+    >
+      {renderStep()}
+    </ModalSheetLayout>
   )
 }

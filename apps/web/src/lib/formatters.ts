@@ -8,7 +8,7 @@ export const formatCurrency = (value: number): string => {
 
 export const formatTime = (isoString: string, timezone?: string): string => {
   if (!isoString) return ""
-  
+
   const date = new Date(isoString)
   if (isNaN(date.getTime())) return ""
 
@@ -19,12 +19,28 @@ export const formatTime = (isoString: string, timezone?: string): string => {
   }).format(date)
 }
 
+export const formatAppointmentDate = (isoString: string, timezone?: string): string => {
+  if (!isoString) return ""
+
+  const date = new Date(isoString)
+  if (isNaN(date.getTime())) return ""
+
+  const str = new Intl.DateTimeFormat("ru-RU", {
+    weekday: "short",
+    day: "numeric",
+    month: "long",
+    timeZone: timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+  }).format(date)
+
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
 export const getTzDateString = (date: Date, timezone: string): string => {
-  return new Intl.DateTimeFormat('en-CA', { 
+  return new Intl.DateTimeFormat('en-CA', {
     timeZone: timezone,
-    year: 'numeric', 
-    month: '2-digit', 
-    day: '2-digit' 
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
   }).format(date)
 }
 
@@ -58,9 +74,9 @@ export const getGreeting = (date: Date, timezone: string = "Europe/Moscow"): str
     hourCycle: "h23",
     timeZone: timezone,
   })
-  
+
   const hours = parseInt(formatter.format(date), 10)
-  
+
   if (hours >= 5 && hours < 12) return "Доброе утро!"
   if (hours >= 12 && hours < 18) return "Добрый день!"
   if (hours >= 18 && hours < 23) return "Добрый вечер!"
