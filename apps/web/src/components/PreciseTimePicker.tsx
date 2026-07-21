@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { Check, X } from "lucide-react"
+import { ChevronUp, ChevronDown, X } from "lucide-react"
 
 interface PreciseTimePickerProps {
   x: number
@@ -21,7 +21,6 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
         onCancel()
       }
     }
-    // Delay adding to prevent immediate close on the same pointer event
     const timer = setTimeout(() => {
       document.addEventListener("mousedown", handleDown)
       document.addEventListener("touchstart", handleDown)
@@ -34,7 +33,6 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
     }
   }, [onCancel])
 
-  // Ensure popover stays within screen bounds
   const [style, setStyle] = useState<React.CSSProperties>({ 
     top: y, 
     left: x, 
@@ -46,11 +44,11 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
     if (popoverRef.current) {
       const rect = popoverRef.current.getBoundingClientRect()
       let newX = x
-      let newY = y - 20 // 20px above the finger
+      let newY = y - 12
 
       if (newX - rect.width / 2 < 10) newX = rect.width / 2 + 10
       if (newX + rect.width / 2 > window.innerWidth - 10) newX = window.innerWidth - rect.width / 2 - 10
-      if (newY - rect.height < 10) newY = y + rect.height + 20 // flip below if no space
+      if (newY - rect.height < 10) newY = y + rect.height + 12
 
       setStyle({
         top: newY,
@@ -65,54 +63,63 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
   const pad = (n: number) => n.toString().padStart(2, "0")
 
   return (
-    <div 
-      className="fixed inset-0 z-[100] pointer-events-none"
-    >
+    <div className="fixed inset-0 z-[100] pointer-events-none">
       <div 
         ref={popoverRef}
         style={style}
-        className="absolute bg-panel-surface border border-panel-border shadow-2xl rounded-2xl p-4 flex flex-col gap-4 w-64 pointer-events-auto"
+        className="absolute bg-panel-surface border border-panel-border shadow-xl rounded-2xl p-3 flex flex-col gap-2.5 w-44 pointer-events-auto relative"
       >
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-bold text-panel-text">Точное время</h4>
-          <button onClick={onCancel} className="p-1 hover:bg-panel-base rounded-full text-panel-text-muted transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+        <button 
+          onClick={onCancel} 
+          className="absolute top-2 right-2 p-1 hover:bg-panel-base rounded-full text-panel-text-muted transition-colors"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
 
-        <div className="flex items-center justify-center gap-4">
-          <div className="flex flex-col items-center gap-1">
-            <button onClick={() => setHour(h => (h + 1) % 24)} className="px-4 py-2 hover:bg-panel-base rounded-lg text-panel-text-muted transition-colors">
-              ▲
+        <div className="flex items-center justify-center gap-1 pt-1">
+          <div className="flex flex-col items-center">
+            <button 
+              onClick={() => setHour(h => (h + 1) % 24)} 
+              className="p-1 hover:bg-panel-base rounded-lg text-panel-text-muted transition-colors active:scale-95"
+            >
+              <ChevronUp className="w-4 h-4" />
             </button>
-            <div className="text-3xl font-extrabold text-panel-text w-16 text-center tabular-nums">
+            <div className="text-2xl font-extrabold text-panel-text w-12 text-center tabular-nums py-0.5">
               {pad(hour)}
             </div>
-            <button onClick={() => setHour(h => (h - 1 + 24) % 24)} className="px-4 py-2 hover:bg-panel-base rounded-lg text-panel-text-muted transition-colors">
-              ▼
+            <button 
+              onClick={() => setHour(h => (h - 1 + 24) % 24)} 
+              className="p-1 hover:bg-panel-base rounded-lg text-panel-text-muted transition-colors active:scale-95"
+            >
+              <ChevronDown className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="text-3xl font-extrabold text-panel-text-muted mb-1">:</div>
+          <div className="text-2xl font-extrabold text-panel-text-muted pb-1">:</div>
 
-          <div className="flex flex-col items-center gap-1">
-            <button onClick={() => setMinute(m => (m + 5) % 60)} className="px-4 py-2 hover:bg-panel-base rounded-lg text-panel-text-muted transition-colors">
-              ▲
+          <div className="flex flex-col items-center">
+            <button 
+              onClick={() => setMinute(m => (m + 5) % 60)} 
+              className="p-1 hover:bg-panel-base rounded-lg text-panel-text-muted transition-colors active:scale-95"
+            >
+              <ChevronUp className="w-4 h-4" />
             </button>
-            <div className="text-3xl font-extrabold text-panel-text w-16 text-center tabular-nums">
+            <div className="text-2xl font-extrabold text-panel-text w-12 text-center tabular-nums py-0.5">
               {pad(minute)}
             </div>
-            <button onClick={() => setMinute(m => (m - 5 + 60) % 60)} className="px-4 py-2 hover:bg-panel-base rounded-lg text-panel-text-muted transition-colors">
-              ▼
+            <button 
+              onClick={() => setMinute(m => (m - 5 + 60) % 60)} 
+              className="p-1 hover:bg-panel-base rounded-lg text-panel-text-muted transition-colors active:scale-95"
+            >
+              <ChevronDown className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         <button 
           onClick={() => onConfirm(hour, minute)}
-          className="w-full bg-panel-text text-panel-base py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all"
+          className="w-full bg-panel-text text-panel-base py-2 rounded-xl text-xs font-semibold flex items-center justify-center hover:opacity-90 active:scale-95 transition-all"
         >
-          <Check className="w-4 h-4" />
           Выбрать
         </button>
       </div>
