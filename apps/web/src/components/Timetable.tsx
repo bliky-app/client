@@ -1,9 +1,11 @@
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
+import { createPortal } from "react-dom"
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react"
 import { getTzDateString } from "@/lib/formatters"
 import type { Appointment, TimetableColumn, TimetableViewType } from "@/types/models"
 import Avatar from "@/components/Avatar"
 import { formatTime } from "@/lib/formatters"
+import { PreciseTimePicker } from "./PreciseTimePicker"
 
 export type TimetableViewMode = "1day" | "week" | "month"
 
@@ -64,6 +66,20 @@ export default function Timetable({
   const [showCal, setShowCal] = useState(false)
   const [calMonth, setCalMonth] = useState(() => new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
   const [now, setNow] = useState(new Date())
+
+  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pointerStart = useRef({ x: 0, y: 0 })
+  const isLongPressTriggered = useRef(false)
+  
+  const [longPressPopover, setLongPressPopover] = useState<{
+    show: boolean
+    x: number
+    y: number
+    dateString: string
+    staffId?: string
+    initialHour: number
+    initialMinute: number
+  } | null>(null)
 
   useEffect(() => {
     setCalMonth(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
@@ -368,9 +384,57 @@ export default function Timetable({
                       </div>
 
                       <div 
-                        className="relative cursor-pointer" 
+                        className="relative cursor-pointer touch-none" 
                         style={{ height: gH }}
+                        onPointerDown={(e) => {
+                          if (!col.dateString) return
+                          isLongPressTriggered.current = false
+                          const rect = e.currentTarget.getBoundingClientRect()
+                          const y = e.clientY - rect.top
+                          pointerStart.current = { x: e.clientX, y: e.clientY }
+
+                          longPressRef.current = setTimeout(() => {
+                            isLongPressTriggered.current = true
+                            const minutes = Math.floor(y / PPM) + (gStart * 60)
+                            const snappedMinutes = Math.round(minutes / 15) * 15
+                            const h = Math.floor(snappedMinutes / 60)
+                            const m = snappedMinutes % 60
+                            
+                            setLongPressPopover({
+                              show: true,
+                              x: e.clientX,
+                              y: e.clientY,
+                              dateString: col.dateString!,
+                              staffId: col.id !== col.dateString ? col.id : undefined,
+                              initialHour: h,
+                              initialMinute: m
+                            })
+                          }, 400)
+                        }}
+                        onPointerMove={(e) => {
+                          if (longPressRef.current) {
+                            const dx = Math.abs(e.clientX - pointerStart.current.x)
+                            const dy = Math.abs(e.clientY - pointerStart.current.y)
+                            if (dx > 10 || dy > 10) {
+                              clearTimeout(longPressRef.current)
+                              longPressRef.current = null
+                            }
+                          }
+                        }}
+                        onPointerUp={() => {
+                          if (longPressRef.current) {
+                            clearTimeout(longPressRef.current)
+                            longPressRef.current = null
+                          }
+                        }}
+                        onPointerCancel={() => {
+                          if (longPressRef.current) {
+                            clearTimeout(longPressRef.current)
+                            longPressRef.current = null
+                          }
+                        }}
                         onClick={(e) => {
+                          if (isLongPressTriggered.current) return
                           if (!col.dateString) return
                           const rect = e.currentTarget.getBoundingClientRect()
                           const y = e.clientY - rect.top
@@ -453,6 +517,22 @@ export default function Timetable({
             </div>
           </div>
         )
+      )}
+      
+      {longPressPopover?.show && typeof document !== "undefined" && createPortal(
+        <PreciseTimePicker
+          x={longPressPopover.x}
+          y={longPressPopover.y}
+          initialHour={longPressPopover.initialHour}
+          initialMinute={longPressPopover.initialMinute}
+          onCancel={() => setLongPressPopover(null)}
+          onConfirm={(h, m) => {
+            const timeStr = `${pad(h)}:${pad(m)}`
+            onSlotClick?.(longPressPopover.dateString, timeStr, longPressPopover.staffId)
+            setLongPressPopover(null)
+          }}
+        />,
+        document.body
       )}
     </div>
   )

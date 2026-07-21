@@ -1,10 +1,25 @@
-import { createBrowserRouter, RouterProvider, useParams } from "react-router-dom"
+import { createBrowserRouter, RouterProvider, useParams, Navigate } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import MasterLayout from "@/layouts/MasterLayout"
 import Hub from "@/pages/hub/Hub"
 import WorkspacePage from "@/pages/workspace/WorkspacePage"
 import CreateWorkspacePage from "@/pages/workspace/CreateWorkspacePage"
-import { AuthProvider } from "@/lib/AuthProvider"
+import AuthPage from "@/pages/auth/AuthPage"
+import AccountSetupPage from "@/pages/auth/AccountSetupPage"
+import { AuthProvider, useAuth } from "@/lib/AuthProvider"
+import { ThemeProvider } from "@/lib/ThemeProvider"
+
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth()
+  if (!user) {
+    return <Navigate to="/auth" replace />
+  }
+  // If user is logged in but hasn't set their name, force setup
+  if (!user.firstName || !user.lastName) {
+    return <Navigate to="/setup" replace />
+  }
+  return <>{children}</>
+}
 
 function WorkspaceRoute() {
   const { id } = useParams<{ id: string }>()
@@ -14,8 +29,20 @@ function WorkspaceRoute() {
 
 const router = createBrowserRouter([
   {
+    path: "/auth",
+    element: <AuthPage />
+  },
+  {
+    path: "/setup",
+    element: <AccountSetupPage />
+  },
+  {
     path: "/",
-    element: <MasterLayout />,
+    element: (
+      <RequireAuth>
+        <MasterLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         index: true,
@@ -41,8 +68,6 @@ const queryClient = new QueryClient({
     },
   },
 })
-
-import { ThemeProvider } from "@/lib/ThemeProvider"
 
 export function App() {
   return (

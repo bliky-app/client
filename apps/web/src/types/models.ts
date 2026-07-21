@@ -22,8 +22,11 @@ export interface Role {
 // 2. Пользователь и Клиент
 export interface User {
   id: string
-  fullName: string
-  shortName: string
+  phone: string
+  firstName?: string
+  lastName?: string
+  fullName?: string
+  shortName?: string
   gender: "male" | "female"
   isFormal: boolean
   color: string

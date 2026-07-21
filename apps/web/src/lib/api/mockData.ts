@@ -39,7 +39,10 @@ export const ROLE_USER: Role = {
 // 2. Users
 export const MOCK_USER: User = {
   id: "u-kirill",
-  fullName: "Кирилл Волычев",
+  phone: "+7 (999) 000-00-00",
+  firstName: "Кирилл",
+  lastName: "Олегов",
+  fullName: "Кирилл Олегов",
   shortName: "Кирилл",
   gender: "male",
   isFormal: false,
@@ -48,11 +51,11 @@ export const MOCK_USER: User = {
   globalRole: ROLE_USER
 }
 
-const u2: User = { id: "u-masha", fullName: "Мария Смирнова", shortName: "Маша", gender: "female", isFormal: false, color: "#ec4899", globalRole: ROLE_MASTER }
-const u3: User = { id: "u-pasha", fullName: "Павел Иванов", shortName: "Павел", gender: "male", isFormal: true, color: "#14b8a6", globalRole: ROLE_MASTER }
-const u4: User = { id: "u-anya", fullName: "Анна Петрова", shortName: "Аня", gender: "female", isFormal: false, color: "#f59e0b", globalRole: ROLE_ADMIN }
-const u5: User = { id: "u-lena", fullName: "Елена Кузнецова", shortName: "Лена", gender: "female", isFormal: false, color: "#8b5cf6", globalRole: ROLE_MASTER }
-const u6: User = { id: "u-igor", fullName: "Игорь Макаров", shortName: "Игорь", gender: "male", isFormal: false, color: "#ef4444", globalRole: ROLE_MASTER }
+const u2: User = { id: "u-masha", phone: "+79991112233", fullName: "Мария Смирнова", shortName: "Маша", gender: "female", isFormal: false, color: "#ec4899", globalRole: ROLE_MASTER }
+const u3: User = { id: "u-pasha", phone: "+79992223344", fullName: "Павел Иванов", shortName: "Павел", gender: "male", isFormal: true, color: "#14b8a6", globalRole: ROLE_MASTER }
+const u4: User = { id: "u-anya", phone: "+79993334455", fullName: "Анна Петрова", shortName: "Аня", gender: "female", isFormal: false, color: "#f59e0b", globalRole: ROLE_ADMIN }
+const u5: User = { id: "u-lena", phone: "+79994445566", fullName: "Елена Кузнецова", shortName: "Лена", gender: "female", isFormal: false, color: "#8b5cf6", globalRole: ROLE_MASTER }
+const u6: User = { id: "u-igor", phone: "+79995556677", fullName: "Игорь Макаров", shortName: "Игорь", gender: "male", isFormal: false, color: "#ef4444", globalRole: ROLE_MASTER }
 
 // 3. Categories
 const catHair: StaffCategory = { id: "cat-1", name: "Стилист по волосам" }

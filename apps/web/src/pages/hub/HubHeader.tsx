@@ -46,7 +46,7 @@ export default function HubHeader({ user, date }: HubHeaderProps) {
         >
           <Avatar
             type="user"
-            name={user.shortName}
+            name={user.shortName || user.fullName || ""}
             avatarUrl={user.avatarUrl}
             className="h-11 w-11 rounded-full border border-hub-border text-lg group-hover:border-hub-border-light transition-colors"
           />
