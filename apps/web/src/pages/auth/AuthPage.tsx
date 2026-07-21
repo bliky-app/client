@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Navigate } from "react-router-dom"
 import { ChevronLeft, Loader2, Sun, Moon } from "lucide-react"
 import { useTheme } from "@/lib/ThemeProvider"
@@ -7,19 +6,27 @@ import Button from "@/components/ui/Button"
 import PhoneInput from "@/components/ui/PhoneInput"
 import PasswordInput, { validatePassword } from "@/components/ui/PasswordInput"
 import { getGreeting } from "@/lib/formatters"
+import { useAuthForm } from "@/hooks/useAuthForm"
 
 export default function AuthPage() {
-  const { user, login, register, checkPhone, isLoading: isAuthLoading } = useAuth()
+  const { user, isLoading: isAuthLoading } = useAuth()
   const { theme, setTheme } = useTheme()
-
-  const [step, setStep] = useState<"phone" | "password">("phone")
-  const [isLoginFlow, setIsLoginFlow] = useState(true)
-
-  const [phone, setPhone] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const {
+    step,
+    isLoginFlow,
+    phone,
+    setPhone,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    isLoading,
+    error,
+    setError,
+    handlePhoneSubmit,
+    handlePasswordSubmit,
+    goBackToPhone,
+  } = useAuthForm()
 
   if (isAuthLoading) {
     return (
@@ -29,7 +36,6 @@ export default function AuthPage() {
     )
   }
 
-  // If already authenticated and setup complete, go to Hub
   if (user) {
     if (user.firstName && user.lastName) {
       return <Navigate to="/" replace />
@@ -38,63 +44,8 @@ export default function AuthPage() {
     }
   }
 
-  const handlePhoneSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const rawDigits = phone.replace(/\D/g, "")
-    if (!phone || rawDigits.length < 10) {
-      setError("Введите корректный номер телефона")
-      return
-    }
-    setError("")
-    setIsLoading(true)
-    try {
-      const exists = await checkPhone(phone)
-      setIsLoginFlow(exists)
-      setStep("password")
-    } catch {
-      setError("Произошла ошибка при проверке номера")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!password) {
-      setError("Введите пароль")
-      return
-    }
-
-    if (!isLoginFlow) {
-      if (password !== confirmPassword) {
-        setError("Пароли не совпадают")
-        return
-      }
-      const valRes = validatePassword(password)
-      if (!valRes.isValid) {
-        setError(`Пароль не соответствует требованиям: ${valRes.errors.join(", ")}`)
-        return
-      }
-    }
-
-    setError("")
-    setIsLoading(true)
-    try {
-      if (isLoginFlow) {
-        await login(phone, password)
-      } else {
-        await register(phone, password)
-      }
-    } catch (err: any) {
-      setError(err.message || "Неверный пароль")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   return (
     <div className="min-h-screen w-full bg-hub-base flex justify-center items-start pt-16 sm:pt-24 p-6 font-sans relative">
-      {/* Theme Toggle Button */}
       <button
         type="button"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -105,7 +56,6 @@ export default function AuthPage() {
       </button>
 
       <div className="w-full max-w-md">
-        {/* Header */}
         <div className="flex flex-col mb-8 text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
           <h1 className="text-2xl font-medium tracking-tight text-hub-text mb-2 flex items-center gap-2.5">
             <span>—</span> {getGreeting(new Date())}
@@ -115,7 +65,6 @@ export default function AuthPage() {
           </p>
         </div>
 
-        {/* Form Card */}
         <div className="bg-panel-surface border border-panel-border rounded-[32px] p-8 shadow-xl animate-in fade-in zoom-in-95 duration-500 delay-150 fill-mode-both">
           {error && (
             <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium animate-in fade-in slide-in-from-top-2">
@@ -148,7 +97,7 @@ export default function AuthPage() {
             <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-6 animate-in slide-in-from-right-4 duration-300">
               <button
                 type="button"
-                onClick={() => { setStep("phone"); setError(""); setPassword(""); setConfirmPassword("") }}
+                onClick={goBackToPhone}
                 className="flex items-center gap-1.5 text-sm font-medium text-panel-text-muted hover:text-panel-text transition-colors w-fit -ml-1 p-1 rounded-xl"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -161,7 +110,7 @@ export default function AuthPage() {
                 autoFocus
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => { setPassword(e.target.value); setError("") }}
+                onChange={(event) => { setPassword(event.target.value); setError("") }}
                 showRules={!isLoginFlow}
                 inputClassName="py-3.5 text-base font-medium"
               />
@@ -172,7 +121,7 @@ export default function AuthPage() {
                   label="Повторите пароль"
                   placeholder="••••••••"
                   value={confirmPassword}
-                  onChange={(e) => { setConfirmPassword(e.target.value); setError("") }}
+                  onChange={(event) => { setConfirmPassword(event.target.value); setError("") }}
                   error={
                     confirmPassword.length > 0 && confirmPassword !== password
                       ? "Пароли не совпадают"
