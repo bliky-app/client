@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { X, ArrowLeft, Plus } from "lucide-react"
+import { X, ArrowLeft } from "lucide-react"
 import Step1Type from "./steps/Step1Type"
 import Step2Details from "./steps/Step2Details"
 import Step4Schedule from "./steps/Step4Schedule"
@@ -113,13 +113,9 @@ export default function CreateWorkspacePage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-hub-surface border border-hub-border text-hub-text shadow-sm">
-            <Plus className="w-4 h-4 text-hub-text-muted" />
-            <span className="text-xs font-semibold">Новое пространство</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-hub-surface-hover border border-hub-border-light/50 text-hub-text-muted">
-              {step + 1}/{totalSteps}
-            </span>
-          </div>
+          <h2 className="text-sm font-bold text-hub-text tracking-wide">
+            Новое пространство
+          </h2>
         </div>
 
         <button
@@ -145,12 +141,15 @@ export default function CreateWorkspacePage() {
         </div>
 
         {/* Step Title Header inside white panel */}
-        <div className="px-6 pt-2 pb-2 shrink-0">
+        <div className="px-6 pt-2 pb-2 shrink-0 flex items-center justify-between">
           <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
             {step === 0 && "Тип пространства"}
             {step === 1 && "Детали пространства"}
             {step === 2 && "График работы"}
           </h1>
+          <span className="text-xs font-semibold text-panel-text-subtle">
+            Шаг {step + 1} из {totalSteps}
+          </span>
         </div>
 
         {/* Step content scroll body */}

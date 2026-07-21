@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { X, Check, Sun, Moon, Monitor, LogOut, Camera, Trash2, ShieldCheck, User as UserIcon } from "lucide-react"
+import { X, Check, Sun, Moon, Monitor, LogOut, Camera, Trash2, ShieldCheck } from "lucide-react"
 import { useAuth } from "@/lib/AuthProvider"
 import { useTheme } from "@/lib/ThemeProvider"
 import { useToast } from "@/lib/ToastProvider"
@@ -18,7 +18,7 @@ const TIMEZONE_OPTIONS: SelectOption[] = [
   { value: "Europe/Moscow",       label: "Москва",        subtitle: "UTC+3" },
   { value: "Europe/Samara",       label: "Самара",        subtitle: "UTC+4" },
   { value: "Asia/Yekaterinburg",  label: "Екатеринбург",  subtitle: "UTC+5" },
-  { value: "Asia/Omsk",           label: "Омск",          offset: "UTC+6" },
+  { value: "Asia/Omsk",           label: "Омск",          subtitle: "UTC+6" },
   { value: "Asia/Krasnoyarsk",    label: "Красноярск",    subtitle: "UTC+7" },
   { value: "Asia/Irkutsk",        label: "Иркутск",       subtitle: "UTC+8" },
   { value: "Asia/Yakutsk",        label: "Якутск",        subtitle: "UTC+9" },
@@ -185,12 +185,9 @@ export default function UserSettingsPage() {
     <div className="flex flex-col flex-1 bg-hub-base h-svh overflow-hidden">
       {/* Functional Top Hub Header */}
       <div className="h-16 px-6 flex items-center justify-between shrink-0 z-30">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-hub-surface border border-hub-border text-hub-text shadow-sm">
-            <UserIcon className="w-4 h-4 text-hub-text-muted" />
-            <span className="text-xs font-semibold">Профиль</span>
-          </div>
-        </div>
+        <h2 className="text-sm font-bold text-hub-text tracking-wide">
+          Настройки профиля
+        </h2>
 
         <button
           type="button"
