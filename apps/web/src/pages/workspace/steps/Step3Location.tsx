@@ -1,4 +1,4 @@
-import { MapPin, Globe } from "lucide-react"
+import { MapPin } from "lucide-react"
 import type { CreateWorkspaceFormData } from "../CreateWorkspacePage"
 import Input from "@/components/ui/Input"
 import Select, { type SelectOption } from "@/components/ui/Select"
@@ -74,8 +74,7 @@ export default function Step3Location({ data, onChange }: Step3LocationProps) {
             placeholder="Выбрать часовой пояс"
             onChange={(val) => onChange({ timezone: val })}
           />
-          <p className="text-xs pt-1 text-panel-text-subtle flex items-center gap-1.5 font-medium">
-            <Globe className="w-3.5 h-3.5 shrink-0" />
+          <p className="text-xs pt-1 text-panel-text-subtle font-medium">
             Влияет на отображение расписания и уведомления клиентам
           </p>
         </div>
