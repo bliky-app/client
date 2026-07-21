@@ -93,13 +93,14 @@ export interface HubOverviewData {
 export interface AppointmentStage {
   id: string
   name: string
-  durationMinutes: number
+  durationMinutes?: number
   isActive: boolean
 }
 
 export interface Appointment {
   id: string
   startDateTime: string // ISO 8601 (заменили date и startTime)
+  totalDurationMinutes: number // Total duration is now explicitly defined
   color?: string
   client: Client
   serviceName: string

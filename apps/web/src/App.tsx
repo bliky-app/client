@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import MasterLayout from "@/layouts/MasterLayout"
 import Hub from "@/pages/hub/Hub"
 import WorkspacePage from "@/pages/workspace/WorkspacePage"
+import CreateWorkspacePage from "@/pages/workspace/CreateWorkspacePage"
 import { AuthProvider } from "@/lib/AuthProvider"
 
 function WorkspaceRoute() {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Hub />
+      },
+      {
+        path: "workspace/new",
+        element: <CreateWorkspacePage />
       },
       {
         path: "workspace/:id",

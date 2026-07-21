@@ -79,7 +79,9 @@ export default function WorkspaceList({ workspaces }: WorkspaceListProps) {
         )
       })}
 
-      <div className="w-40 shrink-0 snap-start rounded-[32px] p-5 active:scale-[0.97] transition-all duration-150 flex flex-col items-center justify-center h-40 border-2 border-dashed border-panel-border bg-panel-base/50 cursor-pointer group hover:bg-panel-base hover:border-panel-border-subtle">
+      <div
+        onClick={() => navigate("/workspace/new")}
+        className="w-40 shrink-0 snap-start rounded-[32px] p-5 active:scale-[0.97] transition-all duration-150 flex flex-col items-center justify-center h-40 border-2 border-dashed border-panel-border bg-panel-base/50 cursor-pointer group hover:bg-panel-base hover:border-panel-border-subtle">
         <div className="p-3 bg-panel-base rounded-2xl border border-panel-border/50 mb-3 shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform">
           <Plus className="h-6 w-6 text-panel-text-muted group-hover:text-panel-text-muted-dark transition-colors" />
         </div>

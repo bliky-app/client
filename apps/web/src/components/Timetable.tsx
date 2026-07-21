@@ -378,10 +378,15 @@ export default function Timetable({
                         </div>
                         {colEvents.map(event => {
                           const top = t2px(formatTime(event.startDateTime, workspaceTimezone), gStart)
-                          const height = event.stages.reduce((a, s) => a + s.durationMinutes, 0) * PPM
+                          const height = event.totalDurationMinutes * PPM
                           const eventColor = event.color || (viewType === "personal" 
                             ? event.workspace.color 
                             : (event.staff?.color || event.staff?.user?.color))
+
+                          const knownDuration = event.stages.reduce((acc, s) => acc + (s.durationMinutes || 0), 0)
+                          const unknownCount = event.stages.filter(s => s.durationMinutes === undefined).length
+                          const remainingDuration = Math.max(0, event.totalDurationMinutes - knownDuration)
+                          const durationPerUnknown = unknownCount > 0 ? remainingDuration / unknownCount : 0
 
                           return (
                             <div key={event.id} onClick={() => onEventClick?.(event)}
@@ -391,14 +396,17 @@ export default function Timetable({
                                 <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-yellow-400 shadow-sm z-10" />
                               )}
                               <div className="w-1 shrink-0 flex flex-col h-full bg-panel-base/50">
-                                {event.stages.map(s => (
-                                  <div key={s.id} 
-                                    style={{ 
-                                      height: s.durationMinutes * PPM,
-                                      ...(s.isActive ? { backgroundColor: eventColor } : { borderColor: eventColor })
-                                    }}
-                                    className={`w-full box-border ${s.isActive ? (eventColor ? "" : "bg-panel-text") : `border-l-4 border-dashed bg-transparent ${eventColor ? "" : "border-panel-border"}`}`} />
-                                ))}
+                                {event.stages.map(s => {
+                                  const duration = s.durationMinutes !== undefined ? s.durationMinutes : durationPerUnknown
+                                  return (
+                                    <div key={s.id} 
+                                      style={{ 
+                                        height: `${(duration / Math.max(1, event.totalDurationMinutes)) * 100}%`,
+                                        ...(s.isActive ? { backgroundColor: eventColor } : { borderColor: eventColor })
+                                      }}
+                                      className={`w-full box-border ${s.isActive ? (eventColor ? "" : "bg-panel-text") : `border-l-4 border-dashed bg-transparent ${eventColor ? "" : "border-panel-border"}`}`} />
+                                  )
+                                })}
                               </div>
                               <div className="flex flex-col flex-1 min-w-0 px-2 py-1.5 pointer-events-none relative">
                                 <span className="text-[12px] font-semibold leading-[1.2] text-panel-text line-clamp-2">{event.serviceName}</span>

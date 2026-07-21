@@ -12,7 +12,7 @@ interface EventPopupProps {
 export default function EventPopup({ event, onClose, workspaceTimezone = "Europe/Moscow" }: EventPopupProps) {
   if (!event) return null
 
-  const totalDuration = event.stages.reduce((acc, stage) => acc + stage.durationMinutes, 0)
+  const totalDuration = event.totalDurationMinutes
 
   const startTimeStr = formatTime(event.startDateTime, workspaceTimezone)
   const endTimeStr = formatTime(addMinutes(event.startDateTime, totalDuration), workspaceTimezone)
@@ -126,12 +126,17 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
 
           <div className="flex flex-col gap-1">
             {event.stages.map((stage, idx) => {
-              const accumulatedMinutes = event.stages
-                .slice(0, idx)
-                .reduce((acc, s) => acc + s.durationMinutes, 0)
-
-              const stageStartTimeISO = addMinutes(event.startDateTime, accumulatedMinutes)
-              const stageStartTimeStr = formatTime(stageStartTimeISO, workspaceTimezone)
+              let stageStartTimeStr: string | null = null
+              
+              const allPrecedingHaveDuration = event.stages.slice(0, idx).every(s => s.durationMinutes !== undefined)
+              
+              if (allPrecedingHaveDuration) {
+                const accumulatedMinutes = event.stages
+                  .slice(0, idx)
+                  .reduce((acc, s) => acc + (s.durationMinutes || 0), 0)
+                const stageStartTimeISO = addMinutes(event.startDateTime, accumulatedMinutes)
+                stageStartTimeStr = formatTime(stageStartTimeISO, workspaceTimezone)
+              }
 
               return (
                 <div key={stage.id} className="flex gap-4 min-h-12">
@@ -144,12 +149,14 @@ export default function EventPopup({ event, onClose, workspaceTimezone = "Europe
                     <span className={`text-base font-medium leading-tight ${stage.isActive ? 'text-panel-text' : 'text-panel-text-muted-dark'}`}>
                       {stage.name}
                     </span>
-                    <span className="text-sm text-panel-text-subtle mt-1 flex items-center gap-1.5">
-                      <span className="font-medium text-panel-text-muted-dark">≈ {stageStartTimeStr}</span>
-                      <span className="text-[10px] text-panel-border">•</span>
-                      <span>{formatDuration(stage.durationMinutes)}</span>
-                      {!stage.isActive && <span>(Ожидание)</span>}
-                    </span>
+                    {(stageStartTimeStr || stage.durationMinutes !== undefined || !stage.isActive) && (
+                      <span className="text-sm text-panel-text-subtle mt-1 flex items-center gap-1.5">
+                        {stageStartTimeStr && <span className="font-medium text-panel-text-muted-dark">≈ {stageStartTimeStr}</span>}
+                        {stageStartTimeStr && stage.durationMinutes !== undefined && <span className="text-[10px] text-panel-border">•</span>}
+                        {stage.durationMinutes !== undefined && <span>{formatDuration(stage.durationMinutes)}</span>}
+                        {!stage.isActive && <span>(Ожидание)</span>}
+                      </span>
+                    )}
                   </div>
                 </div>
               )

@@ -172,7 +172,8 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
   // Shared Workspace (Kirill)
   {
     id: "apt-1",
-    startDateTime: makeISO(today, "10:00"),
+    startDateTime: makeISO(today,"10:00"),
+    totalDurationMinutes: 120,
     client: clients.c1,
     serviceName: "Сложное окрашивание (Балаяж)",
     price: 12000,
@@ -180,21 +181,22 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
     staff: staffKirillShared,
     stages: [
       { id: "stg1", name: "Консультация и разделение", durationMinutes: 30, isActive: true },
-      { id: "stg2", name: "Ожидание осветления", durationMinutes: 45, isActive: false },
+      { id: "stg2", name: "Ожидание осветления", isActive: false },
       { id: "stg3", name: "Тонирование и укладка", durationMinutes: 45, isActive: true },
     ],
     isConfirmed: true
   },
   {
     id: "apt-2",
-    startDateTime: makeISO(today, "15:00"),
+    startDateTime: makeISO(today,"15:00"),
+    totalDurationMinutes: 60,
     client: clients.c2,
     serviceName: "Женская стрижка",
     price: 3500,
     workspace: WS_SHARED,
     staff: staffKirillShared,
     stages: [
-      { id: "stg4", name: "Мытье и уход", durationMinutes: 15, isActive: true },
+      { id: "stg4", name: "Мытье и уход", isActive: true },
       { id: "stg5", name: "Стрижка", durationMinutes: 45, isActive: true },
     ],
     isConfirmed: true
@@ -203,7 +205,8 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
   // Shared Workspace (Other staff)
   {
     id: "apt-3",
-    startDateTime: makeISO(today, "11:00"),
+    startDateTime: makeISO(today,"11:00"),
+    totalDurationMinutes: 60,
     client: clients.c3,
     serviceName: "Аппаратный маникюр",
     price: 2500,
@@ -216,7 +219,8 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
   },
   {
     id: "apt-4",
-    startDateTime: makeISO(today, "16:00"),
+    startDateTime: makeISO(today,"16:00"),
+    totalDurationMinutes: 105,
     client: clients.c4,
     serviceName: "Массаж спины",
     price: 4000,
@@ -231,7 +235,8 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
   // Individual Workspace (Kirill)
   {
     id: "apt-5",
-    startDateTime: makeISO(today, "18:00"),
+    startDateTime: makeISO(today,"18:00"),
+    totalDurationMinutes: 105,
     client: clients.c5,
     serviceName: "Мужская стрижка",
     price: 3000,
@@ -246,7 +251,8 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
   // Coworking (Kirill Employee)
   {
     id: "apt-6",
-    startDateTime: makeISO(today, "12:00"),
+    startDateTime: makeISO(today,"12:00"),
+    totalDurationMinutes: 45,
     client: clients.c6,
     serviceName: "Оформление бороды",
     price: 1500,
@@ -261,7 +267,8 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
   // --- YESTERDAY ---
   {
     id: "apt-7",
-    startDateTime: makeISO(yesterday, "14:00"),
+    startDateTime: makeISO(yesterday,"14:00"),
+    totalDurationMinutes: 30,
     client: clients.c1,
     serviceName: "Консультация",
     price: 1000,
@@ -276,7 +283,8 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
   // --- TOMORROW ---
   {
     id: "apt-8",
-    startDateTime: makeISO(tomorrow, "11:30"),
+    startDateTime: makeISO(tomorrow,"11:30"),
+    totalDurationMinutes: 60,
     client: clients.c2,
     serviceName: "Окрашивание корней",
     price: 5000,
@@ -292,7 +300,8 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
   // --- NEXT WEEK ---
   {
     id: "apt-9",
-    startDateTime: makeISO(nextWeek, "15:00"),
+    startDateTime: makeISO(nextWeek,"15:00"),
+    totalDurationMinutes: 90,
     client: clients.c3,
     serviceName: "Маникюр с дизайном",
     price: 3500,
@@ -332,7 +341,7 @@ let lastEndTime: string | null = null
 if (todayKirillApts.length > 0) {
   const sorted = [...todayKirillApts].sort((a, b) => a.startDateTime.localeCompare(b.startDateTime))
   const lastApt = sorted[sorted.length - 1]
-  const totalDuration = lastApt.stages.reduce((acc, stg) => acc + stg.durationMinutes, 0)
+  const totalDuration = lastApt.totalDurationMinutes
   
   const endD = new Date(lastApt.startDateTime)
   endD.setMinutes(endD.getMinutes() + totalDuration)
