@@ -66,11 +66,11 @@ function CustomSelect({ placeholder, options, onChange }: { placeholder: string,
   )
 }
 
-function DatePickerButton({ onChange }: { onChange: (val: string) => void }) {
+function DatePickerButton({ placeholder, onChange }: { placeholder: string, onChange: (val: string) => void }) {
   return (
     <div className="relative w-full">
       <button className="w-full text-left bg-panel-base border border-panel-border-subtle rounded-xl px-3 py-2 text-xs font-medium text-panel-text-muted hover:text-panel-text hover:border-panel-text-muted transition-colors flex items-center justify-between pointer-events-none">
-        <span>Календарь...</span>
+        <span>{placeholder}</span>
         <CalendarIcon className="w-4 h-4 shrink-0" />
       </button>
       <input
@@ -105,18 +105,17 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
         <div className="overflow-hidden">
           <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-6 pb-6 pt-2 w-full scroll-pl-6 scrollbar-none">
             
-            {/* Пустая запись */}
+            {/* Новая запись */}
             <div
               onClick={() => onOpenForm({})}
               className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 active:scale-[0.97] transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle cursor-pointer group hover:border-panel-text-muted"
             >
               <div className="flex justify-between items-start w-full gap-2">
                 <h3 className="font-semibold text-panel-text text-base tracking-tight leading-tight">
-                  Пустая запись
+                  Новая запись
                 </h3>
                 <Plus className="h-5 w-5 text-panel-text-subtle shrink-0 translate-y-0.5 group-hover:text-panel-text transition-colors" />
               </div>
-              <div className="mt-auto text-xs text-panel-text-muted font-medium">Без заполнения</div>
             </div>
 
             {/* В пространство (только Hub) */}
@@ -129,7 +128,7 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
                 </div>
                 <div className="mt-auto relative z-10 w-full">
                   <CustomSelect 
-                    placeholder="Выбрать..." 
+                    placeholder="Выбрать" 
                     options={workspaces.map(w => ({ value: w.id, label: w.name }))}
                     onChange={(val) => onOpenForm({ workspaceId: val })}
                   />
@@ -147,7 +146,7 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
                 </div>
                 <div className="mt-auto relative z-10 w-full">
                   <CustomSelect 
-                    placeholder="Выбрать..." 
+                    placeholder="Выбрать" 
                     options={masters.map(m => ({ value: m.id, label: m.name }))}
                     onChange={(val) => onOpenForm({ masterId: val })}
                   />
@@ -165,7 +164,7 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
                 </div>
                 <div className="mt-auto relative z-10 w-full">
                   <CustomSelect 
-                    placeholder="Выбрать..." 
+                    placeholder="Выбрать" 
                     options={services.map(s => ({ value: s.id, label: s.name }))}
                     onChange={(val) => onOpenForm({ serviceId: val })}
                   />
@@ -181,7 +180,7 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
                 </h3>
               </div>
               <div className="mt-auto relative z-10 w-full">
-                <DatePickerButton onChange={(val) => onOpenForm({ startDateTime: val })} />
+                <DatePickerButton placeholder="Выбрать" onChange={(val) => onOpenForm({ startDateTime: val })} />
               </div>
             </div>
 
