@@ -67,16 +67,16 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
       <div 
         ref={popoverRef}
         style={style}
-        className="absolute bg-panel-surface border border-panel-border shadow-xl rounded-2xl p-3 flex flex-col gap-2.5 w-44 pointer-events-auto relative"
+        className="absolute bg-panel-surface border border-panel-border shadow-xl rounded-2xl p-3.5 flex flex-col gap-3 w-52 pointer-events-auto relative"
       >
         <button 
           onClick={onCancel} 
-          className="absolute top-2 right-2 p-1 hover:bg-panel-base rounded-full text-panel-text-muted transition-colors"
+          className="absolute top-2.5 right-2.5 p-1 hover:bg-panel-base rounded-full text-panel-text-muted transition-colors"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="w-4 h-4" />
         </button>
 
-        <div className="flex items-center justify-center gap-1 pt-1">
+        <div className="flex items-center justify-center gap-2 pt-2">
           <div className="flex flex-col items-center">
             <button 
               onClick={() => setHour(h => (h + 1) % 24)} 
@@ -84,7 +84,7 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
             >
               <ChevronUp className="w-4 h-4" />
             </button>
-            <div className="text-2xl font-extrabold text-panel-text w-12 text-center tabular-nums py-0.5">
+            <div className="text-3xl font-extrabold text-panel-text w-14 text-center tabular-nums py-0.5">
               {pad(hour)}
             </div>
             <button 
@@ -95,7 +95,7 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
             </button>
           </div>
 
-          <div className="text-2xl font-extrabold text-panel-text-muted pb-1">:</div>
+          <div className="text-3xl font-extrabold text-panel-text-muted pb-1">:</div>
 
           <div className="flex flex-col items-center">
             <button 
@@ -104,7 +104,7 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
             >
               <ChevronUp className="w-4 h-4" />
             </button>
-            <div className="text-2xl font-extrabold text-panel-text w-12 text-center tabular-nums py-0.5">
+            <div className="text-3xl font-extrabold text-panel-text w-14 text-center tabular-nums py-0.5">
               {pad(minute)}
             </div>
             <button 
@@ -118,7 +118,7 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, onConfirm,
 
         <button 
           onClick={() => onConfirm(hour, minute)}
-          className="w-full bg-panel-text text-panel-base py-2 rounded-xl text-xs font-semibold flex items-center justify-center hover:opacity-90 active:scale-95 transition-all"
+          className="w-full bg-panel-text text-panel-base py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center hover:opacity-90 active:scale-95 transition-all"
         >
           Выбрать
         </button>
