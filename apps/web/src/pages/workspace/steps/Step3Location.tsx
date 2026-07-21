@@ -65,7 +65,7 @@ export default function Step3Location({ data, onChange }: Step3LocationProps) {
             className="w-full bg-panel-surface border border-panel-border rounded-2xl pl-11 pr-4 py-3.5 text-base text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text-muted transition-colors"
           />
         </div>
-        <p className="text-xs text-panel-text-subtle pl-1">Необязательно — клиенты смогут найти вас по адресу</p>
+        <p className="text-xs text-panel-text-subtle pl-1">Необязательно, но поможет клиентам быстрее вас найти</p>
       </div>
 
       {/* Timezone */}

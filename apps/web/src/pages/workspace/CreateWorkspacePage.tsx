@@ -13,6 +13,8 @@ export interface CreateWorkspaceFormData {
   // Step 2
   name: string
   category: string
+  additionalCategories: string[]
+  customCategory: string // Holds the value when 'Другое' is selected
   color: string
   avatarUrl?: string
   // Step 3
@@ -26,6 +28,8 @@ const INITIAL_DATA: CreateWorkspaceFormData = {
   type: null,
   name: "",
   category: "",
+  additionalCategories: [],
+  customCategory: "",
   color: "#6366f1",
   address: "",
   timezone: "Europe/Moscow",
@@ -77,7 +81,11 @@ export default function CreateWorkspacePage() {
 
   const canProceed = () => {
     if (step === 0) return data.type !== null
-    if (step === 1) return data.name.trim().length > 0 && data.category.trim().length > 0
+    if (step === 1) {
+      const nameValid = data.name.trim().length >= 4 && data.name.trim().length <= 32
+      const categoryValid = data.category.trim().length > 0 && (data.category !== "Другое" || data.customCategory.trim().length > 0)
+      return nameValid && categoryValid
+    }
     return true
   }
 
@@ -94,7 +102,7 @@ export default function CreateWorkspacePage() {
   return (
     <div className="flex flex-col flex-1 bg-hub-base h-svh overflow-hidden">
       {/* White wizard panel */}
-      <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] mt-16 shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden">
+      <div className="flex flex-col flex-1 bg-panel-base rounded-t-[32px] mt-16 shadow-[0_-8px_32px_rgba(0,0,0,0.18)] overflow-hidden animate-in slide-in-from-bottom-8 fade-in duration-300 ease-out">
 
         {/* Header */}
         <div className="flex items-center gap-3 px-6 pt-6 pb-4 shrink-0">

@@ -101,6 +101,7 @@ export default function WorkspaceDropdown({
           onClick={() => {
             onClose()
             if (onSelect) onSelect()
+            navigate("/workspace/new")
           }}
           className="flex items-center px-4 py-3 hover:bg-hub-surface-hover transition-colors text-left gap-3 w-full group"
         >

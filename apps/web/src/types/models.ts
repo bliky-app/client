@@ -66,6 +66,7 @@ export interface Workspace {
   name: string
   type: WorkspaceType
   category: string // "Салон", "Частная практика" и т.д.
+  additionalCategories?: string[]
   color: string
   timezone: string // IANA timezone, например "Europe/Moscow"
   address?: string
