@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/AuthProvider"
 import AppointmentDateCard from "@/components/appointment/AppointmentDateCard"
 import AppointmentClientCard from "@/components/appointment/AppointmentClientCard"
 import AppointmentStatusCard from "@/components/appointment/AppointmentStatusCard"
+import AppointmentNotesCard from "@/components/appointment/AppointmentNotesCard"
 
 interface AppointmentDetailsSheetProps {
   event: Appointment | null
@@ -276,45 +277,13 @@ export default function AppointmentDetailsSheet({
             </div>
 
             {/* 6. Refined Color & Notes Unified Card */}
-            <div className="p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex flex-col gap-4">
-              {canEdit ? (
-                <>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-panel-text-muted">Цвет метки</span>
-                    <ColorPicker
-                      value={color}
-                      onChange={setColor}
-                      size="sm"
-                    />
-                  </div>
-
-                  <div className="h-px w-full bg-panel-border-subtle" />
-
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-panel-text-muted">Заметка</span>
-                    <textarea
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Добавить заметку..."
-                      rows={3}
-                      className="w-full bg-panel-base border border-panel-border-subtle rounded-xl p-3 text-sm text-panel-text placeholder:text-panel-text-subtle outline-none focus:border-panel-text transition-colors resize-none"
-                    />
-                  </div>
-                </>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-panel-text-muted">Заметка</span>
-                    {color && (
-                      <div className="w-3.5 h-3.5 rounded-full shrink-0 border border-panel-border-subtle shadow-xs" style={{ backgroundColor: color }} />
-                    )}
-                  </div>
-                  <p className="text-sm font-medium text-panel-text whitespace-pre-wrap leading-relaxed">
-                    {notes || "Заметка отсутствует"}
-                  </p>
-                </div>
-              )}
-            </div>
+            <AppointmentNotesCard
+              color={color}
+              onColorChange={setColor}
+              notes={notes}
+              onNotesChange={setNotes}
+              isEditable={canEdit}
+            />
 
             {/* Read-Only Notice if user cannot edit */}
             {!canEdit && (
