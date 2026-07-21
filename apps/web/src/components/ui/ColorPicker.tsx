@@ -9,7 +9,6 @@ const DEFAULT_PRESET_COLORS = [
   "#ef4444", // Crimson
   "#f97316", // Orange
   "#f59e0b", // Amber
-  "#eab308", // Yellow
   "#10b981", // Emerald Green
   "#06b6d4", // Cyan
   "#3b82f6", // Royal Blue
