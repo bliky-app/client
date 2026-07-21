@@ -1,9 +1,10 @@
 import { Phone } from "lucide-react"
-import IconBox from "@/components/ui/IconBox"
 
 interface AppointmentClientCardProps {
   name: string
   phone?: string
+  avatarUrl?: string
+  color?: string
   onEdit?: () => void
   actionLabel?: string
 }
@@ -11,15 +12,31 @@ interface AppointmentClientCardProps {
 export function AppointmentClientCard({
   name,
   phone,
+  avatarUrl,
+  color,
   onEdit,
   actionLabel = "Изменить",
 }: AppointmentClientCardProps) {
+  const initial = name?.[0]?.toUpperCase() || "К"
+
   return (
     <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center justify-between w-full">
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <IconBox size="lg" shape="circle" className="bg-panel-text text-panel-base border-none font-bold">
-          {name?.[0]?.toUpperCase() || "К"}
-        </IconBox>
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={name}
+            className="w-12 h-12 rounded-full object-cover shrink-0 border border-panel-border-subtle"
+          />
+        ) : (
+          <div
+            className="w-12 h-12 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-bold text-base shrink-0 shadow-xs"
+            style={color ? { backgroundColor: color, color: "#ffffff" } : undefined}
+          >
+            {initial}
+          </div>
+        )}
+
         <div className="flex flex-col min-w-0">
           <span className="text-base font-semibold text-panel-text truncate">{name}</span>
           {phone ? (
