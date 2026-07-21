@@ -9,6 +9,9 @@ import PhoneInput from "@/components/ui/PhoneInput"
 import ColorPicker from "@/components/ui/ColorPicker"
 import { formatAppointmentDate } from "@/lib/formatters"
 
+import AppointmentDateCard from "@/components/appointment/AppointmentDateCard"
+import AppointmentClientCard from "@/components/appointment/AppointmentClientCard"
+
 const ACCENT_COLORS = [
   "#6366f1", "#8b5cf6", "#d946ef", "#ec4899",
   "#f43f5e", "#ef4444", "#f97316", "#eab308",
@@ -358,39 +361,12 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
           <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full pb-32">
             
             <div className="flex flex-col gap-3">
-              <h3 className="text-xs font-semibold text-panel-text-subtle pl-1">Дата и время</h3>
-              <label className="relative flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle hover:border-panel-text-muted transition-colors rounded-2xl shadow-sm cursor-pointer group">
-                <input 
-                  type="datetime-local"
-                  value={draft.startDateTime || ""}
-                  onChange={e => setDraft({ ...draft, startDateTime: e.target.value })}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                />
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center shrink-0 text-panel-text">
-                    <Calendar className="w-5 h-5" />
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    {draft.startDateTime ? (
-                      <>
-                        <span className="text-base font-semibold text-panel-text capitalize truncate">
-                          {formatAppointmentDate(draft.startDateTime)}
-                        </span>
-                        <span className="text-sm text-panel-text-muted truncate">
-                          {new Date(draft.startDateTime).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-base font-medium text-panel-text-subtle truncate">
-                        {isFormal ? "Выберите время..." : "Выбери время..."}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="px-4 py-2 bg-panel-base border border-panel-border-subtle group-hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0">
-                  {draft.startDateTime ? "Изменить" : "Выбрать"}
-                </div>
-              </label>
+              <AppointmentDateCard
+                startDateTime={draft.startDateTime}
+                isEditable={true}
+                onChange={(val) => setDraft({ ...draft, startDateTime: val })}
+                placeholder={isFormal ? "Выберите время..." : "Выбери время..."}
+              />
             </div>
 
             <div className="flex flex-col gap-3">
@@ -512,26 +488,14 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       />
                     )
                   ) : (
-                    <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-medium text-lg shrink-0">
-                          {draft.clientName?.[0]?.toUpperCase() || "К"}
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-base font-semibold text-panel-text truncate">{draft.clientName}</span>
-                          <span className="text-sm text-panel-text-muted truncate">{draft.clientPhone || "Телефон не указан"}</span>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => {
-                          setDraft({ ...draft, clientId: undefined, clientName: undefined, clientPhone: undefined })
-                          setIsClientSearchActive(true)
-                        }} 
-                        className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text"
-                      >
-                        Изменить
-                      </button>
-                    </div>
+                    <AppointmentClientCard
+                      name={draft.clientName || "Клиент"}
+                      phone={draft.clientPhone}
+                      onEdit={() => {
+                        setDraft({ ...draft, clientId: undefined, clientName: undefined, clientPhone: undefined })
+                        setIsClientSearchActive(true)
+                      }}
+                    />
                   )}
                 </div>
 

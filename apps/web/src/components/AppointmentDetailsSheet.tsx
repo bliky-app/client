@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react"
-import { X, Calendar as CalendarIcon, Phone, Wallet, Trash2, AlertCircle, CheckCircle2, Clock } from "lucide-react"
+import { X, Phone, Trash2, AlertCircle } from "lucide-react"
 import Avatar from "@/components/Avatar"
 import Button from "@/components/ui/Button"
 import ColorPicker from "@/components/ui/ColorPicker"
 import type { Appointment } from "@/types/models"
-import { formatCurrency, addMinutes, formatDuration, formatTime, formatAppointmentDate } from "@/lib/formatters"
+import { formatCurrency, addMinutes, formatDuration, formatTime } from "@/lib/formatters"
 import { usePermissions } from "@/lib/permissions"
 import { useAuth } from "@/lib/AuthProvider"
+import AppointmentDateCard from "@/components/appointment/AppointmentDateCard"
+import AppointmentClientCard from "@/components/appointment/AppointmentClientCard"
+import AppointmentStatusCard from "@/components/appointment/AppointmentStatusCard"
 
 interface AppointmentDetailsSheetProps {
   event: Appointment | null
@@ -59,10 +62,6 @@ export default function AppointmentDetailsSheet({
 
   const totalDuration = event.totalDurationMinutes || 60
   const currentStartISO = startDateTime || event.startDateTime
-
-  const startTimeStr = formatTime(currentStartISO, workspaceTimezone)
-  const endTimeStr = formatTime(addMinutes(currentStartISO, totalDuration), workspaceTimezone)
-  const formattedDate = formatAppointmentDate(currentStartISO, workspaceTimezone)
 
   // Check if any field has actually been modified
   const hasChanges =
@@ -145,63 +144,23 @@ export default function AppointmentDetailsSheet({
         <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="flex flex-col gap-4 max-w-2xl mx-auto w-full pb-32">
 
-            {/* 1. Date & Time Picker Card */}
-            <label className="relative flex items-center justify-between p-4 bg-panel-surface border border-panel-border rounded-2xl shadow-sm cursor-pointer group">
-              {canEdit && (
-                <input
-                  type="datetime-local"
-                  value={startDateTime}
-                  onChange={(e) => setStartDateTime(e.target.value)}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                />
-              )}
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center shrink-0 text-panel-text">
-                  <CalendarIcon className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-base font-semibold text-panel-text capitalize truncate">
-                    {formattedDate}
-                  </span>
-                  <span className="text-sm text-panel-text-muted truncate">
-                    {startTimeStr} — {endTimeStr} • {formatDuration(totalDuration)}
-                  </span>
-                </div>
-              </div>
-
-              {canEdit && (
-                <div className="px-4 py-2 bg-panel-base border border-panel-border-subtle group-hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0">
-                  Изменить
-                </div>
-              )}
-            </label>
+            {/* 1. Date & Time Card */}
+            <AppointmentDateCard
+              startDateTime={currentStartISO}
+              totalDurationMinutes={totalDuration}
+              workspaceTimezone={workspaceTimezone}
+              isEditable={canEdit}
+              onChange={setStartDateTime}
+            />
 
             {/* 2. Client Info Card */}
-            <div className="p-4 bg-panel-surface border border-panel-border rounded-2xl shadow-sm flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-panel-text text-panel-base flex items-center justify-center font-bold text-base shrink-0">
-                  {event.client.name[0]?.toUpperCase() || "К"}
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-base font-semibold text-panel-text truncate">{event.client.name}</span>
-                  {event.client.phone ? (
-                    <a
-                      href={`tel:${event.client.phone}`}
-                      className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1.5 truncate"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>{event.client.phone}</span>
-                    </a>
-                  ) : (
-                    <span className="text-sm text-panel-text-muted">Телефон не указан</span>
-                  )}
-                </div>
-              </div>
-            </div>
+            <AppointmentClientCard
+              name={event.client.name}
+              phone={event.client.phone}
+            />
 
             {/* 3. Service Details & Price Input Card */}
-            <div className="bg-panel-surface border border-panel-border rounded-2xl shadow-sm overflow-hidden p-5 flex flex-col gap-4">
+            <div className="bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden p-5 flex flex-col gap-4">
               <div className="flex items-center justify-between border-b border-panel-border-subtle pb-4">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div className="w-12 h-12 rounded-2xl bg-panel-border flex items-center justify-center font-medium text-lg shrink-0 text-panel-text">
@@ -223,7 +182,7 @@ export default function AppointmentDetailsSheet({
                       type="number"
                       value={price}
                       onChange={(e) => setPrice(Number(e.target.value))}
-                      className="w-28 bg-panel-base border border-panel-border rounded-xl px-3 py-1.5 text-sm font-bold text-panel-text outline-none focus:border-panel-text"
+                      className="w-28 bg-panel-base border border-panel-border-subtle rounded-xl px-3 py-1.5 text-sm font-bold text-panel-text outline-none focus:border-panel-text"
                     />
                     <span className="text-sm font-medium text-panel-text-muted">₽</span>
                   </div>
@@ -253,7 +212,7 @@ export default function AppointmentDetailsSheet({
                       <div key={stage.id} className="flex gap-4 min-h-10">
                         <div className="flex flex-col items-center">
                           <div className={`w-3 h-3 rounded-full mt-1.5 z-10 ${stage.isActive ? 'bg-panel-text' : 'bg-panel-border'}`} />
-                          <div className={`w-0.5 flex-1 -mt-1.5 mb-1 ${stage.isActive ? 'bg-panel-border-subtle' : 'border-l-2 border-dashed border-panel-border bg-transparent'}`} />
+                          <div className={`w-0.5 flex-1 -mt-1.5 mb-1 ${stage.isActive ? 'bg-panel-border-subtle' : 'border-l-2 border-dashed border-panel-border-subtle bg-transparent'}`} />
                         </div>
 
                         <div className="flex flex-col pb-3">
@@ -274,43 +233,17 @@ export default function AppointmentDetailsSheet({
             </div>
 
             {/* 4. Status Card */}
-            <div className="p-4 bg-panel-surface border border-panel-border rounded-2xl shadow-sm flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-panel-base border border-panel-border-subtle flex items-center justify-center shrink-0">
-                  {isConfirmed ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  ) : (
-                    <Clock className="w-5 h-5 text-amber-500" />
-                  )}
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-medium text-panel-text-muted">Статус записи</span>
-                  <span className={`text-base font-bold ${isConfirmed ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
-                    {isConfirmed ? "Подтверждена" : "Ожидает подтверждения"}
-                  </span>
-                </div>
-              </div>
-
-              {canEdit && (
-                <button
-                  type="button"
-                  onClick={handleToggleConfirm}
-                  className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95 border ${
-                    isConfirmed
-                      ? "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
-                      : "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
-                  }`}
-                >
-                  {isConfirmed ? "Снять подтверждение" : "Подтвердить запись"}
-                </button>
-              )}
-            </div>
+            <AppointmentStatusCard
+              isConfirmed={isConfirmed}
+              canEdit={canEdit}
+              onToggleConfirm={handleToggleConfirm}
+            />
 
             {/* 5. Workspace & Master Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Master */}
               {event.staff && (
-                <div className="p-4 bg-panel-surface border border-panel-border rounded-2xl shadow-sm flex items-center gap-3">
+                <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center gap-3">
                   <Avatar data={event.staff} className="w-12 h-12 rounded-full text-sm shrink-0" />
                   <div className="flex flex-col min-w-0">
                     <span className="text-xs font-medium text-panel-text-muted">Мастер</span>
@@ -326,7 +259,7 @@ export default function AppointmentDetailsSheet({
 
               {/* Workspace */}
               {event.workspace && (
-                <div className="p-4 bg-panel-surface border border-panel-border rounded-2xl shadow-sm flex items-center gap-3">
+                <div className="p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex items-center gap-3">
                   <Avatar data={event.workspace} className="w-12 h-12 rounded-2xl text-sm shrink-0" />
                   <div className="flex flex-col min-w-0">
                     <span className="text-xs font-medium text-panel-text-muted">Пространство</span>
@@ -344,7 +277,7 @@ export default function AppointmentDetailsSheet({
             </div>
 
             {/* 6. Refined Color & Notes Unified Card */}
-            <div className="p-5 bg-panel-surface border border-panel-border rounded-2xl shadow-sm flex flex-col gap-4">
+            <div className="p-5 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm flex flex-col gap-4">
               {canEdit ? (
                 <>
                   <div className="flex flex-col gap-2">
