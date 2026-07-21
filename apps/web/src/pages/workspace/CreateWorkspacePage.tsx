@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom"
 import { X, ArrowLeft } from "lucide-react"
 import Step1Type from "./steps/Step1Type"
 import Step2Details from "./steps/Step2Details"
-import Step3Location from "./steps/Step3Location"
 import Step4Schedule from "./steps/Step4Schedule"
 import Button from "@/components/ui/Button"
 import { useAuth } from "@/lib/AuthProvider"
@@ -17,13 +16,12 @@ export interface CreateWorkspaceFormData {
   name: string
   category: string
   additionalCategories: string[]
-  customCategory: string // Holds the value when 'Другое' is selected
+  customCategory: string
   color: string
   avatarUrl?: string
-  // Step 3
   address: string
   timezone: string
-  // Step 4
+  // Step 3
   schedule: WorkspaceSchedule
 }
 
@@ -48,7 +46,6 @@ const INITIAL_DATA: CreateWorkspaceFormData = {
 const STEP_LABELS = [
   "Тип",
   "Детали",
-  "Адрес",
   "График",
 ]
 
@@ -97,8 +94,7 @@ export default function CreateWorkspacePage() {
     switch (step) {
       case 0: return <Step1Type value={data.type} onChange={type => updateData({ type })} />
       case 1: return <Step2Details data={data} onChange={updateData} />
-      case 2: return <Step3Location data={data} onChange={updateData} />
-      case 3: return <Step4Schedule data={data} onChange={updateData} />
+      case 2: return <Step4Schedule data={data} onChange={updateData} />
       default: return null
     }
   }
@@ -125,8 +121,7 @@ export default function CreateWorkspacePage() {
             <h1 className="text-xl font-bold text-panel-text leading-tight truncate">
               {step === 0 && "Тип пространства"}
               {step === 1 && "Детали пространства"}
-              {step === 2 && "Адрес и часовой пояс"}
-              {step === 3 && "График работы"}
+              {step === 2 && "График работы"}
             </h1>
           </div>
 
