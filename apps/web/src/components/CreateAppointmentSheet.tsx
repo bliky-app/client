@@ -214,8 +214,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
   const [isClientSearchActive, setIsClientSearchActive] = useState(!initialData?.clientId)
   const [isMasterSearchActive, setIsMasterSearchActive] = useState(!initialData?.masterId)
   const [isServiceSearchActive, setIsServiceSearchActive] = useState(!initialData?.serviceId)
-  
-  const [autoOpenField, setAutoOpenField] = useState<string | null>(null)
 
   const [clientSearch, setClientSearch] = useState("")
   const [newClientName, setNewClientName] = useState("")
@@ -283,7 +281,15 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
   const totalDuration = draft.stages?.reduce((acc, s) => acc + s.durationMinutes, 0) || 0
 
   const selectedWorkspace = workspaces?.find(w => w.id === draft.workspaceId)
-  const selectedMaster = MOCK_MASTERS.find(m => m.id === draft.masterId)
+  const selectedMasterFromWorkspace = workspaces?.flatMap(w => w.staff || []).find(s => s.id === draft.masterId)
+  const selectedMaster = MOCK_MASTERS.find(m => m.id === draft.masterId) || 
+    (selectedMasterFromWorkspace ? { 
+      id: selectedMasterFromWorkspace.id, 
+      name: selectedMasterFromWorkspace.user?.shortName || selectedMasterFromWorkspace.user?.fullName || "Мастер",
+      subtitle: selectedMasterFromWorkspace.mainCategory?.name,
+      avatarUrl: selectedMasterFromWorkspace.user?.avatarUrl,
+      color: selectedMasterFromWorkspace.user?.color
+    } : undefined)
   const selectedService = draft.serviceId === "custom" 
     ? { name: draft.customService?.name || "Свободная услуга", price: undefined } 
     : MOCK_SERVICES.find(s => s.id === draft.serviceId)
@@ -361,7 +367,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                   }}
                   options={workspaces?.map(w => ({ id: w.id, name: w.name, subtitle: w.address, color: w.color, avatarUrl: w.avatarUrl })) || []}
                   placeholder={isFormal ? "Выберите пространство..." : "Выбери пространство..."}
-                  autoOpen={autoOpenField === "workspace"}
                 />
               ) : (
                 <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
@@ -383,7 +388,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       onClick={() => {
                         setDraft({ ...draft, workspaceId: undefined, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
                         setIsWorkspaceSearchActive(true)
-                        setAutoOpenField("workspace")
                       }} 
                       className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
                     >
@@ -469,7 +473,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                         }}
                         options={[{ id: "client-1", name: "Алина Смирнова", subtitle: "+7 (999) 123-45-67", color: "#ec4899" }]}
                         placeholder={isFormal ? "Выберите клиента..." : "Выбери клиента..."}
-                        autoOpen={autoOpenField === "client"}
                         showCustomOption={true}
                         customOptionLabel="Создать нового клиента"
                         searchValue={clientSearch}
@@ -496,7 +499,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                         onClick={() => {
                           setDraft({ ...draft, clientId: undefined, clientName: undefined, clientPhone: undefined })
                           setIsClientSearchActive(true)
-                          setAutoOpenField("client")
                         }} 
                         className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text"
                       >
@@ -512,9 +514,8 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       <SearchableSelect
                         value={draft.masterId}
                         onChange={val => { setDraft({ ...draft, masterId: val }); setIsMasterSearchActive(false) }}
-                        options={MOCK_MASTERS}
+                        options={selectedWorkspace?.staff?.map(s => ({ id: s.id, name: s.user?.shortName || s.user?.fullName || "Мастер", subtitle: s.mainCategory?.name, avatarUrl: s.user?.avatarUrl })) || []}
                         placeholder={isFormal ? "Выберите мастера..." : "Выбери мастера..."}
-                        autoOpen={autoOpenField === "master"}
                       />
                     ) : (
                       <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm h-full min-h-[82px]">
@@ -535,7 +536,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                           onClick={() => {
                             setDraft({ ...draft, masterId: undefined })
                             setIsMasterSearchActive(true)
-                            setAutoOpenField("master")
                           }} 
                           className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text"
                         >
@@ -562,7 +562,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       options={MOCK_SERVICES.map(s => ({ id: s.id, name: s.name, subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽` }))}
                       placeholder={isFormal ? "Выберите услугу..." : "Выбери услугу..."}
                       showCustomOption={true}
-                      autoOpen={autoOpenField === "service"}
                     />
                   ) : (
                     <div className="flex flex-col bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">
@@ -594,7 +593,6 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                           onClick={() => {
                             setDraft({ ...draft, serviceId: undefined, customService: undefined, stages: undefined, price: undefined })
                             setIsServiceSearchActive(true)
-                            setAutoOpenField("service")
                           }} 
                           className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
                         >

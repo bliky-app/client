@@ -65,8 +65,7 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
               })) || []}
               services={[
                 { id: "srv-1", name: "Стрижка", subtitle: "60 мин • 1500 ₽" },
-                { id: "srv-2", name: "Окрашивание", subtitle: "120 мин • 4000 ₽" },
-                { id: "custom", name: "Свободная услуга" }
+                { id: "srv-2", name: "Окрашивание", subtitle: "120 мин • 4000 ₽" }
               ]}
               showMasterCard={workspace.type !== "individual" && canViewGlobalSchedule}
               onOpenForm={(draft) => {
@@ -111,6 +110,7 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
         isOpen={isAppointmentSheetOpen} 
         onClose={() => setIsAppointmentSheetOpen(false)}
         initialData={appointmentDraft}
+        workspaces={[workspace]}
       />
     </div>
   )

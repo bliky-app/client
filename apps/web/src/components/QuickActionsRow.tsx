@@ -45,7 +45,7 @@ function CustomSelect({ placeholder, options, onChange }: { placeholder: string,
         <div className="fixed inset-0 z-50 flex" onClick={() => setIsOpen(false)}>
            <div 
              style={{ top: rect.bottom + 8, left: rect.left, width: Math.max(160, rect.width) }} 
-             className="absolute bg-panel-surface border border-panel-border rounded-2xl shadow-xl overflow-hidden py-1 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-100"
+             className="absolute bg-panel-surface border border-panel-border rounded-2xl shadow-xl overflow-hidden py-1 max-h-80 overflow-y-auto animate-in fade-in zoom-in-95 duration-100"
              onClick={e => e.stopPropagation()}
            >
              {options.length === 0 ? (
