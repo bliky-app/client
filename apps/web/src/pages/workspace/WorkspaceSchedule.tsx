@@ -54,10 +54,19 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
           </div>
         ) : (
           <div className="flex-1 flex flex-col min-h-0 gap-6 p-4 sm:p-6 pb-0">
-            <QuickActionsRow context="workspace_schedule" onOpenForm={(draft) => {
-              setAppointmentDraft(draft)
-              setIsAppointmentSheetOpen(true)
-            }} />
+            <QuickActionsRow 
+              context="workspace_schedule" 
+              masters={workspace.staff?.map(s => ({ id: s.id, name: s.user?.shortName || s.user?.fullName || s.id })) || []}
+              services={[
+                { id: "srv-1", name: "Стрижка" },
+                { id: "srv-2", name: "Окрашивание" },
+                { id: "custom", name: "Свободная услуга" }
+              ]}
+              onOpenForm={(draft) => {
+                setAppointmentDraft(draft)
+                setIsAppointmentSheetOpen(true)
+              }} 
+            />
             
             <div className="flex-1 flex flex-col min-h-0 bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden shrink-0 mb-6">
               <Timetable

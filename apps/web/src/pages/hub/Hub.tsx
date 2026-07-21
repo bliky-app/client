@@ -121,7 +121,7 @@ export default function Hub() {
 
             <div className="w-12 h-1.5 bg-panel-border rounded-full mx-auto shrink-0 -mb-2" />
 
-            <QuickActionsRow context="hub" onOpenForm={handleOpenForm} />
+            <QuickActionsRow context="hub" workspaces={workspaces} onOpenForm={handleOpenForm} />
 
             {/* Workspaces */}
             <div className="flex flex-col bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden shrink-0">

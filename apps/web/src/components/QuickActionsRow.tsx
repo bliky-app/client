@@ -1,5 +1,7 @@
-import { useState } from "react"
-import { ChevronRight, Plus, UserRound, Clock, Sparkles, Layers } from "lucide-react"
+import { useState, useRef } from "react"
+import { createPortal } from "react-dom"
+import { ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react"
+import type { Workspace } from "@/types/models"
 
 export type QuickActionContext = "hub" | "workspace_schedule"
 
@@ -12,16 +14,76 @@ export interface QuickActionDraft {
 
 interface QuickActionsRowProps {
   context: QuickActionContext
+  workspaces?: Workspace[]
+  masters?: { id: string, name: string }[]
+  services?: { id: string, name: string }[]
   onOpenForm: (draft: QuickActionDraft) => void
 }
 
-export default function QuickActionsRow({ context, onOpenForm }: QuickActionsRowProps) {
-  const [isExpanded, setIsExpanded] = useState(true)
+function CustomSelect({ placeholder, options, onChange }: { placeholder: string, options: {value: string, label: string}[], onChange: (val: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const ref = useRef<HTMLButtonElement>(null)
+  const [rect, setRect] = useState<DOMRect | null>(null)
 
-  // We need local state for the selects so they don't immediately fire on change,
-  // or maybe they DO immediately fire on change. The user says: 
-  // "после выбора конкретной сущность открывается форма создания записи с выбранным вариантом."
-  // This means changing the select triggers the action.
+  const open = () => {
+    if (ref.current) setRect(ref.current.getBoundingClientRect())
+    setIsOpen(true)
+  }
+
+  return (
+    <>
+      <button 
+        ref={ref} 
+        onClick={open} 
+        className="w-full text-left bg-panel-base border border-panel-border-subtle rounded-xl px-3 py-2 text-xs font-medium text-panel-text-muted hover:text-panel-text hover:border-panel-text-muted transition-colors flex items-center justify-between"
+      >
+        <span className="truncate">{placeholder}</span>
+        <ChevronRight className="w-4 h-4 shrink-0 rotate-90" />
+      </button>
+      {isOpen && rect && createPortal(
+        <div className="fixed inset-0 z-50 flex" onClick={() => setIsOpen(false)}>
+           <div 
+             style={{ top: rect.bottom + 8, left: rect.left, width: Math.max(160, rect.width) }} 
+             className="absolute bg-panel-surface border border-panel-border rounded-2xl shadow-xl overflow-hidden py-1 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-100"
+             onClick={e => e.stopPropagation()}
+           >
+             {options.length === 0 ? (
+                <div className="px-4 py-3 text-xs text-panel-text-muted">Нет вариантов</div>
+             ) : options.map(opt => (
+                <button 
+                  key={opt.value} 
+                  className="w-full text-left px-4 py-2.5 text-xs font-medium text-panel-text hover:bg-panel-surface-hover transition-colors"
+                  onClick={() => { setIsOpen(false); onChange(opt.value) }}
+                >
+                  {opt.label}
+                </button>
+             ))}
+           </div>
+        </div>,
+        document.body
+      )}
+    </>
+  )
+}
+
+function DatePickerButton({ onChange }: { onChange: (val: string) => void }) {
+  return (
+    <div className="relative w-full">
+      <button className="w-full text-left bg-panel-base border border-panel-border-subtle rounded-xl px-3 py-2 text-xs font-medium text-panel-text-muted hover:text-panel-text hover:border-panel-text-muted transition-colors flex items-center justify-between pointer-events-none">
+        <span>Календарь...</span>
+        <CalendarIcon className="w-4 h-4 shrink-0" />
+      </button>
+      <input
+        type="datetime-local"
+        onChange={(e) => { if (e.target.value) onChange(e.target.value) }}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer block"
+      />
+    </div>
+  )
+}
+
+export default function QuickActionsRow({ context, workspaces = [], masters = [], services = [], onOpenForm }: QuickActionsRowProps) {
+  const [isExpanded, setIsExpanded] = useState(true)
 
   return (
     <div className="flex flex-col bg-panel-surface border border-panel-border rounded-[32px] shadow-sm overflow-hidden shrink-0">
@@ -43,28 +105,18 @@ export default function QuickActionsRow({ context, onOpenForm }: QuickActionsRow
         <div className="overflow-hidden">
           <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-6 pb-6 pt-2 w-full scroll-pl-6 scrollbar-none">
             
-            {/* Обычная запись */}
+            {/* Пустая запись */}
             <div
               onClick={() => onOpenForm({})}
               className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 active:scale-[0.97] transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle cursor-pointer group hover:border-panel-text-muted"
             >
               <div className="flex justify-between items-start w-full gap-2">
                 <h3 className="font-semibold text-panel-text text-base tracking-tight leading-tight">
-                  Новая запись
+                  Пустая запись
                 </h3>
                 <Plus className="h-5 w-5 text-panel-text-subtle shrink-0 translate-y-0.5 group-hover:text-panel-text transition-colors" />
               </div>
-
-              <div className="flex items-center gap-3 mt-auto">
-                <div className="h-9 w-9 rounded-xl bg-panel-base border border-panel-border-subtle flex items-center justify-center shrink-0">
-                  <Plus className="h-4 w-4 text-panel-text-muted" />
-                </div>
-                <div className="flex flex-col min-w-0 pb-0.5">
-                  <span className="text-xs text-panel-text-muted-dark font-medium line-clamp-2 mt-0.5 leading-tight">
-                    Просто создать
-                  </span>
-                </div>
-              </div>
+              <div className="mt-auto text-xs text-panel-text-muted font-medium">Без заполнения</div>
             </div>
 
             {/* В пространство (только Hub) */}
@@ -74,27 +126,14 @@ export default function QuickActionsRow({ context, onOpenForm }: QuickActionsRow
                   <h3 className="font-semibold text-panel-text text-base tracking-tight leading-tight">
                     В пространство
                   </h3>
-                  <ChevronRight className="h-5 w-5 text-panel-text-subtle shrink-0 translate-y-0.5" />
                 </div>
-                <div className="flex items-center gap-3 mt-auto relative z-10">
-                  <div className="h-9 w-9 rounded-xl bg-panel-base border border-panel-border-subtle flex items-center justify-center shrink-0">
-                    <Layers className="h-4 w-4 text-panel-text-muted" />
-                  </div>
-                  <div className="flex flex-col min-w-0 pb-0.5 w-full">
-                    <select
-                      onChange={(e) => {
-                        if (e.target.value) onOpenForm({ workspaceId: e.target.value })
-                        e.target.value = "" // reset select
-                      }}
-                      className="w-full text-xs text-panel-text-muted-dark font-medium mt-0.5 leading-tight bg-transparent outline-none cursor-pointer appearance-none truncate"
-                    >
-                      <option value="" disabled selected>Выбрать...</option>
-                      <option value="ws-1">Моё пространство</option>
-                      <option value="ws-2">Барбершоп</option>
-                    </select>
-                  </div>
+                <div className="mt-auto relative z-10 w-full">
+                  <CustomSelect 
+                    placeholder="Выбрать..." 
+                    options={workspaces.map(w => ({ value: w.id, label: w.name }))}
+                    onChange={(val) => onOpenForm({ workspaceId: val })}
+                  />
                 </div>
-                {/* Invisible absolute overlay to trigger full card click? No, we have a select inside. */}
               </div>
             )}
 
@@ -105,57 +144,34 @@ export default function QuickActionsRow({ context, onOpenForm }: QuickActionsRow
                   <h3 className="font-semibold text-panel-text text-base tracking-tight leading-tight">
                     К мастеру
                   </h3>
-                  <ChevronRight className="h-5 w-5 text-panel-text-subtle shrink-0 translate-y-0.5" />
                 </div>
-                <div className="flex items-center gap-3 mt-auto relative z-10">
-                  <div className="h-9 w-9 rounded-xl bg-panel-base border border-panel-border-subtle flex items-center justify-center shrink-0">
-                    <UserRound className="h-4 w-4 text-panel-text-muted" />
-                  </div>
-                  <div className="flex flex-col min-w-0 pb-0.5 w-full">
-                    <select
-                      onChange={(e) => {
-                        if (e.target.value) onOpenForm({ masterId: e.target.value })
-                        e.target.value = ""
-                      }}
-                      className="w-full text-xs text-panel-text-muted-dark font-medium mt-0.5 leading-tight bg-transparent outline-none cursor-pointer appearance-none truncate"
-                    >
-                      <option value="" disabled selected>Выбрать...</option>
-                      <option value="me">Я (Александр)</option>
-                      <option value="other">Елена</option>
-                    </select>
-                  </div>
+                <div className="mt-auto relative z-10 w-full">
+                  <CustomSelect 
+                    placeholder="Выбрать..." 
+                    options={masters.map(m => ({ value: m.id, label: m.name }))}
+                    onChange={(val) => onOpenForm({ masterId: val })}
+                  />
                 </div>
               </div>
             )}
 
-            {/* На услугу */}
-            <div className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle relative group">
-              <div className="flex justify-between items-start w-full gap-2 pointer-events-none">
-                <h3 className="font-semibold text-panel-text text-base tracking-tight leading-tight">
-                  На услугу
-                </h3>
-                <ChevronRight className="h-5 w-5 text-panel-text-subtle shrink-0 translate-y-0.5" />
-              </div>
-              <div className="flex items-center gap-3 mt-auto relative z-10">
-                <div className="h-9 w-9 rounded-xl bg-panel-base border border-panel-border-subtle flex items-center justify-center shrink-0">
-                  <Sparkles className="h-4 w-4 text-panel-text-muted" />
+            {/* На услугу (убрали из Хаба) */}
+            {context === "workspace_schedule" && (
+              <div className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle relative group">
+                <div className="flex justify-between items-start w-full gap-2 pointer-events-none">
+                  <h3 className="font-semibold text-panel-text text-base tracking-tight leading-tight">
+                    На услугу
+                  </h3>
                 </div>
-                <div className="flex flex-col min-w-0 pb-0.5 w-full">
-                  <select
-                    onChange={(e) => {
-                      if (e.target.value) onOpenForm({ serviceId: e.target.value })
-                      e.target.value = ""
-                    }}
-                    className="w-full text-xs text-panel-text-muted-dark font-medium mt-0.5 leading-tight bg-transparent outline-none cursor-pointer appearance-none truncate"
-                  >
-                    <option value="" disabled selected>Выбрать...</option>
-                    <option value="Стрижка">Стрижка</option>
-                    <option value="Окрашивание">Окрашивание</option>
-                    <option value="custom">Свободная услуга</option>
-                  </select>
+                <div className="mt-auto relative z-10 w-full">
+                  <CustomSelect 
+                    placeholder="Выбрать..." 
+                    options={services.map(s => ({ value: s.id, label: s.name }))}
+                    onChange={(val) => onOpenForm({ serviceId: val })}
+                  />
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Ко времени */}
             <div className="bg-panel-surface w-40 shrink-0 snap-start rounded-[32px] p-5 transition-all duration-150 flex flex-col justify-between h-40 shadow-sm border border-panel-border-subtle relative group">
@@ -163,21 +179,9 @@ export default function QuickActionsRow({ context, onOpenForm }: QuickActionsRow
                 <h3 className="font-semibold text-panel-text text-base tracking-tight leading-tight">
                   Ко времени
                 </h3>
-                <ChevronRight className="h-5 w-5 text-panel-text-subtle shrink-0 translate-y-0.5" />
               </div>
-              <div className="flex items-center gap-3 mt-auto relative z-10">
-                <div className="h-9 w-9 rounded-xl bg-panel-base border border-panel-border-subtle flex items-center justify-center shrink-0">
-                  <Clock className="h-4 w-4 text-panel-text-muted" />
-                </div>
-                <div className="flex flex-col min-w-0 pb-0.5 w-full">
-                  <input
-                    type="datetime-local"
-                    onChange={(e) => {
-                      if (e.target.value) onOpenForm({ startDateTime: e.target.value })
-                    }}
-                    className="w-full text-xs text-panel-text-muted-dark font-medium mt-0.5 leading-tight bg-transparent outline-none cursor-pointer appearance-none truncate"
-                  />
-                </div>
+              <div className="mt-auto relative z-10 w-full">
+                <DatePickerButton onChange={(val) => onOpenForm({ startDateTime: val })} />
               </div>
             </div>
 
