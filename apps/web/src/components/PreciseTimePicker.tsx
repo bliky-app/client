@@ -24,7 +24,7 @@ export function PreciseTimePicker({ x, y, initialHour, initialMinute, dateString
       const monthNames = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
       const dayNames = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"]
       return `${dayNames[d.getDay()]}, ${day} ${monthNames[d.getMonth()]}`
-    } catch (e) {
+    } catch {
       return dateString
     }
   })() : null

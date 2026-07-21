@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { workspaceApi } from "@/lib/api/workspaceApi"

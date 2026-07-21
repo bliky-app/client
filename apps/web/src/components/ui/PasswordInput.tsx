@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React from "react"
 import Input, { type InputTheme } from "./Input"
 import { Check, X } from "lucide-react"
@@ -15,7 +16,7 @@ export function validatePassword(password: string): PasswordValidationResult {
   const hasMinLength = password.length >= 8
   const hasUppercase = /[A-ZА-Я]/.test(password)
   const hasNumber = /[0-9]/.test(password)
-  const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password)
+  const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]/.test(password)
 
   const errors: string[] = []
   if (!hasMinLength) errors.push("Минимум 8 символов")

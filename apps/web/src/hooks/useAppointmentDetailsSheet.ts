@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from "react"
 import type { Appointment, ServiceStage } from "@/types/models"
 import { usePermissions } from "@/lib/permissions"

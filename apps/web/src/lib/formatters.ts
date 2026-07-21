@@ -83,7 +83,7 @@ export const getDefaultTimezone = (): string => {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
     if (tz) return tz
-  } catch (e) {
+  } catch {
     // ignore
   }
   return "Europe/Moscow"
