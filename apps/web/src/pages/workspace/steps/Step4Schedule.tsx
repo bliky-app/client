@@ -66,7 +66,7 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
 
   return (
     <div className="flex flex-col gap-6 py-2">
-      <div className="flex items-center justify-between px-2">
+      <div className="flex items-center justify-between px-1">
         <p className="text-sm font-semibold text-panel-text-muted-dark uppercase tracking-wider">
           Рабочие дни
         </p>
@@ -76,7 +76,7 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
       </div>
 
       <div className="flex flex-col bg-panel-surface border border-panel-border rounded-3xl overflow-hidden shadow-sm">
-        {DAYS.map(({ key, label, short }, idx) => {
+        {DAYS.map(({ key, short }, idx) => {
           const enabled = isEnabled(key)
           const slot = schedule[key]?.[0]
           const isWeekend = key === 0 || key === 6
@@ -85,61 +85,50 @@ export default function Step4Schedule({ data, onChange }: Step4ScheduleProps) {
           return (
             <div
               key={key}
-              className={`flex items-center gap-4 px-5 py-4 transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3.5 ${
                 !isLast ? "border-b border-panel-border-subtle" : ""
-              } ${!enabled ? "bg-panel-base/30" : ""}`}
+              } ${!enabled ? "opacity-50" : ""}`}
             >
-              {/* Toggle switch */}
+              {/* Toggle */}
               <button
                 type="button"
                 onClick={() => toggleDay(key)}
-                className={`relative w-11 h-6 rounded-full shrink-0 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-panel-text-muted ${
+                className={`relative w-10 h-5.5 h-[22px] rounded-full shrink-0 transition-colors duration-200 ${
                   enabled ? "bg-panel-text" : "bg-panel-border"
                 }`}
               >
-                <div className={`absolute top-[2px] w-5 h-5 rounded-full bg-panel-base shadow-sm transition-transform duration-200 ${
-                  enabled ? "translate-x-5" : "translate-x-[2px]"
+                <div className={`absolute top-[2px] w-[18px] h-[18px] rounded-full bg-panel-base shadow-sm transition-transform duration-200 ${
+                  enabled ? "translate-x-[20px]" : "translate-x-[2px]"
                 }`} />
               </button>
 
-              {/* Day label */}
-              <div className="w-28 shrink-0">
-                <span className={`text-base font-medium ${
-                  enabled
-                    ? (isWeekend ? "text-red-500" : "text-panel-text")
-                    : "text-panel-text-muted"
-                }`}>
-                  <span className="hidden sm:inline">{label}</span>
-                  <span className="sm:hidden">{short}</span>
-                </span>
-              </div>
+              {/* Day — short name */}
+              <span className={`text-base flex-1 min-w-0 font-semibold ${
+                enabled ? (isWeekend ? "text-red-500" : "text-panel-text") : "text-panel-text-muted"
+              }`}>
+                {short}
+              </span>
 
-              {/* Time inputs or Off label */}
-              <div className="flex items-center gap-2 ml-auto">
-                {enabled && slot ? (
-                  <>
-                    <div className="relative group">
-                      <input
-                        type="time"
-                        value={slot.start}
-                        onChange={e => updateTime(key, "start", e.target.value)}
-                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[115px]"
-                      />
-                    </div>
-                    <span className="text-panel-text-subtle text-sm font-medium">—</span>
-                    <div className="relative group">
-                      <input
-                        type="time"
-                        value={slot.end}
-                        onChange={e => updateTime(key, "end", e.target.value)}
-                        className="bg-panel-base hover:bg-panel-surface-hover border border-panel-border-subtle hover:border-panel-text-muted rounded-lg px-2 py-1.5 text-sm font-medium text-panel-text outline-none focus:border-panel-text focus:ring-1 focus:ring-panel-text transition-all cursor-pointer w-[115px]"
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <span className="text-sm font-medium text-panel-text-subtle pr-4">Выходной</span>
-                )}
-              </div>
+              {/* Time inputs or "Выходной" */}
+              {enabled && slot ? (
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <input
+                    type="time"
+                    value={slot.start}
+                    onChange={e => updateTime(key, "start", e.target.value)}
+                    className="bg-panel-base border border-panel-border-subtle rounded-lg px-1.5 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-[5.5rem]"
+                  />
+                  <span className="text-panel-text-subtle text-sm">—</span>
+                  <input
+                    type="time"
+                    value={slot.end}
+                    onChange={e => updateTime(key, "end", e.target.value)}
+                    className="bg-panel-base border border-panel-border-subtle rounded-lg px-1.5 py-1 text-sm font-medium text-panel-text outline-none focus:border-panel-text transition-all w-[5.5rem]"
+                  />
+                </div>
+              ) : (
+                <span className="text-sm text-panel-text-subtle shrink-0">Выходной</span>
+              )}
             </div>
           )
         })}
