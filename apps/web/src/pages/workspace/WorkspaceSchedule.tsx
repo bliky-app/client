@@ -56,10 +56,16 @@ export default function WorkspaceSchedule({ workspace, forcedViewType }: Workspa
           <div className="flex-1 flex flex-col min-h-0 gap-6 p-4 sm:p-6 pb-0">
             <QuickActionsRow 
               context="workspace_schedule" 
-              masters={workspace.staff?.map(s => ({ id: s.id, name: s.user?.shortName || s.user?.fullName || s.id })) || []}
+              masters={workspace.staff?.map(s => ({ 
+                id: s.id, 
+                name: s.user?.shortName || s.user?.fullName || s.id,
+                subtitle: s.mainCategory?.name,
+                color: s.user?.color,
+                avatarUrl: s.user?.avatarUrl
+              })) || []}
               services={[
-                { id: "srv-1", name: "Стрижка" },
-                { id: "srv-2", name: "Окрашивание" },
+                { id: "srv-1", name: "Стрижка", subtitle: "60 мин • 1500 ₽" },
+                { id: "srv-2", name: "Окрашивание", subtitle: "120 мин • 4000 ₽" },
                 { id: "custom", name: "Свободная услуга" }
               ]}
               showMasterCard={workspace.type !== "individual" && canViewGlobalSchedule}

@@ -378,16 +378,18 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       <span className="text-sm text-panel-text-muted truncate">{selectedWorkspace?.address || "Пространство"}</span>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => {
-                      setDraft({ ...draft, workspaceId: undefined, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
-                      setIsWorkspaceSearchActive(true)
-                      setAutoOpenField("workspace")
-                    }} 
-                    className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
-                  >
-                    Изменить
-                  </button>
+                  {!initialData?.workspaceId && (
+                    <button 
+                      onClick={() => {
+                        setDraft({ ...draft, workspaceId: undefined, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
+                        setIsWorkspaceSearchActive(true)
+                        setAutoOpenField("workspace")
+                      }} 
+                      className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
+                    >
+                      Изменить
+                    </button>
+                  )}
                 </div>
               )}
             </div>

@@ -15,13 +15,13 @@ export interface QuickActionDraft {
 interface QuickActionsRowProps {
   context: QuickActionContext
   workspaces?: Workspace[]
-  masters?: { id: string, name: string }[]
-  services?: { id: string, name: string }[]
+  masters?: { id: string, name: string, subtitle?: string, color?: string, avatarUrl?: string }[]
+  services?: { id: string, name: string, subtitle?: string }[]
   showMasterCard?: boolean
   onOpenForm: (draft: QuickActionDraft) => void
 }
 
-function CustomSelect({ placeholder, options, onChange }: { placeholder: string, options: {value: string, label: string}[], onChange: (val: string) => void }) {
+function CustomSelect({ placeholder, options, onChange }: { placeholder: string, options: {value: string, label: string, subtitle?: string, color?: string, avatarUrl?: string}[], onChange: (val: string) => void }) {
   const [isOpen, setIsOpen] = useState(false)
   const ref = useRef<HTMLButtonElement>(null)
   const [rect, setRect] = useState<DOMRect | null>(null)
@@ -53,10 +53,25 @@ function CustomSelect({ placeholder, options, onChange }: { placeholder: string,
              ) : options.map(opt => (
                 <button 
                   key={opt.value} 
-                  className="w-full text-left px-4 py-2.5 text-xs font-medium text-panel-text hover:bg-panel-surface-hover transition-colors"
+                  className="w-full text-left px-4 py-2.5 hover:bg-panel-surface-hover transition-colors flex items-center gap-3"
                   onClick={() => { setIsOpen(false); onChange(opt.value) }}
                 >
-                  {opt.label}
+                  {opt.avatarUrl ? (
+                    <img src={opt.avatarUrl} alt={opt.label} className="w-8 h-8 rounded-full object-cover shrink-0 border border-panel-border-subtle" />
+                  ) : (
+                    (opt.subtitle || opt.color) ? (
+                      <div 
+                        className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-xs shrink-0 text-white"
+                        style={{ backgroundColor: opt.color || 'var(--panel-text)' }}
+                      >
+                        {opt.label?.[0]?.toUpperCase()}
+                      </div>
+                    ) : null 
+                  )}
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-medium text-panel-text truncate">{opt.label}</span>
+                    {opt.subtitle && <span className="text-xs text-panel-text-muted truncate">{opt.subtitle}</span>}
+                  </div>
                 </button>
              ))}
            </div>
@@ -130,7 +145,7 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
                 <div className="mt-auto relative z-10 w-full">
                   <CustomSelect 
                     placeholder="Выбрать" 
-                    options={workspaces.map(w => ({ value: w.id, label: w.name }))}
+                    options={workspaces.map(w => ({ value: w.id, label: w.name, subtitle: w.address, color: w.color, avatarUrl: w.avatarUrl }))}
                     onChange={(val) => onOpenForm({ workspaceId: val })}
                   />
                 </div>
@@ -148,7 +163,7 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
                 <div className="mt-auto relative z-10 w-full">
                   <CustomSelect 
                     placeholder="Выбрать" 
-                    options={masters.map(m => ({ value: m.id, label: m.name }))}
+                    options={masters.map(m => ({ value: m.id, label: m.name, subtitle: m.subtitle, color: m.color, avatarUrl: m.avatarUrl }))}
                     onChange={(val) => onOpenForm({ masterId: val })}
                   />
                 </div>
@@ -166,7 +181,7 @@ export default function QuickActionsRow({ context, workspaces = [], masters = []
                 <div className="mt-auto relative z-10 w-full">
                   <CustomSelect 
                     placeholder="Выбрать" 
-                    options={services.map(s => ({ value: s.id, label: s.name }))}
+                    options={services.map(s => ({ value: s.id, label: s.name, subtitle: s.subtitle }))}
                     onChange={(val) => onOpenForm({ serviceId: val })}
                   />
                 </div>
