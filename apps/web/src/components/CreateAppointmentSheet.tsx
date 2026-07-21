@@ -194,6 +194,8 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
   const [isClientSearchActive, setIsClientSearchActive] = useState(!initialData?.clientId)
   const [isMasterSearchActive, setIsMasterSearchActive] = useState(!initialData?.masterId)
   const [isServiceSearchActive, setIsServiceSearchActive] = useState(!initialData?.serviceId)
+  
+  const [autoOpenField, setAutoOpenField] = useState<string | null>(null)
 
   const [clientSearch, setClientSearch] = useState("")
   const [newClientName, setNewClientName] = useState("")
@@ -303,7 +305,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                   }}
                   options={workspaces?.map(w => ({ id: w.id, name: w.name, avatarUrl: w.avatarUrl })) || []}
                   placeholder="Выберите пространство..."
-                  autoOpen={true}
+                  autoOpen={autoOpenField === "workspace"}
                 />
               ) : (
                 <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm">
@@ -324,6 +326,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                     onClick={() => {
                       setDraft({ ...draft, workspaceId: undefined, masterId: undefined, serviceId: undefined, stages: undefined, price: undefined })
                       setIsWorkspaceSearchActive(true)
+                      setAutoOpenField("workspace")
                     }} 
                     className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
                   >
@@ -489,7 +492,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                         onChange={val => { setDraft({ ...draft, masterId: val }); setIsMasterSearchActive(false) }}
                         options={MOCK_MASTERS}
                         placeholder="Выберите мастера..."
-                        autoOpen={true}
+                        autoOpen={autoOpenField === "master"}
                       />
                     ) : (
                       <div className="flex items-center justify-between p-4 bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm h-full min-h-[82px]">
@@ -510,6 +513,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                           onClick={() => {
                             setDraft({ ...draft, masterId: undefined })
                             setIsMasterSearchActive(true)
+                            setAutoOpenField("master")
                           }} 
                           className="px-4 py-2 bg-panel-base border border-panel-border-subtle rounded-xl text-sm font-medium text-panel-text"
                         >
@@ -572,7 +576,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                       options={MOCK_SERVICES.map(s => ({ id: s.id, name: s.name, subtitle: `${s.stages.reduce((acc, st) => acc + st.durationMinutes, 0)} мин • ${s.price} ₽` }))}
                       placeholder="Выберите услугу..."
                       showCustomOption={true}
-                      autoOpen={true}
+                      autoOpen={autoOpenField === "service"}
                     />
                   ) : (
                     <div className="flex flex-col bg-panel-surface border border-panel-border-subtle rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">
@@ -604,6 +608,7 @@ export default function CreateAppointmentSheet({ isOpen, onClose, initialData, w
                           onClick={() => {
                             setDraft({ ...draft, serviceId: undefined, customService: undefined, stages: undefined, price: undefined })
                             setIsServiceSearchActive(true)
+                            setAutoOpenField("service")
                           }} 
                           className="px-4 py-2 bg-panel-base border border-panel-border-subtle hover:border-panel-text-muted rounded-xl text-sm font-medium text-panel-text transition-colors shrink-0"
                         >
